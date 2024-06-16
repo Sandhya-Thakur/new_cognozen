@@ -12,25 +12,52 @@ yarn dev
 pnpm dev
 # or
 bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying app/page.tsx. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+This project uses next/font to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
-
+Learn More
 To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js Documentation - learn about Next.js features and API.
+Learn Next.js - an interactive Next.js tutorial.
+You can check out the Next.js GitHub repository - your feedback and contributions are welcome!
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Deploy on Vercel
+The easiest way to deploy your Next.js app is to use the Vercel Platform from the creators of Next.js.
 
-## Deploy on Vercel
+Check out our Next.js deployment documentation for more details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+MVP
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+### Steps to Commit and Push
+
+1. **Save the resolved file** in VS Code (`File > Save` or `Ctrl + S`).
+
+2. **Stage the resolved file** in the terminal:
+    ```sh
+    git add README.md
+    ```
+
+3. **Commit the merge**:
+    ```sh
+    git commit -m "Resolved merge conflicts in README.md"
+    ```
+
+4. **Push your changes to the remote repository**:
+    ```sh
+    git push -u origin main
+    ```
+
+By following these steps, you will have successfully resolved the merge conflict, committed the changes, and pushed your code to GitHub. This ensures that your `README.md` is comprehensive and your repository is ready for deployment.
+
+
+
+
+
+
+
