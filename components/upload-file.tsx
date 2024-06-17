@@ -53,7 +53,7 @@ export const FileUpload = () => {
           onSuccess: ({ chat_id }) => {
             toast.success("PDF uploaded successfully");
             console.log("Chat ID:", chat_id);
-            router.push(`/pdf/${chat_id}`);
+            //router.push(`/pdf/${chat_id}`);
           },
           onError: (error) => {
             console.log("Mutation error:", error);
