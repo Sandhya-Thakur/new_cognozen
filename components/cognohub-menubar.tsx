@@ -17,7 +17,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Message } from "ai";
 import axios from "axios";
 
-
 const baseComponents = [
   {
     title: "Pdfs",
@@ -27,7 +26,7 @@ const baseComponents = [
   },
   {
     title: "Summaries",
-    href: "/summaries",
+    href: "/summary",
     description: "View all your notes summaries",
     icon: "/summery.png",
   },
@@ -99,6 +98,12 @@ export function CognoHubMenu({ chatId }: Props) {
     router.push("/pdf");
   };
 
+  const handleSummaryClick = () => {
+    if (latestId !== null) {
+      router.push(`/summary/${latestId}`);
+    }
+  };
+
   return (
     <NavigationMenu className="text-blue-800  ">
       <NavigationMenuList>
@@ -148,7 +153,11 @@ export function CognoHubMenu({ chatId }: Props) {
                   </Button>
                 </ListItem>
                 <ListItem>
-                  <Button variant="ghost" size="rounded">
+                  <Button
+                    variant="ghost"
+                    size="rounded"
+                    onClick={handleSummaryClick}
+                  >
                     <Image
                       src="/summery.png"
                       height={50}
@@ -188,6 +197,18 @@ export function CognoHubMenu({ chatId }: Props) {
                       Chat with PDF
                     </Button>
                   )}
+                </ListItem>
+                <ListItem>
+                  <Button variant="ghost" size="rounded">
+                    <Image
+                      src="/flash-card.png"
+                      height={50}
+                      width={40}
+                      alt="cognozen"
+                      className="pr-4"
+                    />
+                    Generate Flash Notes
+                  </Button>
                 </ListItem>
               </div>
             </ul>
