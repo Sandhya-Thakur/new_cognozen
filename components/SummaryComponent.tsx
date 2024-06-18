@@ -2,7 +2,6 @@
 import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Send } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useChat, useCompletion } from "ai/react";
 import { Message } from "ai";
@@ -58,17 +57,12 @@ const SummaryComponent = ({ chatId }: Props) => {
       {/* Generate Summary Button */}
       <div className="px-32 py-4">
         <form onSubmit={handleSubmit}>
-          <div className="flex">
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Type your message here"
-              className="flex-1"
-            />
-            <Button type="submit" className="ml-2">
-              Generate
-            </Button>
-          </div>
+          <input
+            className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+            value={input}
+            placeholder="Generate summary..."
+            onChange={handleInputChange}
+          />
         </form>
       </div>
     </div>
