@@ -69,34 +69,36 @@ const PdfPage: React.FC<Props> = ({ chatId }) => {
   return (
     <div className="flex h-full overflow-scroll p-8">
       <div className="flex w-full overflow-scroll flex-wrap ">
-        
         {data.map((pdf, index) => (
           <div className="flex justify-center items-center p-8">
-          <Card key={index} className="w-[350px] p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-red-100 via-purple-100 to-blue-100">
-            <CardHeader>
-              <CardTitle>{pdf.pdfName.trim()}</CardTitle>
-              <Separator className="my-4" />
-              <CardDescription>{`Uploaded at: ${new Date(
-                pdf.createdAt
-              ).toLocaleString()}`}</CardDescription>
-              <Separator className="my-4" />
-            </CardHeader>
-            <CardContent>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <p>{`Chat ID: ${pdf.id}`}</p>
+            <Card
+              key={index}
+              className="w-[350px] p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-red-100 via-purple-100 to-blue-100"
+            >
+              <CardHeader>
+                <CardTitle>{pdf.pdfName.trim()}</CardTitle>
+                <Separator className="my-4" />
+                <CardDescription>{`Uploaded at: ${new Date(
+                  pdf.createdAt
+                ).toLocaleString()}`}</CardDescription>
+                <Separator className="my-4" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid w-full items-center gap-4">
+                  <div className="flex flex-col space-y-1.5">
+                    <p>{`Chat ID: ${pdf.id}`}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                size="sm"
-                onClick={() => router.push(`/readPdf/${pdf.id}`)}
-              >
-                View PDF
-              </Button>
-            </CardFooter>
-          </Card>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  size="sm"
+                  onClick={() => router.push(`/readPdf/${pdf.id}`)}
+                >
+                  View PDF
+                </Button>
+              </CardFooter>
+            </Card>
           </div>
         ))}
       </div>

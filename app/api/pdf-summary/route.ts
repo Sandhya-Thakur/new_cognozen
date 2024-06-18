@@ -2,7 +2,7 @@ import { Configuration, OpenAIApi } from "openai-edge";
 import { Message, OpenAIStream, StreamingTextResponse } from "ai";
 import { getContext } from "@/lib/ context";
 import { db } from "@/lib/db";
-import { chats, summaries as _summaries } from "@/lib/db/schema";
+import { chats, messages as _messages, summaries } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -14,14 +14,14 @@ const openai = new OpenAIApi(config);
 
 export async function POST(req: Request) {
   try {
-    const { summaries, chatId } = await req.json();
+    const { messages, chatId } = await req.json();
     const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
     if (_chats.length != 1) {
       return NextResponse.json({ error: "chat not found" }, { status: 404 });
     }
     const fileKey = _chats[0].fileKey;
-    const lastSummary = summaries[summaries.length - 1];
-    const context = await getContext(lastSummary.content, fileKey);
+    const lastMessage = messages[messages.length - 1];
+    const context = await getContext(lastMessage.content, fileKey);
 
     const prompt = {
       role: "system",
@@ -35,33 +35,32 @@ export async function POST(req: Request) {
       ${context}
       END OF CONTEXT BLOCK
       AI assistant will take into account any CONTEXT BLOCK that is provided in a conversation.
-      If the context does not provide the answer to a question, the AI assistant will say, "I'm sorry, but I don't know the answer to that question".
-      AI assistant will not apologize for previous responses, but instead will indicate new information was gained.
+      If the context does not provide the answer to question, the AI assistant will say, "I'm sorry, but I don't know the answer to that question".
+      AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
       AI assistant will not invent anything that is not drawn directly from the context.
-      AI assistant will generate a concise and informative summary based on the provided CONTEXT BLOCK.
       `,
     };
-
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
         prompt,
-        ...summaries.filter((summary: Message) => summary.role === "user"),
+        ...messages.filter((message: Message) => message.role === "user"),
       ],
       stream: true,
     });
     const stream = OpenAIStream(response, {
       onStart: async () => {
-        // save user summary into db
-        await db.insert(_summaries).values({
+        // save summary into db
+
+        await db.insert(summaries).values({
           chatId,
-          content: lastSummary.content,
+          content: lastMessage.content,
           role: "user",
         });
       },
       onCompletion: async (completion) => {
         // save ai message into db
-        await db.insert(_summaries).values({
+        await db.insert(summaries).values({
           chatId,
           content: completion,
           role: "system",
