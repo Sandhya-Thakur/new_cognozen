@@ -42,6 +42,17 @@ import {
     role: userSystemEnum("role").notNull(),
   });
 
+  export const flashcards = pgTable("flashcards", {
+    id: serial("id").primaryKey(),
+    chatId: integer("chat_id")
+      .references(() => chats.id)
+      .notNull(),
+    question: text("question").notNull(),
+    answer: text("answer").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    role: userSystemEnum("role").notNull(),
+  });
+
   
 
   
