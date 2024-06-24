@@ -11,7 +11,7 @@ type Props = { chatId: number };
 
 const FlashCardComponent = ({ chatId }: Props) => {
   const [hasGeneratedFlashcard, setHasGeneratedFlashcard] = useState(false);
-  
+
   const { data, isLoading } = useQuery({
     queryKey: ["chat-messages", chatId],
     queryFn: async () => {
@@ -45,7 +45,7 @@ const FlashCardComponent = ({ chatId }: Props) => {
     if (messages.length > 0) {
       setHasGeneratedFlashcard(true);
     }
-    
+
   }, [messages]);
 
 
@@ -65,7 +65,7 @@ const FlashCardComponent = ({ chatId }: Props) => {
           <Input
             className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
             value={input}
-            placeholder={hasGeneratedFlashcard ? "generate flashcards" : "generate flashcards "}
+            placeholder={hasGeneratedFlashcard ? "type generate flashcards to generate flashcards" : "type generate flashcards to generate flashcards"}
             onChange={handleInputChange}
           />
         </form>
