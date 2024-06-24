@@ -20,7 +20,7 @@ const MessageList = ({ messages, isLoading }: Props) => {
   if (!messages) return <></>;
   return (
     <div className="flex flex-col gap-4 px-4"> {/* Increased gap from 2 to 4 */}
-      {messages.map((message) => {
+      {messages.map((message) => {// Log message content to the console 
         return (
           <div
             key={message.id}

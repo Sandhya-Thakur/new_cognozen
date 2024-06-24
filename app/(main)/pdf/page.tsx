@@ -73,7 +73,7 @@ const PdfPage: React.FC<Props> = ({ chatId }) => {
           <div className="flex justify-center items-center p-8">
             <Card
               key={index}
-              className="w-[350px] p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-red-100 via-purple-100 to-blue-100"
+              className="w-[350px] p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-blue-100 via-purple-100 to-blue-100"
             >
               <CardHeader>
                 <CardTitle>{pdf.pdfName.trim()}</CardTitle>

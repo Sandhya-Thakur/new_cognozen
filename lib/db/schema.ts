@@ -47,12 +47,10 @@ import {
     chatId: integer("chat_id")
       .references(() => chats.id)
       .notNull(),
-    question: text("question").notNull(),
-    answer: text("answer").notNull(),
+    content: text("content").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     role: userSystemEnum("role").notNull(),
   });
-
   
 
   
