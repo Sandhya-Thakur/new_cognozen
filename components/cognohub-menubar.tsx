@@ -32,7 +32,7 @@ const baseComponents = [
   },
   {
     title: "Flash Notes",
-    href: "/flashcards",
+    href: "/flashCard",
     description: "View all your flashcards",
     icon: "/flash-card.png",
   },
@@ -103,6 +103,14 @@ export function CognoHubMenu({ chatId }: Props) {
       router.push(`/summary/${latestId}`);
     }
   };
+
+  const handleFlashCardClick = () => {
+    if (latestId !== null) {
+      router.push(`/flashCard/${latestId}`);
+    }
+  };
+
+
 
   return (
     <NavigationMenu className="text-blue-800  ">
@@ -199,7 +207,9 @@ export function CognoHubMenu({ chatId }: Props) {
                   )}
                 </ListItem>
                 <ListItem>
-                  <Button variant="ghost" size="rounded">
+                  <Button variant="ghost" size="rounded"
+                  onClick={handleFlashCardClick}
+                  >
                     <Image
                       src="/flash-card.png"
                       height={50}
