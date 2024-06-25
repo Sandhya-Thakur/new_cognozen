@@ -14,14 +14,14 @@ type AttentionData = {
 let attentionDataStore: AttentionData[] = [];
 let lastLoggedTime = Date.now();
 
-function logDataEveryTenSeconds() {
+function logDataEveryThirtySeconds() {
   const currentTime = Date.now();
-  const tenSeconds = 30000;
+  const thirtySeconds = 30000;
 
-  if (currentTime - lastLoggedTime >= tenSeconds) {
-    console.log("Aggregated attention data for the last 10 seconds:", attentionDataStore);
-    attentionDataStore = []; 
-    lastLoggedTime = currentTime; 
+  if (currentTime - lastLoggedTime >= thirtySeconds) {
+    console.log("Aggregated attention data for the last 30 seconds:", attentionDataStore);
+    attentionDataStore = [];
+    lastLoggedTime = currentTime;
   }
 }
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   try {
     const { attentionData }: { attentionData: AttentionData } = await req.json();
     attentionDataStore.push(attentionData); // Add received data to the store
-    logDataEveryTenSeconds(); // Check if it's time to log the data
+    logDataEveryThirtySeconds(); // Check if it's time to log the data
     return NextResponse.json({ message: "Attention data received" });
   } catch (error) {
     console.error("Error in API:", error); // Log error
