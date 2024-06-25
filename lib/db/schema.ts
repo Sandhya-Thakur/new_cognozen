@@ -51,7 +51,16 @@ import {
     createdAt: timestamp("created_at").notNull().defaultNow(),
     role: userSystemEnum("role").notNull(),
   });
-  
+
+
+
+// attention data
+
+export const attentionData = pgTable("attention_data", {
+  id: serial("id").primaryKey(),
+  attentionLevel: integer("attention_level").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 
   
 

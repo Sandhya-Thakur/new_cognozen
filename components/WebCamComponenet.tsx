@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 
-const WebcamAComponent: React.FC = () => {
+const WebcamAnalyzer: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [stopSdk, setStopSdk] = useState<(() => void) | null>(null);
@@ -153,15 +153,29 @@ const WebcamAComponent: React.FC = () => {
 
         window.addEventListener(
           sdk.modules().FACE_ATTENTION.eventName,
-          (e: any) => {
+          async (e: any) => {
+            console.log("FACE_ATTENTION event data:", e.detail);
             setAttentionData(e.detail);
+            try {
+              const response = await fetch("/api/upload-attention-data", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ attentionData: e.detail }),
+              });
+              const data = await response.json();
+              console.log("API response:", data);
+            } catch (error) {
+              console.error("Error sending attention data to API:", error);
+            }
           }
         );
 
         window.addEventListener(
           sdk.modules().FACE_EMOTION.eventName,
           (e: any) => {
-            console.log("FACE_EMOTION event data:", e.detail);
+            //console.log("FACE_EMOTION event data:", e.detail);
             setEmotionData(e.detail);
           }
         );
@@ -186,23 +200,19 @@ const WebcamAComponent: React.FC = () => {
   }, [stream]);
 
   return (
-    <div className="fixed top-8 right-4 p-8">
+    <div className="fixed top-2 right-2">
       <video
         ref={videoRef}
         autoPlay
-        className="w-40 h-40 border-2 border-transparent rounded-lg shadow-lg"
+        className="w-40 h-40 border-2 border-gray-300 rounded-lg object-cover"
       />
       {isCameraOn ? (
-        <Button size="sm" onClick={stopCamera}>
-          Turn Off Camera
-        </Button>
+        <Button onClick={stopCamera}>Turn Off Camera</Button>
       ) : (
-        <Button size="sm" onClick={startCamera}>
-          Turn On Camera
-        </Button>
+        <Button onClick={startCamera}>Turn On Camera</Button>
       )}
     </div>
   );
 };
 
-export default WebcamAComponent;
+export default WebcamAnalyzer;

@@ -6,7 +6,8 @@ import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import GetBackButton from "@/components/GetBackButton";
-import WebcamAComponent from "@/components/WebCamComponenet"
+import WebcamAComponent from "@/components/WebCamComponenet";
+import Link from "next/link";
 
 type Props = {
   params: {
@@ -39,10 +40,12 @@ const ReadPdfPage: React.FC<Props> = async ({ params: { chatId } }) => {
       <div className="flex-[4]">
         <WebcamAComponent />
       </div>
-      <div className="absolute bottom-0 right-4 p-8">
-        <GetBackButton />
+
+        <Link href="/dashboard">
+          <p className="p-4 absolute bottom-0 right-0">go to dashboard</p>
+        </Link>
       </div>
-    </div>
+
   );
 };
 
