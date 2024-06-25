@@ -64,6 +64,10 @@ export const attentionData = pgTable("attention_data", {
 
 export type DrizzleAttentionData = typeof attentionData.$inferSelect;
 
+
+
+
+
   
 
   
