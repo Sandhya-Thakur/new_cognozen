@@ -27,6 +27,8 @@ function logDataEveryThirtySeconds() {
   }
 }
 
+
+
 export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) {
@@ -36,7 +38,7 @@ export async function POST(req: Request) {
     const { attentionData }: { attentionData: AttentionData } = await req.json();
     attentionDataStore.push(attentionData); // Add received data to the store
     logDataEveryThirtySeconds(); // Check if it's time to log the data
- 
+  
     
     return NextResponse.json({ message: "Attention data received" });
   } catch (error) {

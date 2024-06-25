@@ -56,14 +56,10 @@ import {
 
 // attention data
 
-export const attentionData = pgTable("attention_data", {
-  id: serial("id").primaryKey(),
-  attentionLevel: integer("attention_level").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+export const attentionData = pgTable("attentionData", {
+  level: integer("level").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
-
-export type DrizzleAttentionData = typeof attentionData.$inferSelect;
-
 
 
 
