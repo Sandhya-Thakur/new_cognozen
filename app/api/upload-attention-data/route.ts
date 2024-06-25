@@ -16,7 +16,7 @@ let lastLoggedTime = Date.now();
 
 function logDataEveryTenSeconds() {
   const currentTime = Date.now();
-  const tenSeconds = 10000;
+  const tenSeconds = 30000;
 
   if (currentTime - lastLoggedTime >= tenSeconds) {
     console.log("Aggregated attention data for the last 10 seconds:", attentionDataStore);
