@@ -2,6 +2,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
+// Define the AttentionData type
+type AttentionData = {
+  level: number;
+  timestamp: string;
+
+};
 
 const WebcamAnalyzer: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -151,7 +157,7 @@ const WebcamAnalyzer: React.FC = () => {
             }
           );
 
-          // Add event listeners for face attention data
+          // event listeners for face attention data
         window.addEventListener(
           sdk.modules().FACE_ATTENTION.eventName,
           async (e: any) => {

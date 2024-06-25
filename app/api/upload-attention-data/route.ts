@@ -1,5 +1,7 @@
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+
 
 // Define the AttentionData type
 type AttentionData = {
