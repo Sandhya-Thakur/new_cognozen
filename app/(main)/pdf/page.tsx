@@ -80,7 +80,7 @@ const PdfPage: React.FC<Props> = ({ chatId }) => {
                 <CardTitle>{pdf.pdfName.trim()}</CardTitle>
                 <Separator className="my-4" />
                 <CardDescription>{`Uploaded at: ${new Date(
-                  pdf.createdAt
+                  pdf.createdAt,
                 ).toLocaleString()}`}</CardDescription>
                 <Separator className="my-4" />
               </CardHeader>

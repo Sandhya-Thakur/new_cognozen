@@ -11,7 +11,7 @@ export const getPineconeClient = () => {
 
 export async function getMatchesFromEmbeddings(
   embeddings: number[],
-  fileKey: string
+  fileKey: string,
 ) {
   try {
     console.log("Getting Pinecone client");
@@ -20,7 +20,7 @@ export async function getMatchesFromEmbeddings(
 
     console.log("Accessing Pinecone index: chatpdf");
     const pineconeIndex = await client.index("cognozen");
-  
+
     console.log("Pinecone index accessed");
 
     console.log("Converting fileKey to ASCII namespace");
@@ -55,7 +55,7 @@ export async function getContext(query: string, fileKey: string) {
 
   console.log("Filtering qualifying documents");
   const qualifyingDocs = matches.filter(
-    (match) => match.score && match.score > 0.7
+    (match) => match.score && match.score > 0.7,
   );
   console.log("Documents filtered");
 

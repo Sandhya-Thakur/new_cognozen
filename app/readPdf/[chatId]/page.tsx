@@ -41,11 +41,10 @@ const ReadPdfPage: React.FC<Props> = async ({ params: { chatId } }) => {
         <WebcamAComponent />
       </div>
 
-        <Link href="/dashboard">
-          <p className="p-4 absolute bottom-0 right-0">go to dashboard</p>
-        </Link>
-      </div>
-
+      <Link href="/dashboard">
+        <p className="p-4 absolute bottom-0 right-0">go to dashboard</p>
+      </Link>
+    </div>
   );
 };
 

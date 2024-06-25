@@ -6,10 +6,10 @@ import { NextResponse } from "next/server";
 export const runtime = "edge";
 
 export const POST = async (req: Request) => {
-    const { chatId } = await req.json();
-    const _summaries = await db
-        .select()
-        .from(summaries)
-        .where(eq(summaries.chatId, chatId));
-    return NextResponse.json(_summaries);
-}
+  const { chatId } = await req.json();
+  const _summaries = await db
+    .select()
+    .from(summaries)
+    .where(eq(summaries.chatId, chatId));
+  return NextResponse.json(_summaries);
+};

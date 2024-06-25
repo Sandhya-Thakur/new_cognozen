@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Loader } from "lucide-react";
-import { 
-  ClerkLoaded, 
+import {
+  ClerkLoaded,
   ClerkLoading,
   SignedIn,
   SignedOut,
@@ -9,7 +9,6 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-
 
 export const Header = () => {
   return (
@@ -26,9 +25,7 @@ export const Header = () => {
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>
-            <UserButton
-              afterSignOutUrl="/"
-            />
+            <UserButton afterSignOutUrl="/" />
           </SignedIn>
           <SignedOut>
             <SignInButton
@@ -46,4 +43,3 @@ export const Header = () => {
     </header>
   );
 };
- 

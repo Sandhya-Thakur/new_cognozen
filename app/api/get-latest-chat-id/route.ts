@@ -3,8 +3,8 @@ import { chats } from "@/lib/db/schema";
 import { NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
 
-export const dynamic = 'force-dynamic'; // static by default, unless reading the request
-export const runtime = 'edge'; // specify the runtime to be edge
+export const dynamic = "force-dynamic"; // static by default, unless reading the request
+export const runtime = "edge"; // specify the runtime to be edge
 
 export async function GET(request: Request) {
   try {
@@ -18,8 +18,9 @@ export async function GET(request: Request) {
     }
   } catch (error) {
     console.error("Failed to fetch chat IDs", error);
-    return NextResponse.json({ error: "Failed to fetch chat IDs" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch chat IDs" },
+      { status: 500 },
+    );
   }
 }
-
-

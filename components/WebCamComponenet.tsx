@@ -6,7 +6,6 @@ import { useStore } from "@/lib/store";
 type AttentionData = {
   level: number;
   timestamp: string;
-
 };
 
 const WebcamAnalyzer: React.FC = () => {
@@ -53,7 +52,7 @@ const WebcamAnalyzer: React.FC = () => {
   useEffect(() => {
     const loadScript = (
       src: string,
-      dataConfig: string | null = null
+      dataConfig: string | null = null,
     ): Promise<void> => {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -71,10 +70,10 @@ const WebcamAnalyzer: React.FC = () => {
     const downloadAiSDK = async () => {
       await loadScript(
         "https://sdk.morphcast.com/mphtools/v1.1/mphtools.js",
-        "cameraPrivacyPopup, compatibilityUI, compatibilityAutoCheck"
+        "cameraPrivacyPopup, compatibilityUI, compatibilityAutoCheck",
       );
       await loadScript(
-        "https://sdk.morphcast.com/emotion-statistics/v1.0-beta/script.js"
+        "https://sdk.morphcast.com/emotion-statistics/v1.0-beta/script.js",
       );
       await loadScript("https://ai-sdk.morphcast.com/v1.16/ai-sdk.js");
       return (window as any).CY;
@@ -154,10 +153,10 @@ const WebcamAnalyzer: React.FC = () => {
                 await statisticsUploader.stop();
                 await stop();
               }, options.stopAfter);
-            }
+            },
           );
 
-          // event listeners for face attention data
+        // event listeners for face attention data
         window.addEventListener(
           sdk.modules().FACE_ATTENTION.eventName,
           async (e: any) => {
@@ -176,7 +175,7 @@ const WebcamAnalyzer: React.FC = () => {
             } catch (error) {
               console.error("Error sending attention data to API:", error);
             }
-          }
+          },
         );
 
         window.addEventListener(
@@ -184,7 +183,7 @@ const WebcamAnalyzer: React.FC = () => {
           (e: any) => {
             //console.log("FACE_EMOTION event data:", e.detail);
             setEmotionData(e.detail);
-          }
+          },
         );
 
         (window as any).MphTools.CameraPrivacyPopup.setText({
