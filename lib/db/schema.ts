@@ -62,6 +62,8 @@ export const attentionData = pgTable("attention_data", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export type DrizzleAttentionData = typeof attentionData.$inferSelect;
+
   
 
   

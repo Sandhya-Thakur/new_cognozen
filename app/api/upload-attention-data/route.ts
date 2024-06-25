@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { attentionData} from "@/lib/db/schema";
 
 
 // Define the AttentionData type
@@ -22,6 +23,7 @@ function logDataEveryThirtySeconds() {
     console.log("Aggregated attention data for the last 30 seconds:", attentionDataStore);
     attentionDataStore = [];
     lastLoggedTime = currentTime;
+    
   }
 }
 
