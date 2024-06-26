@@ -1,4 +1,3 @@
-
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
@@ -31,11 +30,8 @@ const ChatPage: React.FC<Props> = async ({ params: { chatId } }) => {
   }
   const currentChat = _chats.find((chat) => chat.id === parseInt(chatId));
 
-
   return (
-
     <div className="flex h-full overflow-scroll">
-      
       <div className="flex w-full overflow-scroll">
         {/* å sidebar */}
         <div className="flex-[1] max-w-xs">
@@ -50,7 +46,6 @@ const ChatPage: React.FC<Props> = async ({ params: { chatId } }) => {
         </div>
       </div>
     </div>
-
   );
 };
 

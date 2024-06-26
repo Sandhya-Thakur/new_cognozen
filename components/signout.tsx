@@ -1,10 +1,5 @@
 import { Loader } from "lucide-react";
-import {
-  ClerkLoaded,
-  ClerkLoading,
-  SignedIn,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from "@clerk/nextjs";
 
 export const SignOut = () => {
   return (

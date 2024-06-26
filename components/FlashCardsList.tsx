@@ -57,7 +57,7 @@ const FlashCardList = ({ messages, isLoading }: Props) => {
                 <CardDescription>Answer: {flashcard.answer}</CardDescription>
               </CardContent>
             </Card>
-          )
+          ),
         );
       })}
     </div>

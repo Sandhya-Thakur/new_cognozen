@@ -13,7 +13,7 @@ export const Sidebar = ({ className }: Props) => {
     <div
       className={cn(
         "flex h-full lg:w-[256px] lg:fixed left-0 top-0 px-4 border-r-2 flex-col shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-50",
-        className
+        className,
       )}
     >
       <Link href="/dashboard">
@@ -25,16 +25,8 @@ export const Sidebar = ({ className }: Props) => {
         </div>
       </Link>
       <div className="flex flex-col gap-y-2 flex-1">
-        <SidebarItem
-          label="Dashboard"
-          href="/dashboard"
-          iconSrc="/dash.svg"
-        />
-        <SidebarItem
-          label="CognoHub"
-          href="/cognohub"
-          iconSrc="/library.svg"
-        />
+        <SidebarItem label="Dashboard" href="/dashboard" iconSrc="/dash.svg" />
+        <SidebarItem label="CognoHub" href="/cognohub" iconSrc="/library.svg" />
         <SidebarItem
           label="Classroom"
           href="/classroom"

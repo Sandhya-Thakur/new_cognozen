@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import axios from "axios";
 import { DrizzleChat } from "@/lib/db/schema";
 
-
 type Props = {
   chats: DrizzleChat[];
   chatId: number;
@@ -16,14 +15,10 @@ type Props = {
 const ChatSideBar = ({ chats, chatId }: Props) => {
   return (
     <div className="w-full max-h-screen overflow-scroll soff p-4 text-white bg-gray-200">
-
-      <Link href= "/cognohub">
+      <Link href="/cognohub">
         <Button size="lg" variant="secondary" className="w-full ">
-
-         
           <PlusCircle className="mr-2 w-4 h-4" />
           Upload Pdf
-         
         </Button>
       </Link>
       <div className="flex max-h-screen overflow-scroll pb-20 flex-col gap-2 mt-4">

@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 First, run the development server:
 
-```bash
+````bash
 npm run dev
 # or
 yarn dev
@@ -61,3 +61,4 @@ By following these steps, you will have successfully resolved the merge conflict
 
 
 
+````

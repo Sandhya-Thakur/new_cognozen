@@ -32,19 +32,18 @@ export async function POST(req: Request) {
 
     const chat_id = chatResult[0].insertedId;
 
-
     console.log("Chat ID:", chat_id); // Log chat ID
     return NextResponse.json(
       {
         chat_id,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error in API:", error); // Log error
     return NextResponse.json(
       { error: "internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

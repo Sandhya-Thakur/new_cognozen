@@ -28,8 +28,6 @@ const MainLayout = ({ children }: Props) => {
           {children}
         </div>
       </main>
-
-
     </>
   );
 };

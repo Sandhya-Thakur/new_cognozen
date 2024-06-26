@@ -66,7 +66,7 @@ export function CognoHubMenu({ chatId }: Props) {
     queryKey: ["chat-messages", chatId],
     queryFn: async () => {
       const response = await axios.get<Message[]>(
-        `/api/get-latest-chat-id?chatId=${chatId}`
+        `/api/get-latest-chat-id?chatId=${chatId}`,
       );
       return response.data;
     },
@@ -85,8 +85,8 @@ export function CognoHubMenu({ chatId }: Props) {
       component.title === "Pdfs"
         ? component.href
         : latestId
-        ? `${component.href}/${latestId}`
-        : component.href,
+          ? `${component.href}/${latestId}`
+          : component.href,
   }));
 
   const handleChatClick = () => {
@@ -109,8 +109,6 @@ export function CognoHubMenu({ chatId }: Props) {
       router.push(`/flashCard/${latestId}`);
     }
   };
-
-
 
   return (
     <NavigationMenu className="text-blue-800  ">
@@ -207,8 +205,10 @@ export function CognoHubMenu({ chatId }: Props) {
                   )}
                 </ListItem>
                 <ListItem>
-                  <Button variant="ghost" size="rounded"
-                  onClick={handleFlashCardClick}
+                  <Button
+                    variant="ghost"
+                    size="rounded"
+                    onClick={handleFlashCardClick}
                   >
                     <Image
                       src="/flash-card.png"
@@ -243,7 +243,7 @@ const ListItem = React.forwardRef<
           ref={ref}
           className={cn(
             "flex items-center space-y-1 space-x-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
+            className,
           )}
           href={href}
           onClick={onClick}

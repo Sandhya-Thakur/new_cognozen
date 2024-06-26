@@ -1,4 +1,3 @@
-
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { auth } from "@clerk/nextjs";
@@ -6,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import React from "react";
 import ChatSideBar from "@/components/ChatSideBar";
-import FlashCardComponent from "@/components/FlashCardComponenet"
+import FlashCardComponent from "@/components/FlashCardComponenet";
 
 type Props = {
   params: {
@@ -36,10 +35,10 @@ const FlashCardPage: React.FC<Props> = async ({ params: { chatId } }) => {
         {/* Chat */}
         <div className="flex-[3] border-l-4 border-l-slate-200">
           <FlashCardComponent chatId={parseInt(chatId)} />
-          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default FlashCardPage;

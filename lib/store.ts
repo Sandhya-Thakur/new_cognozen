@@ -1,4 +1,4 @@
-import {create} from 'zustand';
+import { create } from "zustand";
 
 interface StoreState {
   emotionData: any;
@@ -17,7 +17,3 @@ export const useStore = create<StoreState>((set) => ({
   setAttentionData: (data) => set({ attentionData: data }),
   setCameraStatus: (status) => set({ isCameraOn: status }),
 }));
-
-
-
-

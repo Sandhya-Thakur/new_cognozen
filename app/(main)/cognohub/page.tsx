@@ -89,7 +89,11 @@ const CognoHub: React.FC<Props> = ({ chatId }) => {
             <div key={card.id} className="min-w-[250px]">
               <Card className="w-[250px] p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-blue-100 via-purple-120 to-blue-150">
                 <CardHeader className="bg-transparent text-blue-800 text-xl ">
-                <CardTitle>{card.pdfName.trim().length > 10 ? `${card.pdfName.trim().substring(0, 10)}...` : card.pdfName.trim()}</CardTitle>
+                  <CardTitle>
+                    {card.pdfName.trim().length > 10
+                      ? `${card.pdfName.trim().substring(0, 10)}...`
+                      : card.pdfName.trim()}
+                  </CardTitle>
 
                   <Separator className="my-4" />
                 </CardHeader>

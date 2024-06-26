@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { chats, messages as _messages, flashcards } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { streamText } from 'ai';
+import { streamText } from "ai";
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,17 +16,21 @@ const openai = new OpenAIApi(config);
 export async function POST(req: Request) {
   try {
     const { messages, chatId } = await req.json();
-    console.log("Received request with messages:", messages, "and chatId:", chatId);
+    console.log(
+      "Received request with messages:",
+      messages,
+      "and chatId:",
+      chatId,
+    );
 
     const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
     if (_chats.length !== 1) {
       return NextResponse.json({ error: "Chat not found" }, { status: 404 });
     }
-    
+
     const fileKey = _chats[0].fileKey;
     const lastMessage = messages[messages.length - 1];
     const context = await getContext(lastMessage.content, fileKey);
-  
 
     const prompt = {
       role: "system",
@@ -59,7 +63,7 @@ export async function POST(req: Request) {
       ],
       stream: true,
     });
-    
+
     const stream = OpenAIStream(response, {
       onStart: async () => {
         // save summary into db
@@ -81,6 +85,9 @@ export async function POST(req: Request) {
     return new StreamingTextResponse(stream);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
