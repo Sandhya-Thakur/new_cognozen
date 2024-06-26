@@ -6,6 +6,8 @@ import {
     text,
     timestamp,
     varchar,
+    doublePrecision 
+
   } from "drizzle-orm/pg-core";
   
   export const userSystemEnum = pgEnum("user_system_enum", ["system", "user"]);
@@ -56,10 +58,18 @@ import {
 
 // attention data
 
+
 export const attentionData = pgTable("attentionData", {
-  level: integer("level").notNull(),
+  id: serial("id").primaryKey(), // Primary key column
+  level: doublePrecision("level").notNull(), // Use doublePrecision for float values
   timestamp: timestamp("timestamp").notNull().defaultNow(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
 });
+
+export type AttentionData = typeof attentionData.$inferSelect;
+
+
+
 
 
 

@@ -6,7 +6,6 @@ import { useStore } from "@/lib/store";
 type AttentionData = {
   level: number;
   timestamp: string;
-
 };
 
 const WebcamAnalyzer: React.FC = () => {
@@ -157,33 +156,37 @@ const WebcamAnalyzer: React.FC = () => {
             }
           );
 
-          // event listeners for face attention data
+        // Event listeners for face attention data
         window.addEventListener(
           sdk.modules().FACE_ATTENTION.eventName,
-          async (e: any) => {
-            console.log("FACE_ATTENTION event data:", e.detail);
-            setAttentionData(e.detail);
-            try {
-              const response = await fetch("/api/upload-attention-data", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ attentionData: e.detail }),
-              });
-              const data = await response.json();
-              console.log("API response:", data);
-            } catch (error) {
-              console.error("Error sending attention data to API:", error);
+          (e: any) => {
+            if (isCameraOn) {
+              console.log("FACE_ATTENTION event data:", e.detail);
+              setAttentionData(e.detail);
+              try {
+                fetch("/api/upload-attention-data", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(e.detail),
+                });
+              }
+              catch (error) {
+                console.error("Error sending attention data: ", error);
             }
           }
+          }
         );
+        // Event listeners for face emotion data
 
         window.addEventListener(
           sdk.modules().FACE_EMOTION.eventName,
           (e: any) => {
-            //console.log("FACE_EMOTION event data:", e.detail);
-            setEmotionData(e.detail);
+            if (isCameraOn) {
+              console.log("FACE_EMOTION event data:", e.detail);
+              setEmotionData(e.detail);
+            }
           }
         );
 
