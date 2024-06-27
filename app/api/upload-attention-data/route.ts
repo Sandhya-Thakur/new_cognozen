@@ -10,8 +10,6 @@ type AttentionData = {
 };
 
 let attentionDataStore: AttentionData[] = [];
-<<<<<<< HEAD
-=======
 let lastLoggedTime = Date.now();
 
 function logDataEveryThirtySeconds() {
@@ -27,7 +25,6 @@ function logDataEveryThirtySeconds() {
     lastLoggedTime = currentTime;
   }
 }
->>>>>>> 73239b525beb90395278205e6fac4fc356c7a6a0
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -35,7 +32,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   try {
-<<<<<<< HEAD
     const body = await req.json();
     const level = parseFloat(body.output.attention); // Ensure level is parsed as a float
     const timestamp = new Date().toISOString(); // Generate the current timestamp
@@ -58,12 +54,8 @@ export async function POST(req: Request) {
 
     // Add received data to the store
     attentionDataStore.push({ level, timestamp });
-=======
-    const { attentionData }: { attentionData: AttentionData } =
-      await req.json();
-    attentionDataStore.push(attentionData); // Add received data to the store
+
     logDataEveryThirtySeconds(); // Check if it's time to log the data
->>>>>>> 73239b525beb90395278205e6fac4fc356c7a6a0
 
     return NextResponse.json({ message: "Attention data received" });
   } catch (error) {
