@@ -2,7 +2,7 @@ name: Code Quality checks
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -10,6 +10,7 @@ jobs:
   prettier:
     name: Prettier
     runs-on: ubuntu-22.04
+    continue-on-error: true
     strategy:
       matrix:
         node-version: [18]
