@@ -171,12 +171,11 @@ const WebcamAnalyzer: React.FC = () => {
                   },
                   body: JSON.stringify(e.detail),
                 });
-              }
-              catch (error) {
+              } catch (error) {
                 console.error("Error sending attention data: ", error);
+              }
             }
-          }
-          }
+          },
         );
         // Event listeners for face emotion data
 
@@ -187,7 +186,7 @@ const WebcamAnalyzer: React.FC = () => {
               console.log("FACE_EMOTION event data:", e.detail);
               setEmotionData(e.detail);
             }
-          }
+          },
         );
 
         (window as any).MphTools.CameraPrivacyPopup.setText({

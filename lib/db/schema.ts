@@ -6,7 +6,7 @@ import {
   text,
   timestamp,
   varchar,
-  doublePrecision
+  doublePrecision,
 } from "drizzle-orm/pg-core";
 
 export const userSystemEnum = pgEnum("user_system_enum", ["system", "user"]);
