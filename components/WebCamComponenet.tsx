@@ -169,10 +169,9 @@ window.addEventListener(sdk.modules().FACE_ATTENTION.eventName, (e: any) => {
     console.log("FACE_ATTENTION event data:", e.detail);
     setAttentionData(e.detail);
 
-    // Store the latest attention data
+    // Stored the latest attention data
     latestAttentionData = e.detail;
 
-    // Start the interval if it's not already running
     if (!attentionInterval) {
       attentionInterval = setInterval(() => {
         if (latestAttentionData) {
@@ -186,11 +185,11 @@ window.addEventListener(sdk.modules().FACE_ATTENTION.eventName, (e: any) => {
             }).then(response => response.json())
               .then(data => {
                 console.log("Data sent to server:", data);
-                // Clear the interval after data is sent once
+                // Clearing the interval after data is sent once
                 clearInterval(attentionInterval as NodeJS.Timeout);
                 attentionInterval = null;
 
-                // Restart the interval to ensure it continues to send data every 10 seconds
+                // Restarting the interval to ensure it continues to send data every 10 seconds
                 if (isCameraOn) {
                   attentionInterval = setInterval(() => {
                     if (latestAttentionData) {
@@ -219,10 +218,10 @@ window.addEventListener(sdk.modules().FACE_ATTENTION.eventName, (e: any) => {
             console.error("Error sending attention data: ", error);
           }
         }
-      }, 10000); // 1000 milliseconds = 1 second
+      }, 10000); 
     }
   } else {
-    // Clear the interval when the camera is off
+    // Clearing the interval when the camera is off
     if (attentionInterval) {
       clearInterval(attentionInterval);
       attentionInterval = null;
