@@ -156,84 +156,85 @@ const WebcamAnalyzer: React.FC = () => {
             },
           );
 
-
-
-
-
         // Event listeners for face attention data
-let latestAttentionData: any = null;
-let attentionInterval: NodeJS.Timeout | null = null;
+        let latestAttentionData: any = null;
+        let attentionInterval: NodeJS.Timeout | null = null;
 
-window.addEventListener(sdk.modules().FACE_ATTENTION.eventName, (e: any) => {
-  if (isCameraOn) {
-    console.log("FACE_ATTENTION event data:", e.detail);
-    setAttentionData(e.detail);
+        window.addEventListener(
+          sdk.modules().FACE_ATTENTION.eventName,
+          (e: any) => {
+            if (isCameraOn) {
+              console.log("FACE_ATTENTION event data:", e.detail);
+              setAttentionData(e.detail);
 
-    // Stored the latest attention data
-    latestAttentionData = e.detail;
+              // Store the latest attention data
+              latestAttentionData = e.detail;
 
-    if (!attentionInterval) {
-      attentionInterval = setInterval(() => {
-        if (latestAttentionData) {
-          try {
-            fetch("/api/upload-attention-data", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(latestAttentionData),
-            }).then(response => response.json())
-              .then(data => {
-                console.log("Data sent to server:", data);
-                // Clearing the interval after data is sent once
-                clearInterval(attentionInterval as NodeJS.Timeout);
-                attentionInterval = null;
+              // Start the interval if it's not already running
+              if (!attentionInterval) {
+                attentionInterval = setInterval(() => {
+                  if (latestAttentionData) {
+                    try {
+                      fetch("/api/upload-attention-data", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(latestAttentionData),
+                      })
+                        .then((response) => response.json())
+                        .then((data) => {
+                          console.log("Data sent to server:", data);
+                          // Clear the interval after data is sent once
+                          clearInterval(attentionInterval as NodeJS.Timeout);
+                          attentionInterval = null;
 
-                // Restarting the interval to ensure it continues to send data every 10 seconds
-                if (isCameraOn) {
-                  attentionInterval = setInterval(() => {
-                    if (latestAttentionData) {
-                      try {
-                        fetch("/api/upload-attention-data", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify(latestAttentionData),
-                        }).then(response => response.json())
-                          .then(data => {
-                            console.log("Data sent to server:", data);
-                            // Clear the interval after data is sent once
-                            clearInterval(attentionInterval as NodeJS.Timeout);
-                            attentionInterval = null;
-                          });
-                      } catch (error) {
-                        console.error("Error sending attention data: ", error);
-                      }
+                          // Restart the interval to ensure it continues to send data every 10 seconds
+                          if (isCameraOn) {
+                            attentionInterval = setInterval(() => {
+                              if (latestAttentionData) {
+                                try {
+                                  fetch("/api/upload-attention-data", {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify(latestAttentionData),
+                                  })
+                                    .then((response) => response.json())
+                                    .then((data) => {
+                                      console.log("Data sent to server:", data);
+                                      // Clear the interval after data is sent once
+                                      clearInterval(
+                                        attentionInterval as NodeJS.Timeout,
+                                      );
+                                      attentionInterval = null;
+                                    });
+                                } catch (error) {
+                                  console.error(
+                                    "Error sending attention data: ",
+                                    error,
+                                  );
+                                }
+                              }
+                            }, 10000);
+                          }
+                        });
+                    } catch (error) {
+                      console.error("Error sending attention data: ", error);
                     }
-                  }, 10000);
-                }
-              });
-          } catch (error) {
-            console.error("Error sending attention data: ", error);
-          }
-        }
-      }, 10000); 
-    }
-  } else {
-    // Clearing the interval when the camera is off
-    if (attentionInterval) {
-      clearInterval(attentionInterval);
-      attentionInterval = null;
-    }
-  }
-});
-
-
-
-
-
-
+                  }
+                }, 10000); // 1000 milliseconds = 1 second
+              }
+            } else {
+              // Clear the interval when the camera is off
+              if (attentionInterval) {
+                clearInterval(attentionInterval);
+                attentionInterval = null;
+              }
+            }
+          },
+        );
 
         // Event listeners for face emotion data
         window.addEventListener(
