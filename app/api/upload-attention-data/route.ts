@@ -3,28 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { attentionData } from "@/lib/db/schema";
 
-// Define the AttentionData type
-type AttentionData = {
-  level: number;
-  timestamp: string;
-};
-
-let attentionDataStore: AttentionData[] = [];
-let lastLoggedTime = Date.now();
-
-function logDataEveryThirtySeconds() {
-  const currentTime = Date.now();
-  const thirtySeconds = 30000;
-
-  if (currentTime - lastLoggedTime >= thirtySeconds) {
-    console.log(
-      "Aggregated attention data for the last 30 seconds:",
-      attentionDataStore,
-    );
-    attentionDataStore = [];
-    lastLoggedTime = currentTime;
-  }
-}
+export const runtime = "edge";
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -50,12 +29,7 @@ export async function POST(req: Request) {
         insertedId: attentionData.id,
       });
 
-    console.log("Attention data result:", attentionDataResult); // Log the result
-
-    // Add received data to the store
-    attentionDataStore.push({ level, timestamp });
-
-    logDataEveryThirtySeconds(); // Check if it's time to log the data
+    console.log("Attention data got stored after every 10 seconds:", attentionDataResult); // Log the result
 
     return NextResponse.json({ message: "Attention data received" });
   } catch (error) {
