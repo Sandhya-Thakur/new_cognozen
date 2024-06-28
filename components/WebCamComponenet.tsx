@@ -247,6 +247,8 @@ const WebcamAnalyzer: React.FC = () => {
           },
         );
 
+        
+
         (window as any).MphTools.CameraPrivacyPopup.setText({
           title: "Allow us to use your camera",
           description:

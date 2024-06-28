@@ -52,6 +52,8 @@ export const flashcards = pgTable("flashcards", {
   role: userSystemEnum("role").notNull(),
 });
 
+// storing attention data
+
 export const attentionData = pgTable("attentionData", {
   id: serial("id").primaryKey(), // Primary key column
   level: doublePrecision("level").notNull(), // Use doublePrecision for float values
@@ -60,3 +62,24 @@ export const attentionData = pgTable("attentionData", {
 });
 
 export type AttentionData = typeof attentionData.$inferSelect;
+
+
+// storing emotions data
+
+
+export const emotionsData = pgTable("emotionsData", {
+  id: serial("id").primaryKey(), // Primary key column
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  angry: doublePrecision("angry").notNull(),
+  disgust: doublePrecision("disgust").notNull(),
+  fear: doublePrecision("fear").notNull(),
+  happy: doublePrecision("happy").notNull(),
+  neutral: doublePrecision("neutral").notNull(),
+  sad: doublePrecision("sad").notNull(),
+  surprise: doublePrecision("surprise").notNull(),
+  dominantEmotion: varchar("dominant_emotion", { length: 50 }).notNull(),
+  
+});
+
+export type EmotionsData = typeof emotionsData.$inferSelect;
