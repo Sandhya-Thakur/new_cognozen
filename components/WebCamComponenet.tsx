@@ -2,11 +2,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
-// Define the AttentionData type
-type AttentionData = {
-  level: number;
-  timestamp: string;
-};
+
+
 
 const WebcamAnalyzer: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -247,7 +244,7 @@ const WebcamAnalyzer: React.FC = () => {
           },
         );
 
-        
+
 
         (window as any).MphTools.CameraPrivacyPopup.setText({
           title: "Allow us to use your camera",
