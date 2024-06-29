@@ -71,7 +71,7 @@ const PdfPage: React.FC<Props> = ({ chatId }) => {
     <div className="flex h-full overflow-scroll p-8">
       <div className="flex w-full overflow-scroll flex-wrap ">
         {data.map((pdf, index) => (
-          <div className="flex justify-center items-center p-8">
+          <div key={index} className="flex justify-center items-center p-8">
             <Card
               key={index}
               className="w-[350px] p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-blue-100 via-purple-100 to-blue-100"
