@@ -1,4 +1,5 @@
 "use client";
+
 import { Header } from "./cognoHeader";
 import { CognoHubLibrary } from "@/components/cognohub-library";
 import { useRouter } from "next/navigation";
@@ -25,7 +26,9 @@ type PdfData = {
   userId: string;
 };
 
-type Props = { chatId: number };
+type Props = {
+  chatId: number;
+};
 
 const CognoHub: React.FC<Props> = ({ chatId }) => {
   const router = useRouter();
@@ -71,7 +74,7 @@ const CognoHub: React.FC<Props> = ({ chatId }) => {
     router.push("/pdf");
   };
 
-  const sampleCards = data.slice(0, 6); // Display only the first 10 PDFs
+  const sampleCards = data.slice(0, 6); // Display only the first 6 PDFs
 
   return (
     <>
@@ -94,7 +97,6 @@ const CognoHub: React.FC<Props> = ({ chatId }) => {
                       ? `${card.pdfName.trim().substring(0, 10)}...`
                       : card.pdfName.trim()}
                   </CardTitle>
-
                   <Separator className="my-4" />
                 </CardHeader>
                 <CardContent>
