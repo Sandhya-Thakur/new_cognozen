@@ -47,7 +47,7 @@ const WebcamAnalyzer: React.FC = () => {
   useEffect(() => {
     const loadScript = (
       src: string,
-      dataConfig: string | null = null,
+      dataConfig: string | null = null
     ): Promise<void> => {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -65,10 +65,10 @@ const WebcamAnalyzer: React.FC = () => {
     const downloadAiSDK = async () => {
       await loadScript(
         "https://sdk.morphcast.com/mphtools/v1.1/mphtools.js",
-        "cameraPrivacyPopup, compatibilityUI, compatibilityAutoCheck",
+        "cameraPrivacyPopup, compatibilityUI, compatibilityAutoCheck"
       );
       await loadScript(
-        "https://sdk.morphcast.com/emotion-statistics/v1.0-beta/script.js",
+        "https://sdk.morphcast.com/emotion-statistics/v1.0-beta/script.js"
       );
       await loadScript("https://ai-sdk.morphcast.com/v1.16/ai-sdk.js");
       return (window as any).CY;
@@ -148,7 +148,7 @@ const WebcamAnalyzer: React.FC = () => {
                 await statisticsUploader.stop();
                 await stop();
               }, options.stopAfter);
-            },
+            }
           );
 
         // Event listeners for face attention data
@@ -201,14 +201,14 @@ const WebcamAnalyzer: React.FC = () => {
                                       console.log("Data sent to server:", data);
                                       // Clear the interval after data is sent once
                                       clearInterval(
-                                        attentionInterval as NodeJS.Timeout,
+                                        attentionInterval as NodeJS.Timeout
                                       );
                                       attentionInterval = null;
                                     });
                                 } catch (error) {
                                   console.error(
                                     "Error sending attention data: ",
-                                    error,
+                                    error
                                   );
                                 }
                               }
@@ -228,7 +228,7 @@ const WebcamAnalyzer: React.FC = () => {
                 attentionInterval = null;
               }
             }
-          },
+          }
         );
 
         // Event listeners for face emotion data
@@ -239,7 +239,7 @@ const WebcamAnalyzer: React.FC = () => {
               console.log("FACE_EMOTION event data:", e.detail);
               setEmotionData(e.detail);
             }
-          },
+          }
         );
 
         (window as any).MphTools.CameraPrivacyPopup.setText({
