@@ -26,14 +26,10 @@ type PdfData = {
   userId: string;
 };
 
-type Props = {
-  chatId: number;
-};
-
-const CognoHub: React.FC<Props> = ({ chatId }) => {
+const CognoHub: React.FC = () => {
   const router = useRouter();
   const { data, isLoading, isError } = useQuery<PdfData[]>({
-    queryKey: ["chat-messages", chatId],
+    queryKey: ["chat-messages"],
     queryFn: async () => {
       const response = await axios.get<PdfData[]>(`/api/get-all-chat-ids`);
       return response.data;
