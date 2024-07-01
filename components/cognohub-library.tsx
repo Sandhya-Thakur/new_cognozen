@@ -1,5 +1,4 @@
 "use client";
-import { Cards } from "@/components/cards";
 
 export const CognoHubLibrary = () => {
   return (
