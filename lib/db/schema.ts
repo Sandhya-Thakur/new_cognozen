@@ -63,9 +63,7 @@ export const attentionData = pgTable("attentionData", {
 
 export type AttentionData = typeof attentionData.$inferSelect;
 
-
 // storing emotions data
-
 
 export const emotionsData = pgTable("emotionsData", {
   id: serial("id").primaryKey(), // Primary key column
@@ -79,7 +77,6 @@ export const emotionsData = pgTable("emotionsData", {
   sad: doublePrecision("sad").notNull(),
   surprise: doublePrecision("surprise").notNull(),
   dominantEmotion: varchar("dominant_emotion", { length: 50 }).notNull(),
-  
 });
 
 export type EmotionsData = typeof emotionsData.$inferSelect;

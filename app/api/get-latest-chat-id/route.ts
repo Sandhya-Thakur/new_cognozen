@@ -16,7 +16,12 @@ export async function GET(request: Request) {
   }
   try {
     // Fetch the latest chat id
-    const data = await db.select().from(chats).where(eq(chats.userId, userId)).orderBy(desc(chats.id)).limit(1);
+    const data = await db
+      .select()
+      .from(chats)
+      .where(eq(chats.userId, userId))
+      .orderBy(desc(chats.id))
+      .limit(1);
     if (data.length > 0) {
       //return NextResponse.json({ chatId: data[0].id, message: 'success' });
       return NextResponse.json(data[0].id);

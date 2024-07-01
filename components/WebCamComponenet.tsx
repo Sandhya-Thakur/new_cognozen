@@ -3,8 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 
-
-
 const WebcamAnalyzer: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -243,8 +241,6 @@ const WebcamAnalyzer: React.FC = () => {
             }
           },
         );
-
-
 
         (window as any).MphTools.CameraPrivacyPopup.setText({
           title: "Allow us to use your camera",
