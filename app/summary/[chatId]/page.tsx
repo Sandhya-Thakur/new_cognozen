@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import ChatSideBar from "@/components/ChatSideBar";
 import SummaryComponent from "@/components/SummaryComponent";
+import SummarySideBar from "@/components/SummarySideBar"
 
 type Props = {
   params: {
@@ -31,7 +32,7 @@ const SummaryPage: React.FC<Props> = async ({ params: { chatId } }) => {
       <div className="flex w-full overflow-scroll">
         {/* Sidebar */}
         <div className="flex-[1] max-w-xs">
-          <ChatSideBar chats={_chats} chatId={parseInt(chatId)} />
+          <SummarySideBar chats={_chats} chatId={parseInt(chatId)} />
         </div>
         {/* Summary component */}
         <div className="flex-[3] border-l-4 border-l-slate-200">

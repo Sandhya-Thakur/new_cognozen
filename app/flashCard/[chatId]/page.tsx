@@ -4,8 +4,8 @@ import { auth } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import React from "react";
-import ChatSideBar from "@/components/ChatSideBar";
 import FlashCardComponent from "@/components/FlashCardComponenet"
+import FlashCardSideBar from "@/components/FlashCardSideBar";
 
 type Props = {
   params: {
@@ -31,7 +31,7 @@ const FlashCardPage: React.FC<Props> = async ({ params: { chatId } }) => {
       <div className="flex w-full overflow-scroll">
         {/* Sidebar */}
         <div className="flex-[1] max-w-xs">
-          <ChatSideBar chats={_chats} chatId={parseInt(chatId)} />
+          <FlashCardSideBar chats={_chats} chatId={parseInt(chatId)} />
         </div>
         {/* FlashCardComponent */}
         <div className="flex-[3] border-l-4 border-l-slate-200">
