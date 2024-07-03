@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { auth } from "@clerk/nextjs";
-import { Loader } from "lucide-react";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import React from "react";

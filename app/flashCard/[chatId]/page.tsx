@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import React from "react";
 import ChatSideBar from "@/components/ChatSideBar";
-import FlashCardComponent from "@/components/FlashCardComponenet";
+import FlashCardComponent from "@/components/FlashCardComponenet"
 
 type Props = {
   params: {
@@ -25,6 +25,7 @@ const FlashCardPage: React.FC<Props> = async ({ params: { chatId } }) => {
   if (!_chats.find((chat) => chat.id === parseInt(chatId))) {
     return redirect("/cognohub");
   }
+
   return (
     <div className="flex h-full overflow-scroll">
       <div className="flex w-full overflow-scroll">
@@ -32,7 +33,7 @@ const FlashCardPage: React.FC<Props> = async ({ params: { chatId } }) => {
         <div className="flex-[1] max-w-xs">
           <ChatSideBar chats={_chats} chatId={parseInt(chatId)} />
         </div>
-        {/* Chat */}
+        {/* FlashCardComponent */}
         <div className="flex-[3] border-l-4 border-l-slate-200">
           <FlashCardComponent chatId={parseInt(chatId)} />
         </div>

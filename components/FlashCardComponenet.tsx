@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Input } from "./ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { useChat } from "ai/react";
@@ -10,47 +10,34 @@ import axios from "axios";
 type Props = { chatId: number };
 
 const FlashCardComponent = ({ chatId }: Props) => {
-  const [hasGeneratedFlashcard, setHasGeneratedFlashcard] = useState(false);
-
   const { data, isLoading } = useQuery({
-    queryKey: ["chat-messages", chatId],
+    queryKey: ["flashcard-details", chatId],
     queryFn: async () => {
-      const response = await axios.post<Message[]>(
-        "/api/get-flashcards-details",
-        {
-          chatId,
-        },
-      );
+      const response = await axios.post<Message[]>("/api/get-flashcards-details", { chatId });
       return response.data;
     },
   });
 
-  const { messages, input, handleSubmit, handleInputChange } = useChat({
+  const { input, handleInputChange, messages, handleSubmit } = useChat({
     api: "/api/pdf-flashcards",
-    body: {
-      chatId,
-    },
+    body: { chatId },
     initialMessages: data || [],
   });
 
   useEffect(() => {
-    const messageContainer = document.getElementById("message-container");
+    const messageContainer = document.getElementById("flashcard-container");
     if (messageContainer) {
       messageContainer.scrollTo({
         top: messageContainer.scrollHeight,
         behavior: "smooth",
       });
     }
-
-    if (messages.length > 0) {
-      setHasGeneratedFlashcard(true);
-    }
   }, [messages]);
 
   return (
     <div
-      className="relative max-h-screen overflow-scroll "
-      id="message-container"
+      className="relative max-h-screen overflow-scroll"
+      id="flashcard-container"
     >
       {/* Header */}
       <div className="px-64 py-4">
@@ -66,11 +53,7 @@ const FlashCardComponent = ({ chatId }: Props) => {
           <Input
             className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
             value={input}
-            placeholder={
-              hasGeneratedFlashcard
-                ? "type generate flashcards to generate flashcards"
-                : "type generate flashcards to generate flashcards"
-            }
+            placeholder="Type 'generate flashcards' to generate flashcards"
             onChange={handleInputChange}
           />
         </form>
