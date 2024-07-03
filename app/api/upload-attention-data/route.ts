@@ -29,10 +29,12 @@ export async function POST(req: Request) {
         insertedId: attentionData.id,
       });
 
+       // Log the result
+
     console.log(
       "Attention data got stored after every 10 seconds:",
       attentionDataResult,
-    ); // Log the result
+    );
 
     return NextResponse.json({ message: "Attention data received" });
   } catch (error) {

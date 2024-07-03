@@ -66,17 +66,17 @@ export type AttentionData = typeof attentionData.$inferSelect;
 // storing emotions data
 
 export const emotionsData = pgTable("emotionsData", {
-  id: serial("id").primaryKey(), // Primary key column
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  id: serial("id").primaryKey(), // Primary key column 
+  angry: doublePrecision("angry").notNull(), // Floating-point type for emotion intensity values
+  disgust: doublePrecision("disgust").notNull(), // Floating-point type for emotion intensity values
+  fear: doublePrecision("fear").notNull(), // Floating-point type for emotion intensity values
+  happy: doublePrecision("happy").notNull(), // Floating-point type for emotion intensity values
+  neutral: doublePrecision("neutral").notNull(), // Floating-point type for emotion intensity values
+  sad: doublePrecision("sad").notNull(), // Floating-point type for emotion intensity values
+  surprise: doublePrecision("surprise").notNull(), // Floating-point type for emotion intensity values
+  dominantEmotion: varchar("dominant_emotion", { length: 50 }).notNull(), // Varchar column
+  timestamp: timestamp("timestamp").notNull().defaultNow(), // Timestamp column
   userId: varchar("user_id", { length: 256 }).notNull(),
-  angry: doublePrecision("angry").notNull(),
-  disgust: doublePrecision("disgust").notNull(),
-  fear: doublePrecision("fear").notNull(),
-  happy: doublePrecision("happy").notNull(),
-  neutral: doublePrecision("neutral").notNull(),
-  sad: doublePrecision("sad").notNull(),
-  surprise: doublePrecision("surprise").notNull(),
-  dominantEmotion: varchar("dominant_emotion", { length: 50 }).notNull(),
 });
 
 export type EmotionsData = typeof emotionsData.$inferSelect;

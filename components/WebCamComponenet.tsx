@@ -159,7 +159,7 @@ const WebcamAnalyzer: React.FC = () => {
           sdk.modules().FACE_ATTENTION.eventName,
           (e: any) => {
             if (isCameraOn) {
-              console.log("FACE_ATTENTION event data:", e.detail);
+              //console.log("FACE_ATTENTION event data:", e.detail);
               setAttentionData(e.detail);
 
               // Store the latest attention data
@@ -231,13 +231,85 @@ const WebcamAnalyzer: React.FC = () => {
           }
         );
 
+
+        
+
         // Event listeners for face emotion data
+        let latestEmotionData: any = null;
+        let emotionInterval: NodeJS.Timeout | null = null;
+
         window.addEventListener(
           sdk.modules().FACE_EMOTION.eventName,
           (e: any) => {
             if (isCameraOn) {
-              console.log("FACE_EMOTION event data:", e.detail);
+              //console.log("FACE_EMOTION event data:", e.detail);
               setEmotionData(e.detail);
+
+              // Store the latest emotion data
+              latestEmotionData = e.detail;
+
+              // Start the interval if it's not already running
+              if (!emotionInterval) {
+                emotionInterval = setInterval(() => {
+                  if (latestEmotionData) {
+                    try {
+                      fetch("/api/upload-emotions-data", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(latestEmotionData),
+                      })
+                        .then((response) => response.json())
+                        .then((data) => {
+                          console.log("Data sent to server:", data);
+                          // Clear the interval after data is sent once
+                          clearInterval(emotionInterval as NodeJS.Timeout);
+                          emotionInterval = null;
+
+                          // Restart the interval to ensure it continues to send data every 10 seconds
+                          if (isCameraOn) {
+                            emotionInterval = setInterval(() => {
+                              if (latestEmotionData) {
+                                try {
+                                  fetch("/api/upload-emotions-data", {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify(latestEmotionData),
+                                  })
+                                    .then((response) => response.json())
+                                    .then((data) => {
+                                      console.log("Data sent to server:", data);
+                                      // Clear the interval after data is sent once
+                                      clearInterval(
+                                        emotionInterval as NodeJS.Timeout
+                                      );
+                                      emotionInterval = null;
+                                    });
+                                } catch (error) {
+                                  console.error(
+                                    "Error sending emotion data: ",
+                                    error
+                                  );
+                                }
+                              }
+                            }, 10000);
+                          }
+                        });
+                    } catch (error) {
+                      console.error("Error sending emotion data: ", error);
+                    }
+                  }
+                }, 10000); // 10000 milliseconds = 10 seconds
+              }
+            } else {
+              // Clear the interval when the camera is off
+              if (emotionInterval) {
+                clearInterval(emotionInterval);
+                emotionInterval = null;
+              }
             }
           }
         );
