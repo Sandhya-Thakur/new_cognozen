@@ -6,6 +6,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 type PdfData = {
   id: number;
@@ -60,14 +61,20 @@ const AllPdf: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
       {data.map((pdf) => (
-        <Card key={pdf.id} className="mb-4">
-          <CardHeader>
-            <CardTitle>{pdf.pdfName}</CardTitle>
+        <Card key={pdf.id} className="p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-blue-100 via-purple-120 to-blue-150">
+          <CardHeader className="bg-transparent text-blue-800 text-xl">
+            <CardTitle>
+              {pdf.pdfName.trim().length > 10
+                ? `${pdf.pdfName.trim().substring(0, 10)}...`
+                : pdf.pdfName.trim()}
+            </CardTitle>
+            <Separator className="my-4" />
           </CardHeader>
           <CardFooter>
             <Button
+              size="sm"
               onClick={() => {
                 router.push(`/readPdf/${pdf.id}`);
               }}
