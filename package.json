@@ -45,6 +45,7 @@
     "react-dom": "^18.0.0",
     "react-dropzone": "^14.2.3",
     "react-hot-toast": "^2.4.1",
+    "recharts": "^2.12.7",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.164.1",

@@ -52,7 +52,7 @@ export const flashcards = pgTable("flashcards", {
   role: userSystemEnum("role").notNull(),
 });
 
-// storing attention data
+// storing attention data for reading pdf
 
 export const attentionData = pgTable("attentionData", {
   id: serial("id").primaryKey(), // Primary key column
@@ -63,7 +63,7 @@ export const attentionData = pgTable("attentionData", {
 
 export type AttentionData = typeof attentionData.$inferSelect;
 
-// storing emotions data
+// storing emotions data for reading pdf
 
 export const emotionsData = pgTable("emotionsData", {
   id: serial("id").primaryKey(), // Primary key column 
@@ -80,3 +80,36 @@ export const emotionsData = pgTable("emotionsData", {
 });
 
 export type EmotionsData = typeof emotionsData.$inferSelect;
+
+
+// storing user data for taking quiz
+
+export const quizAttentionData = pgTable("quizAttentionData", {
+  id: serial("id").primaryKey(), // Primary key column
+  level: doublePrecision("level").notNull(), // Use doublePrecision for float values
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+});
+
+export type QuizAttentionData = typeof quizAttentionData.$inferSelect;
+
+
+// storing emotions data for taking quiz
+
+export const quizEmotionsData = pgTable("quizEmotionsData", {
+  id: serial("id").primaryKey(), // Primary key column 
+  angry: doublePrecision("angry").notNull(), // Floating-point type for emotion intensity values
+  disgust: doublePrecision("disgust").notNull(), // Floating-point type for emotion intensity values
+  fear: doublePrecision("fear").notNull(), // Floating-point type for emotion intensity values
+  happy: doublePrecision("happy").notNull(), // Floating-point type for emotion intensity values
+  neutral: doublePrecision("neutral").notNull(), // Floating-point type for emotion intensity values
+  sad: doublePrecision("sad").notNull(), // Floating-point type for emotion intensity values
+  surprise: doublePrecision("surprise").notNull(), // Floating-point type for emotion intensity values
+  dominantEmotion: varchar("dominant_emotion", { length: 50 }).notNull(), // Varchar column
+  timestamp: timestamp("timestamp").notNull().defaultNow(), // Timestamp column
+  userId: varchar("user_id", { length: 256 }).notNull(),
+});
+
+export type QuizEmotionsData = typeof quizEmotionsData.$inferSelect;
+
+
