@@ -32,7 +32,9 @@ export default function EmotionsTrackerPage() {
     { text: "Exercise for 30 minutes", completed: false },
   ]);
   const [isBreathing, setIsBreathing] = useState(false);
-  const [breathingPhase, setBreathingPhase] = useState<"Inhale" | "Hold" | "Exhale">("Inhale");
+  const [breathingPhase, setBreathingPhase] = useState<
+    "Inhale" | "Hold" | "Exhale"
+  >("Inhale");
   const [timer, setTimer] = useState(4);
   const [cycles, setCycles] = useState(0);
 
@@ -353,8 +355,8 @@ export default function EmotionsTrackerPage() {
       </main>
       <footer className="flex flex-col items-center p-4 mt-8">
         <button className="bg-indigo-500 text-white py-4 px-8 rounded-2xl hover:bg-indigo-300 transition-all duration-300">
-      <Link href="/dashboard">Continue Learning</Link>
-      </button>
+          <Link href="/dashboard">Continue Learning</Link>
+        </button>
       </footer>
     </div>
   );
