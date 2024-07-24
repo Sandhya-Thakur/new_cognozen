@@ -25,8 +25,8 @@ export default function Home() {
               <SignedOut>
                 <SignUpButton
                   mode="modal"
-                  afterSignInUrl="/dashboard"
-                  afterSignUpUrl="/dashboard"
+                  afterSignInUrl="/emotionsTracker"
+                  afterSignUpUrl="/emotionsTracker"
                 >
                   <Button size="lg" className="w-full bg-transparent">
                     Get Started
@@ -34,8 +34,8 @@ export default function Home() {
                 </SignUpButton>
                 <SignInButton
                   mode="modal"
-                  afterSignInUrl="/dashboard"
-                  afterSignUpUrl="/dashboard"
+                  afterSignInUrl="/emotionsTracker"
+                  afterSignUpUrl="/emotionsTracker"
                 >
                   <Button size="lg" className="w-full bg-transparent">
                     I already have an account
@@ -44,7 +44,7 @@ export default function Home() {
               </SignedOut>
               <SignedIn>
                 <Button size="lg" className="w-full bg-transparent" asChild>
-                  <Link href="/dashboard">Continue Learning</Link>
+                  <Link href="/emotionsTracker">Continue Learning</Link>
                 </Button>
               </SignedIn>
             </ClerkLoaded>
