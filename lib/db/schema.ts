@@ -7,7 +7,9 @@ import {
   timestamp,
   varchar,
   doublePrecision,
+  boolean
 } from "drizzle-orm/pg-core";
+
 
 export const userSystemEnum = pgEnum("user_system_enum", ["system", "user"]);
 
@@ -112,4 +114,80 @@ export const quizEmotionsData = pgTable("quizEmotionsData", {
 
 export type QuizEmotionsData = typeof quizEmotionsData.$inferSelect;
 
+
+// storing mood data 
+
+export const moodData = pgTable("moodData", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  mood: varchar("mood", { length: 50 }).notNull(),
+  intensity: integer("intensity").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export type MoodData = typeof moodData.$inferSelect;
+
+
+// storing  daily journal data
+
+export const journalEntries = pgTable("journalEntries", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type JournalEntry = typeof journalEntries.$inferSelect;
+
+
+// upload gratitude data
+
+export const gratitudeEntries = pgTable("gratitudeEntries", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type GratitudeEntry = typeof gratitudeEntries.$inferSelect;
+
+
+
+// storing emotional wellbeing goals
+
+export const emotionalWellbeingGoals = pgTable("emotionalWellbeingGoals", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  completed: boolean("completed").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type EmotionalWellbeingGoal = typeof emotionalWellbeingGoals.$inferSelect;
+
+
+// storing insights and tips
+
+export const insightsAndTips = pgTable("insightsAndTips", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  mood: varchar("mood", { length: 50 }).notNull(),
+  content : text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type InsightData = typeof insightsAndTips.$inferSelect;
+
+// storing suggested activities
+
+export const suggestedActivities = pgTable("suggestedActivities", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  mood: varchar("mood", { length: 50 }).notNull(),
+  activities: text("activities").notNull(), // This will store JSON string of activities
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type SuggestedActivity = typeof suggestedActivities.$inferSelect;
 

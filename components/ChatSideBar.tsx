@@ -4,7 +4,6 @@ import React from "react";
 import { Button } from "./ui/button";
 import { MessageCircle, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import axios from "axios";
 import { DrizzleChat } from "@/lib/db/schema";
 
 type Props = {
