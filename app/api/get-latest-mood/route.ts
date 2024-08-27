@@ -1,3 +1,5 @@
+// api/get-latest-mood
+
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { moodData } from "@/lib/db/schema";

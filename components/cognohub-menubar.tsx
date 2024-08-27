@@ -110,6 +110,12 @@ export function CognoHubMenu({ chatId }: Props) {
     }
   };
 
+  const handleFQuizClick = () => {
+    if (latestId !== null) {
+      router.push(`/quizzes/${latestId}`);
+    }
+  };
+
   return (
     <NavigationMenu className="text-blue-800  ">
       <NavigationMenuList>
@@ -175,7 +181,7 @@ export function CognoHubMenu({ chatId }: Props) {
                   </Button>
                 </ListItem>
                 <ListItem>
-                  <Button variant="ghost" size="rounded">
+                  <Button variant="ghost" size="rounded" onClick={handleFQuizClick}>
                     <Image
                       src="/q.jpg"
                       height={50}

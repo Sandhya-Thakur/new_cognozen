@@ -1,28 +1,35 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
 import { emotionsData } from "@/lib/db/schema";
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
-export const dynamic = "force-dynamic"; // static by default, unless reading the request
-export const runtime = "edge"; // specify the runtime to be edge
+import { eq, desc } from "drizzle-orm";
+
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export async function GET(request: Request) {
   const { userId } = await auth();
   if (!userId) {
-    return redirect("/sign-in");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   try {
-    const data = await db.select().from(emotionsData).where(eq(emotionsData.userId, userId));
+    const data = await db
+      .select()
+      .from(emotionsData)
+      .where(eq(emotionsData.userId, userId))
+      .orderBy(desc(emotionsData.timestamp))
+      .limit(100); // Limit to last 100 entries for performance
+
     if (data.length > 0) {
       return NextResponse.json(data);
     } else {
-      return NextResponse.json({ error: "No chat IDs found" }, { status: 404 });
+      return NextResponse.json({ message: "No emotion data found" }, { status: 404 });
     }
   } catch (error) {
-    console.error("Failed to fetch chat IDs", error);
+    console.error("Failed to fetch emotion data", error);
     return NextResponse.json(
-      { error: "Failed to fetch chat IDs" },
+      { error: "Failed to fetch emotion data" },
       { status: 500 },
     );
   }

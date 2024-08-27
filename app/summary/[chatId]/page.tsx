@@ -4,7 +4,6 @@ import { auth } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import React from "react";
-import ChatSideBar from "@/components/ChatSideBar";
 import SummaryComponent from "@/components/SummaryComponent";
 import SummarySideBar from "@/components/SummarySideBar"
 

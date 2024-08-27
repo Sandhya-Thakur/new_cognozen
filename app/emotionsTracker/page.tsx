@@ -2,16 +2,14 @@
 import React from "react";
 import Link from "next/link";
 import MoodSelector from "@/components/MoodSelector";
-import MoodHistory from "@/components/MoodHistory";
-import MoodTrendsData from "@/components/MoodTrendsData";
-import MoodComparison from "@/components/MoodComparison";
-import JournalComponent from "@/components/SeeJournalComponent";
-import GratitudeJournal from "@/components/GratitudeJournal";
-import EmotionalWellbeingGoals from "@/components/emotionalWellbeingGoals";
+
 import GuidedBreathingExercise from "@/components/GuidedBreathingExercise";
 import InsightsAndTips from "@/components/InsightsAndTips";
 import { useState, useEffect } from "react";
 import SuggestedActivities from "@/components/SuggestedActivities";
+import JournalEntryForm from "@/components/JournalEntryForm";
+import GratitudeEntryForm from "@/components/GratitudeEntryForm";
+import GoalEntryForm from "@/components/GoalEntryForm";
 // Define your moods array here or import it from a separate file
 const moods = [
   { image: "/happy.png", mood: "Happy", color: "bg-yellow-100" },
@@ -24,6 +22,7 @@ const moods = [
 
 export default function EmotionsTrackerPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+
   const handleMoodSelect = (mood: string | null) => {
     console.log("Mood selected in EmotionsTrackerPage:", mood);
     setSelectedMood(mood);
@@ -41,23 +40,17 @@ export default function EmotionsTrackerPage() {
 
       <main className="flex flex-col items-center p-4 mt-8">
         <MoodSelector moods={moods} onMoodSelect={handleMoodSelect} />
+
         <div className="mt-12 w-full">
-          <MoodHistory />
+          <JournalEntryForm />
         </div>
+
         <div className="mt-12 w-full">
-          <MoodTrendsData />
+          <GratitudeEntryForm />
         </div>
+
         <div className="mt-12 w-full">
-          <MoodComparison />
-        </div>
-        <div className="mt-12 w-full">
-          <JournalComponent />
-        </div>
-        <div className="mt-12 w-full">
-          <GratitudeJournal />
-        </div>
-        <div className="mt-12 w-full">
-          <EmotionalWellbeingGoals />
+          <GoalEntryForm />
         </div>
 
         <div className="mt-12 w-full">
@@ -68,7 +61,7 @@ export default function EmotionsTrackerPage() {
 
         <div className="mt-12 w-full">
           <div>
-          <SuggestedActivities />
+            <SuggestedActivities />
           </div>
         </div>
 
@@ -79,7 +72,7 @@ export default function EmotionsTrackerPage() {
 
       <footer className="flex flex-col items-center p-4 mt-8">
         <button className="bg-indigo-500 text-white py-4 px-8 rounded-2xl hover:bg-indigo-300 transition-all duration-300">
-          <Link href="/dashboard">Continue Learning</Link>
+          <Link href="/habitsTracker">Continue</Link>
         </button>
       </footer>
     </div>

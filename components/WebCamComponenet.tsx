@@ -159,7 +159,7 @@ const WebcamAnalyzer: React.FC = () => {
           sdk.modules().FACE_ATTENTION.eventName,
           (e: any) => {
             if (isCameraOn) {
-              //console.log("FACE_ATTENTION event data:", e.detail);
+              console.log("FACE_ATTENTION event data:", e.detail);
               setAttentionData(e.detail);
 
               // Store the latest attention data
@@ -219,7 +219,7 @@ const WebcamAnalyzer: React.FC = () => {
                       console.error("Error sending attention data: ", error);
                     }
                   }
-                }, 10000); // 1000 milliseconds = 1 second
+                }, 10000); // 10000 milliseconds = 10 seconds
               }
             } else {
               // Clear the interval when the camera is off
@@ -231,9 +231,6 @@ const WebcamAnalyzer: React.FC = () => {
           }
         );
 
-
-        
-
         // Event listeners for face emotion data
         let latestEmotionData: any = null;
         let emotionInterval: NodeJS.Timeout | null = null;
@@ -242,7 +239,7 @@ const WebcamAnalyzer: React.FC = () => {
           sdk.modules().FACE_EMOTION.eventName,
           (e: any) => {
             if (isCameraOn) {
-              //console.log("FACE_EMOTION event data:", e.detail);
+              console.log("FACE_EMOTION event data:", e.detail);
               setEmotionData(e.detail);
 
               // Store the latest emotion data
@@ -331,20 +328,25 @@ const WebcamAnalyzer: React.FC = () => {
     return () => {
       stopCamera();
     };
-  }, [stream]);
-
+  }, [stream, isCameraOn, setCameraStatus, setEmotionData, setAttentionData]);
   return (
-    <div className="fixed top-2 right-2">
-      <video
-        ref={videoRef}
-        autoPlay
-        className="w-40 h-40 border-2 border-gray-300 rounded-lg object-cover"
-      />
-      {isCameraOn ? (
-        <Button onClick={stopCamera}>Turn Off Camera</Button>
-      ) : (
-        <Button onClick={startCamera}>Turn On Camera</Button>
-      )}
+    <div className="w-full h-full flex flex-col items-center justify-center space-y-2">
+      <div className="relative w-full aspect-video">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="w-full h-full object-cover border-2 border-gray-300 rounded-lg"
+        />
+      </div>
+      <Button
+        onClick={isCameraOn ? stopCamera : startCamera}
+        variant={isCameraOn ? "danger" : "default"}
+        className="mt-2"
+      >
+        {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
+      </Button>
     </div>
   );
 };

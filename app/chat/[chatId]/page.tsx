@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
-import { Button } from "@/components/ui/button";
 import { auth } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -30,17 +29,17 @@ const ChatPage: React.FC<Props> = async ({ params: { chatId } }) => {
   const currentChat = _chats.find((chat) => chat.id === parseInt(chatId));
 
   return (
-    <div className="flex h-full overflow-scroll">
+    <div className="flex h-full overflow-scroll bg-white">
       <div className="flex w-full overflow-scroll">
-        {/* å sidebar */}
-        <div className="flex-[1] max-w-xs">
+        {/* sidebar */}
+        <div className="flex-[1] max-w-xs bg-blue-50">
           <ChatSideBar chats={_chats} chatId={parseInt(chatId)} />
         </div>
-        <div className="max-h-screen p-4 oveflow-scroll flex-[5]">
+        <div className="max-h-screen p-4 overflow-scroll flex-[5] bg-white">
           <PDFViewer pdf_url={currentChat?.pdfUrl || ""} />
         </div>
         {/* chat component */}
-        <div className="flex-[3] border-l-4 border-l-slate-200">
+        <div className="flex-[3] border-l-4 border-l-blue-100 bg-white">
           <ChatComponent chatId={parseInt(chatId)} />
         </div>
       </div>

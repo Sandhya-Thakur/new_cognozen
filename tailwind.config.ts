@@ -72,9 +72,40 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      backgroundImage: {
+        'rustic-leather': "url('/rustic-leather-texture.png')",
+        'old-paper': "url('/old-paper-texture.png')",
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities }: { addUtilities: Function }) {
+      const newUtilities = {
+        '.preserve-3d': {
+          transformStyle: 'preserve-3d',
+        },
+        '.backface-hidden': {
+          backfaceVisibility: 'hidden',
+        },
+        '.perspective': {
+          perspective: '1000px',
+        },
+      }
+      addUtilities(newUtilities)
+    },
+    function({ addUtilities, theme, e }: { addUtilities: Function, theme: Function, e: Function }) {
+      const degrees = theme('rotate')
+      const rotateY = Object.entries(degrees).map(([key, value]) => {
+        return {
+          [`.${e(`my-rotate-y-${key}`)}`]: {
+            transform: `rotateY(${value})`
+          }
+        }
+      })
+      addUtilities(rotateY)
+    }
+  ],
 } satisfies Config;
 
 export default config;

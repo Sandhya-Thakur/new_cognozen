@@ -1,26 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { TrendingUp } from "lucide-react";
-import { Pie, PieChart, Cell } from "recharts";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { Separator } from "@radix-ui/react-separator";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Loader } from "lucide-react";
 
-type PdfEmotionData = {
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Scatter, Cell } from 'recharts';
+import { Loader } from "lucide-react";
+import { format } from 'date-fns';
+
+type EmotionData = {
   id: number;
   timestamp: string;
   userId: string;
@@ -34,84 +21,128 @@ type PdfEmotionData = {
   surprise: number;
 };
 
-const chartConfig = {
-  happy: { label: "Happy", color: "hsl(var(--chart-1))" },
-  angry: { label: "Angry", color: "hsl(var(--chart-2))" },
-  disgust: { label: "Disgust", color: "hsl(var(--chart-3))" },
-  fear: { label: "Fear", color: "hsl(var(--chart-4))" },
-  neutral: { label: "Neutral", color: "hsl(var(--chart-5))" },
-  sad: { label: "Sad", color: "hsl(var(--chart-6))" },
-  surprise: { label: "Surprise", color: "hsl(var(--chart-7))" },
+const EMOTIONS = ['happy', 'angry', 'disgust', 'fear', 'neutral', 'sad', 'surprise'];
+const COLORS = {
+  happy: "#4caf50",
+  angry: "#f44336",
+  disgust: "#795548",
+  fear: "#9c27b0",
+  neutral: "#607d8b",
+  sad: "#2196f3",
+  surprise: "#ff9800"
 };
 
-const COLORS = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-  "hsl(var(--chart-6))",
-  "hsl(var(--chart-7))",
-];
+const EMOTION_VALUES = {
+  happy: 1,
+  angry: 2,
+  disgust: 3,
+  fear: 4,
+  neutral: 5,
+  sad: 6,
+  surprise: 7
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white p-2 shadow-md rounded-md text-sm">
+        <p className="font-semibold">{`Time: ${label}`}</p>
+        <p className="text-gray-600">{`Dominant: ${data.dominantEmotion}`}</p>
+        {EMOTIONS.map(emotion => (
+          <p key={emotion} className="flex justify-between">
+            <span style={{ color: COLORS[emotion as keyof typeof COLORS] }}>{emotion}</span>
+            <span>{data[emotion].toFixed(2)}</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 const GetPdfEmotionData: React.FC = () => {
-  const [data, setData] = useState<PdfEmotionData[] | null>(null);
+  const [data, setData] = useState<EmotionData[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
-    const fetchPdfs = async () => {
+    const fetchEmotionData = async () => {
       try {
         const response = await axios.get("/api/get-pdf-emotions-data");
         setData(response.data);
-        console.log(response.data);
       } catch (error) {
-        console.error("Failed to fetch PDFs", error);
+        console.error("Failed to fetch emotion data", error);
       }
       setIsLoading(false);
     };
-    fetchPdfs();
+    fetchEmotionData();
   }, []);
 
   if (isLoading) {
     return (
-      <div className="flex h-full justify-center items-center">
-        <Loader />
+      <div className="flex h-64 justify-center items-center">
+        <Loader className="animate-spin text-gray-500" />
       </div>
     );
   }
 
-  if (!Array.isArray(data)) {
+  if (!Array.isArray(data) || data.length === 0) {
     return (
-      <div className="flex h-full justify-center items-center">
-        <p>Unexpected data format received...</p>
+      <div className="flex h-64 justify-center items-center text-gray-500">
+        <p>No emotion data available</p>
       </div>
     );
   }
 
-  if (!data) {
-    return <div>No PDFs found</div>;
-  }
+  const formattedData = data.map(entry => ({
+    ...entry,
+    timestamp: format(new Date(entry.timestamp), "HH:mm"),
+    dominantEmotionValue: EMOTION_VALUES[entry.dominantEmotion as keyof typeof EMOTION_VALUES] || 0
+  })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Emotions levels</CardTitle>
-          <CardDescription>Emotions levels every 10 seconds</CardDescription>
-        </div>
+    <Card className="w-full shadow-sm">
+      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
+        <CardTitle className="text-sm font-semibold text-gray-800">Emotion Level while Reading</CardTitle>
       </CardHeader>
-      
-     
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          <TrendingUp size={24} />
-          <span>Emotions levels</span>
+      <CardContent className="p-4">
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={formattedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="timestamp" stroke="#888" />
+              <YAxis yAxisId="left" stroke="#888" />
+              <YAxis yAxisId="right" orientation="right" domain={[0, 8]} ticks={[1, 2, 3, 4, 5, 6, 7]} stroke="#888" />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              {EMOTIONS.map(emotion => (
+                <Line
+                  key={emotion}
+                  type="monotone"
+                  dataKey={emotion}
+                  stroke={COLORS[emotion as keyof typeof COLORS]}
+                  strokeWidth={2}
+                  dot={false}
+                  yAxisId="left"
+                />
+              ))}
+              <Scatter
+                name="Dominant Emotion"
+                data={formattedData}
+                fill="#8884d8"
+                yAxisId="right"
+              >
+                {formattedData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[entry.dominantEmotion as keyof typeof COLORS]}
+                  />
+                ))}
+              </Scatter>
+            </LineChart>
+          </ResponsiveContainer>
         </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total emotions levels for today
-        </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };

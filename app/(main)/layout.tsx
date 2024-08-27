@@ -1,9 +1,6 @@
 import { Sidebar } from "@/components/sidebar";
 import { MobileHeader } from "@/components/mobile-header";
 import { SignOut } from "@/components/signout";
-import Image from "next/image";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 type Props = {
   children: React.ReactNode;
 };

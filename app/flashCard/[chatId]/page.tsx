@@ -27,15 +27,22 @@ const FlashCardPage: React.FC<Props> = async ({ params: { chatId } }) => {
   }
 
   return (
-    <div className="flex h-full overflow-scroll">
-      <div className="flex w-full overflow-scroll">
-        {/* Sidebar */}
-        <div className="flex-[1] max-w-xs">
+    <div className="flex flex-col md:flex-row h-screen bg-white">
+      {/* Sidebar */}
+      <div className="w-full md:w-64 bg-blue-50 shadow-md md:shadow-none">
+        <div className="p-4">
+          <h2 className="text-xl font-semibold text-blue-900 mb-4">Flashcards</h2>
           <FlashCardSideBar chats={_chats} chatId={parseInt(chatId)} />
         </div>
-        {/* FlashCardComponent */}
-        <div className="flex-[3] border-l-4 border-l-slate-200">
-          <FlashCardComponent chatId={parseInt(chatId)} />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 md:p-8">
+          <h1 className="text-2xl font-bold text-blue-900 mb-4 md:mb-6">Flashcards</h1>
+          <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 border border-blue-200">
+            <FlashCardComponent chatId={parseInt(chatId)} />
+          </div>
         </div>
       </div>
     </div>

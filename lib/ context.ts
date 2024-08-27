@@ -1,7 +1,6 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 import { convertToAscii } from "./utils";
-import { getEmbeddings } from "@/lib/ embeddings";
-
+import { getEmbeddings } from "@/lib/ embeddings"
 export const getPineconeClient = () => {
   console.log("Initializing Pinecone client");
   return new Pinecone({
@@ -18,14 +17,14 @@ export async function getMatchesFromEmbeddings(
     const client = await getPineconeClient();
     console.log("Pinecone client obtained");
 
-    console.log("Accessing Pinecone index: chatpdf");
+    console.log("Accessing Pinecone index: cognozen");
     const pineconeIndex = await client.index("cognozen");
 
     console.log("Pinecone index accessed");
 
     console.log("Converting fileKey to ASCII namespace");
     const namespace = pineconeIndex.namespace(convertToAscii(fileKey));
-    console.log("Namespace created");
+    console.log("Namespace created:", convertToAscii(fileKey));
 
     console.log("Querying namespace with embeddings");
 
@@ -34,7 +33,7 @@ export async function getMatchesFromEmbeddings(
       vector: embeddings,
       includeMetadata: true,
     });
-    console.log("Query completed");
+    console.log("Query completed, number of matches:", queryResult.matches?.length);
 
     console.log("Returning matches");
     return queryResult.matches || [];
@@ -47,17 +46,22 @@ export async function getMatchesFromEmbeddings(
 export async function getContext(query: string, fileKey: string) {
   console.log("Getting embeddings for query:", query);
   const queryEmbeddings = await getEmbeddings(query);
-  console.log("Embeddings obtained");
+  console.log("Embeddings obtained, length:", queryEmbeddings.length);
 
   console.log("Getting matches from embeddings");
   const matches = await getMatchesFromEmbeddings(queryEmbeddings, fileKey);
-  console.log("Matches obtained");
+  console.log("Matches obtained, count:", matches.length);
+
+  // Log all match scores
+  matches.forEach((match, index) => {
+    console.log(`Match ${index + 1} score:`, match.score);
+  });
 
   console.log("Filtering qualifying documents");
   const qualifyingDocs = matches.filter(
-    (match) => match.score && match.score > 0.7,
+    (match) => match.score && match.score > 0.7, // Lowered threshold to 0.5
   );
-  console.log("Documents filtered");
+  console.log("Documents filtered, qualifying count:", qualifyingDocs.length);
 
   type Metadata = {
     text: string;
@@ -65,9 +69,27 @@ export async function getContext(query: string, fileKey: string) {
   };
 
   console.log("Mapping documents to their text");
-  let docs = qualifyingDocs.map((match) => (match.metadata as Metadata).text);
-  console.log("Documents mapped");
+  let docs = qualifyingDocs.map((match) => {
+    const metadata = match.metadata as Metadata;
+    console.log("Document metadata:", metadata);
+    return metadata.text;
+  });
+  console.log("Documents mapped, count:", docs.length);
+
+  // If we still have no docs, use all matches regardless of score
+  if (docs.length === 0) {
+    console.log("No qualifying docs, using all matches");
+    docs = matches.map((match) => {
+      const metadata = match.metadata as Metadata;
+      console.log("Document metadata:", metadata);
+      return metadata.text;
+    });
+    console.log("All documents mapped, count:", docs.length);
+  }
 
   console.log("Joining document texts and returning result");
-  return docs.join("\n").substring(0, 3000);
+  const result = docs.join("\n").substring(0, 3000);
+  console.log("Final context length:", result.length);
+
+  return result;
 }

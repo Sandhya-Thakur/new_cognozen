@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect } from "react";
 import { Input } from "./ui/input";
 import { useQuery } from "@tanstack/react-query";
@@ -36,24 +37,26 @@ const FlashCardComponent = ({ chatId }: Props) => {
 
   return (
     <div
-      className="relative max-h-screen overflow-scroll"
+      className="relative max-h-screen overflow-scroll bg-white"
       id="flashcard-container"
     >
       {/* Header */}
-      <div className="px-64 py-4">
-        <h3 className="text-xl font-bold">Generate Flashcards</h3>
+      <div className="bg-blue-100 px-8 py-6 shadow-md">
+        {/* You can add a header title or additional content here if needed */}
       </div>
+      
       {/* Chat list */}
       <div className="mb-4">
         <FlashCardList messages={messages} isLoading={isLoading} />
       </div>
+      
       {/* Generate Flashcards */}
-      <div className="px-32 py-8">
+      <div className="fixed bottom-0 left-0 right-0 bg-blue-100 px-8 py-6 shadow-lg">
         <form onSubmit={handleSubmit}>
           <Input
-            className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+            className="w-full max-w-3xl mx-auto p-3 border border-blue-300 rounded-lg shadow-inner bg-white text-blue-900 placeholder-blue-400"
             value={input}
-            placeholder="Type 'generate flashcards' to generate flashcards"
+            placeholder="Type 'generate flashcards' to create new flashcards"
             onChange={handleInputChange}
           />
         </form>

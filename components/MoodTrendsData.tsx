@@ -1,16 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  ScatterChart,
-  Scatter,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  ZAxis,
+  Legend,
+  ReferenceLine,
 } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { startOfWeek, endOfWeek, format, isWithinInterval } from 'date-fns';
 
 interface MoodData {
   mood: string;
@@ -36,6 +38,15 @@ const numberToMood = {
   0: "Angry",
 };
 
+const moodColors = {
+  Happy: "#22c55e",
+  Cool: "#3b82f6",
+  Confused: "#f59e0b",
+  Tired: "#8b5cf6",
+  Sad: "#64748b",
+  Angry: "#ef4444",
+};
+
 const MoodTrendsData: React.FC = () => {
   const [moodData, setMoodData] = useState<MoodData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,8 +60,15 @@ const MoodTrendsData: React.FC = () => {
           throw new Error("Failed to fetch mood data");
         }
         const data = await response.json();
-        // Sort data by timestamp
-        const sortedData = data.sort(
+        const now = new Date();
+        const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // 1 represents Monday
+        const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+
+        const thisWeekData = data.filter((entry: MoodData) => 
+          isWithinInterval(new Date(entry.timestamp), { start: weekStart, end: weekEnd })
+        );
+
+        const sortedData = thisWeekData.sort(
           (a: MoodData, b: MoodData) =>
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
@@ -68,7 +86,7 @@ const MoodTrendsData: React.FC = () => {
 
   const formatDate = (timestamp: string) => {
     const date = new Date(timestamp);
-    return `${date.getMonth() + 1}/${date.getDate()}`;
+    return format(date, 'EEEEEE'); // Returns the short day name (e.g., "Mon", "Tue")
   };
 
   const formatYAxis = (value: number) => {
@@ -76,7 +94,7 @@ const MoodTrendsData: React.FC = () => {
   };
 
   if (isLoading)
-    return <div className="text-center py-4">Loading mood trends...</div>;
+    return <div className="text-center py-4 text-gray-600">Loading...</div>;
   if (error)
     return <div className="text-center py-4 text-red-500">{error}</div>;
 
@@ -86,63 +104,89 @@ const MoodTrendsData: React.FC = () => {
   }));
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-800">
-        Your Mood Trends
-      </h2>
-      {moodData.length === 0 ? (
-        <p className="text-center text-gray-600">
-          No mood data available for visualization.
-        </p>
-      ) : (
-        <ResponsiveContainer width="100%" height={400}>
-          <ScatterChart
-            margin={{
-              top: 20,
-              right: 20,
-              bottom: 20,
-              left: 60,
-            }}
-          >
-            <CartesianGrid />
-            <XAxis
-              dataKey="timestamp"
-              tickFormatter={formatDate}
-              label={{
-                value: "Date",
-                position: "insideBottomRight",
-                offset: -10,
-              }}
-            />
-            <YAxis
-              dataKey="moodValue"
-              domain={[0, 5]}
-              tickFormatter={formatYAxis}
-              label={{ value: "Mood", angle: -90, position: "insideLeft" }}
-            />
-            <ZAxis dataKey="intensity" range={[50, 400]} name="Intensity" />
-            <Tooltip
-              cursor={{ strokeDasharray: "3 3" }}
-              content={({ payload, label }) => {
-                if (payload && payload.length) {
-                  const data = payload[0].payload;
-                  return (
-                    <div className="custom-tooltip bg-white p-2 border border-gray-300 rounded">
-                      <p>{`Date: ${new Date(data.timestamp).toLocaleDateString()}`}</p>
-                      <p>{`Mood: ${data.mood}`}</p>
-                      <p>{`Intensity: ${data.intensity}`}</p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Legend />
-            <Scatter name="Mood" data={chartData} fill="#8884d8" />
-          </ScatterChart>
-        </ResponsiveContainer>
-      )}
-    </div>
+    <Card className="max-w-3xl mx-auto shadow-lg bg-gradient-to-br from-blue-50 to-purple-50">
+      <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
+        <CardTitle className="text-lg font-semibold text-gray-800">This Week's Mood Trends</CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        {moodData.length === 0 ? (
+          <p className="text-center text-gray-500 text-sm">
+            No mood data available for this week.
+          </p>
+        ) : (
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={chartData}
+                margin={{
+                  top: 20,
+                  right: 20,
+                  bottom: 20,
+                  left: 40,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis
+                  dataKey="timestamp"
+                  tickFormatter={formatDate}
+                  stroke="#6b7280"
+                  fontSize={12}
+                  label={{ value: "Day of Week", position: "bottom", offset: -10, fill: "#4b5563" }}
+                />
+                <YAxis
+                  dataKey="moodValue"
+                  domain={[0, 5]}
+                  tickFormatter={formatYAxis}
+                  stroke="#6b7280"
+                  fontSize={12}
+                  label={{ value: "Mood", angle: -90, position: "insideLeft", offset: -20, fill: "#4b5563" }}
+                />
+                <Tooltip
+                  content={({ payload, label }) => {
+                    if (payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white p-3 border border-gray-200 rounded-md shadow-md">
+                          <p className="font-medium text-gray-800">{format(new Date(label), 'EEEE')}</p>
+                          <p className="text-sm" style={{ color: moodColors[data.mood as keyof typeof moodColors] }}>{`Mood: ${data.mood}`}</p>
+                          <p className="text-sm text-gray-600">{`Intensity: ${data.intensity}`}</p>
+                          <p className="text-xs text-gray-400">{format(new Date(label), 'MMM d, yyyy HH:mm')}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Legend />
+                {Object.entries(moodToNumber).map(([mood, value]) => (
+                  <ReferenceLine
+                    key={mood}
+                    y={value}
+                    stroke={moodColors[mood as keyof typeof moodColors]}
+                    strokeDasharray="3 3"
+                    label={{
+                      value: mood,
+                      position: 'right',
+                      fill: moodColors[mood as keyof typeof moodColors],
+                      fontSize: 10,
+                    }}
+                  />
+                ))}
+                <Line
+                  type="monotone"
+                  dataKey="moodValue"
+                  stroke="#6366F1"
+                  strokeWidth={3}
+                  dot={{ r: 6, strokeWidth: 2, stroke: "#4338CA", fill: "white" }}
+                  activeDot={{ r: 8, stroke: "#4338CA", strokeWidth: 2, fill: "#818CF8" }}
+                  name="Mood"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

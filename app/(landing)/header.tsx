@@ -9,19 +9,25 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const Header = () => {
   return (
-    <header className="h-20 w-full border-b-2 border-blue-200 px-4">
+    <header className="h-20 w-full border-b-2 border-indigo-200 px-4 bg-gradient-to-r from-indigo-600 to-purple-600">
       <div className="lg:max-w-screen-lg mx-auto flex items-center justify-between h-full">
-        <div className="pt-8 pl-4 pb-7 flex items-center gap-x-3">
-          <Image src="/cognozen.svg" height={50} width={50} alt="Mascot" />
-          <h1 className="text-2xl font-extrabold text-blue-800 tracking-wide">
+        <Link href="/" className="flex items-center gap-x-3">
+          <Image
+            src="/cognozen.svg"
+            height={50}
+            width={50}
+            alt="CognoZen Logo"
+          />
+          <h1 className="text-2xl font-extrabold text-white tracking-wide">
             CognoZen
           </h1>
-        </div>
+        </Link>
         <ClerkLoading>
-          <Loader className="h-5 w-5 text-muted-foreground animate-spin" />
+          <Loader className="h-5 w-5 text-white animate-spin" />
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>
@@ -33,8 +39,8 @@ export const Header = () => {
               afterSignInUrl="/emotionsTracker"
               afterSignUpUrl="/emotionsTracker"
             >
-              <Button size="lg" variant="ghost">
-                Login
+              <Button size="lg" variant="secondary">
+                Get Started
               </Button>
             </SignInButton>
           </SignedOut>

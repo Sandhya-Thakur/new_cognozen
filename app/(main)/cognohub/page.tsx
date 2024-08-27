@@ -1,23 +1,20 @@
 "use client";
 
 import { Header } from "./cognoHeader";
-import { CognoHubLibrary } from "@/components/cognohub-library";
-import CognoHubPdf from "@/components/CognoHubPdf"
-
-
-
-
+import CognoHubPdf from "@/components/CognoHubPdf";
+import FlashCardGroups from "@/components/GroupFlashCards";
+import QuizSummary from "@/components/QuizSummary"
 
 const CognoHub = () => {
   return (
     <div>
       <Header />
-      <CognoHubLibrary />
       <CognoHubPdf />
+      <FlashCardGroups />
+     <QuizSummary/>
+
     </div>
   );
-  
 };
 
 export default CognoHub;
-

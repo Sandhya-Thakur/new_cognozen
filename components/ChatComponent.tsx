@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -42,34 +43,32 @@ const ChatComponent = ({ chatId }: Props) => {
 
   return (
     <div
-      className="relative max-h-screen overflow-scroll "
+      className="relative max-h-screen overflow-scroll bg-white"
       id="message-container"
     >
       {/* Header */}
-      <div className="px-32 py-4">
-        <h3 className="text-xl font-bold">Ask about pdf</h3>
+      <div className="px-6 py-4 bg-blue-50 border-b border-blue-100">
+        <h3 className="text-xl font-bold text-blue-800">Ask about PDF</h3>
       </div>
+      
       {/* Chat list */}
-      <div className="mb-4">
-        {" "}
-        {/* Added margin bottom */}
+      <div className="mb-4 px-6">
         <MessageList messages={messages} isLoading={isLoading} />
       </div>
 
       {/* Input */}
-
       <form
         onSubmit={handleSubmit}
-        className="sticky bottom-0 inset-x-0 px-2 py-4 bg-white"
+        className="sticky bottom-0 inset-x-0 px-6 py-4 bg-white border-t border-blue-100"
       >
         <div className="flex">
           <Input
             value={input}
             onChange={handleInputChange}
             placeholder="Ask any question..."
-            className="w-full"
+            className="w-full border-blue-200 focus:border-blue-400 focus:ring-blue-400"
           />
-          <Button className="bg-blue-600 ml-2">
+          <Button className="bg-blue-600 hover:bg-blue-700 ml-2">
             <Send className="h-4 w-4" />
           </Button>
         </div>

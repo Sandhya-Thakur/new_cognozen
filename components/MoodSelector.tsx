@@ -15,7 +15,9 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ moods, onMoodSelect }) => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [moodIntensity, setMoodIntensity] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<"success" | "error" | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<"success" | "error" | null>(
+    null
+  );
 
   const handleMoodSelection = (mood: string) => {
     setSelectedMood(mood);
@@ -33,10 +35,10 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ moods, onMoodSelect }) => {
   const uploadMoodData = async (mood: string, intensity: number) => {
     setIsUploading(true);
     try {
-      const response = await fetch('/api/upload-mood-data', {
-        method: 'POST',
+      const response = await fetch("/api/upload-mood-data", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           mood,
@@ -45,11 +47,10 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ moods, onMoodSelect }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to upload mood data');
+        throw new Error("Failed to upload mood data");
       }
 
       setUploadStatus("success");
-      // Clear the state after successful upload
       setTimeout(() => {
         setSelectedMood(null);
         setMoodIntensity(null);
@@ -57,7 +58,7 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ moods, onMoodSelect }) => {
         onMoodSelect(null);
       }, 2000);
     } catch (error) {
-      console.error('Error uploading mood data:', error);
+      console.error("Error uploading mood data:", error);
       setUploadStatus("error");
     } finally {
       setIsUploading(false);
@@ -65,39 +66,37 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ moods, onMoodSelect }) => {
   };
 
   return (
-    <div className="w-full max-w-2xl p-8 rounded-2xl shadow-lg transform transition-all hover:scale-105 duration-300 bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200">
-      <h1 className="text-4xl font-bold mb-8 text-center text-indigo-800 animate-pulse">
+    <div className="w-full max-w-2xl p-8 rounded-lg shadow-md bg-white">
+      <h1 className="text-3xl font-bold mb-8 text-center text-indigo-800">
         How are you feeling today?
       </h1>
       <div className="grid grid-cols-3 gap-6 mb-8">
         {moods.map((item) => (
           <button
             key={item.mood}
-            className={`aspect-square p-4 ${item.color} ${
+            className={`aspect-square p-4 ${
               selectedMood === item.mood
-                ? "ring-4 ring-indigo-500 scale-105"
-                : ""
-            } rounded-2xl flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-xl`}
+                ? "ring-2 ring-indigo-500 bg-indigo-50"
+                : "bg-gray-50 hover:bg-gray-100"
+            } rounded-lg flex flex-col items-center justify-center transition-all duration-300`}
             onClick={() => handleMoodSelection(item.mood)}
             disabled={isUploading}
           >
-            <div className="w-24 h-24 mb-2 flex items-center justify-center rounded-full ">
+            <div className="w-16 h-16 mb-2 flex items-center justify-center">
               <img
                 src={item.image}
                 alt={item.mood}
                 className="max-w-full max-h-full object-contain"
               />
             </div>
-            <span className="text-sm font-bold text-indigo-900">
+            <span className="text-sm font-medium text-gray-700">
               {item.mood}
             </span>
           </button>
         ))}
       </div>
-      <p className="text-center text-indigo-700 text-xl font-semibold bg-indigo-100 py-3 px-6 rounded-full shadow-inner">
-        {selectedMood
-          ? `I am feeling: ${selectedMood}`
-          : "Click an emoji to select your mood"}
+      <p className="text-center text-indigo-700 text-lg font-medium bg-indigo-50 py-3 px-6 rounded-md">
+        {selectedMood ? `I am feeling: ${selectedMood}` : "Select your mood"}
       </p>
 
       {selectedMood && (
@@ -110,11 +109,11 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ moods, onMoodSelect }) => {
               <button
                 key={intensity}
                 onClick={() => handleIntensitySelection(intensity)}
-                className={`w-12 h-12 rounded-full ${
+                className={`w-10 h-10 rounded-full ${
                   moodIntensity === intensity
                     ? "bg-indigo-600 text-white"
-                    : "bg-gray-200"
-                } flex items-center justify-center font-bold text-lg transition-all duration-200 hover:bg-indigo-400`}
+                    : "bg-gray-200 hover:bg-indigo-100"
+                } flex items-center justify-center font-medium text-sm transition-all duration-200`}
                 disabled={isUploading}
               >
                 {intensity}
@@ -125,15 +124,21 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ moods, onMoodSelect }) => {
       )}
 
       {isUploading && (
-        <p className="mt-4 text-center text-indigo-600">Uploading mood data...</p>
+        <p className="mt-4 text-center text-indigo-600">
+          Uploading mood data...
+        </p>
       )}
 
       {uploadStatus === "success" && (
-        <p className="mt-4 text-center text-green-600">Mood data uploaded successfully!</p>
+        <p className="mt-4 text-center text-green-600">
+          Mood data uploaded successfully!
+        </p>
       )}
 
       {uploadStatus === "error" && (
-        <p className="mt-4 text-center text-red-600">Failed to upload mood data. Please try again.</p>
+        <p className="mt-4 text-center text-red-600">
+          Failed to upload mood data. Please try again.
+        </p>
       )}
     </div>
   );

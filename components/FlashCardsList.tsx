@@ -1,15 +1,6 @@
-import { cn } from "@/lib/utils";
+import React, { useState } from "react";
 import { Message } from "ai/react";
-import { Loader2 } from "lucide-react";
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Loader2, BookOpen, RotateCw } from "lucide-react";
 
 type Props = {
   isLoading: boolean;
@@ -17,14 +8,25 @@ type Props = {
 };
 
 const FlashCardList = ({ messages, isLoading }: Props) => {
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+
   if (isLoading) {
     return (
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <Loader2 className="w-6 h-6 animate-spin" />
+      <div className="flex flex-col justify-center items-center h-64 space-y-4">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+        <p className="text-blue-600 font-medium">Loading Flashcards...</p>
       </div>
     );
   }
-  if (!messages) return <></>;
+
+  if (!messages || messages.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-blue-400">
+        <BookOpen className="w-12 h-12 mb-2" />
+        <p className="font-light">No flashcards generated yet</p>
+      </div>
+    );
+  }
 
   const isValidJSON = (str: string) => {
     try {
@@ -35,8 +37,15 @@ const FlashCardList = ({ messages, isLoading }: Props) => {
     }
   };
 
+  const handleCardClick = (cardId: string) => {
+    setFlippedCards(prev => ({
+      ...prev,
+      [cardId]: !prev[cardId]
+    }));
+  };
+
   return (
-    <div className="flex flex-wrap space-x-4 p-4 space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {messages.map((message) => {
         if (!isValidJSON(message.content)) {
           return null;
@@ -45,19 +54,43 @@ const FlashCardList = ({ messages, isLoading }: Props) => {
         const flashcards = JSON.parse(message.content).flashcards;
 
         return flashcards.map(
-          (flashcard: { question: string; answer: string }, index: number) => (
-            <Card
-              key={index}
-              className="w-[250px] p-2 shadow-lg shadow-indigo-500/40 bg-gradient-to-r from-blue-100 via-purple-120 to-blue-150"
-            >
-              <CardHeader>
-                <strong>Question: {flashcard.question} </strong>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>Answer: {flashcard.answer}</CardDescription>
-              </CardContent>
-            </Card>
-          ),
+          (flashcard: { question: string; answer: string }, index: number) => {
+            const cardId = `${message.id}-${index}`;
+            const isFlipped = flippedCards[cardId];
+
+            return (
+              <div
+                key={cardId}
+                className="perspective cursor-pointer"
+                onClick={() => handleCardClick(cardId)}
+              >
+                <div className={`relative preserve-3d w-full aspect-[3/2] duration-500 ${isFlipped ? 'my-rotate-y-180' : ''}`}>
+                  {/* Front of the card */}
+                  <div className="absolute backface-hidden w-full h-full bg-white shadow-md rounded-lg border border-blue-200 transition-shadow hover:shadow-lg">
+                    <div className="w-full h-full p-6 flex flex-col justify-between">
+                      <h3 className="font-bold text-xl text-blue-800 mb-2">Question:</h3>
+                      <p className="text-bold text-blue-700">{flashcard.question}</p>
+                      <div className="flex items-center justify-end mt-4 text-blue-400">
+                        <RotateCw className="w-4 h-4 mr-1" />
+                        <span className="text-xs">Flip</span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Back of the card */}
+                  <div className="absolute my-rotate-y-180 backface-hidden w-full h-full bg-blue-50 shadow-md rounded-lg border border-blue-200 transition-shadow hover:shadow-lg">
+                    <div className="w-full h-full p-6 flex flex-col justify-between">
+                      <h3 className="font-bold text-xl text-blue-800 mb-2">Answer</h3>
+                      <p className="text-bold text-blue-700">{flashcard.answer}</p>
+                      <div className="flex items-center justify-end mt-4 text-blue-400">
+                        <RotateCw className="w-4 h-4 mr-1" />
+                        <span className="text-xs">Flip back</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
         );
       })}
     </div>
