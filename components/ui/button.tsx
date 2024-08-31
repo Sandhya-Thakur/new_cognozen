@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-xl  font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 tracking-wide",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 tracking-wide",
   {
     variants: {
       variant: {
@@ -21,7 +21,6 @@ const buttonVariants = cva(
           "bg-blue-700 text-primary-foreground hover:bg-blue-600/90 border-blue-800 border-b-4 active:border-b-0",
         secondaryOutline:
           " text-blue-500 hover:bg-blue-200 border-transparent hover:border-transparent shadow-md hover:shadow-lg transition-shadow",
-
         danger:
           "bg-rose-500 text-primary-foreground hover:bg-rose-500/90 border-rose-600 border-b-4 active:border-b-0",
         dangerOutline: "bg-white text-rose-500 hover:bg-slate-100",
@@ -34,9 +33,12 @@ const buttonVariants = cva(
           "bg-transparent text-blue-800 border-2 border-transparent hover:bg-blue-100 transition-none",
         sidebarOutline:
           "bg-blue-300/15 text-blue-600 border-blue-300 border-2 hover:bg-blue-500/20 transition-none",
-        // button for an animated ai companian(chatbot)
         chatbot:
           "bg-white text-blue-600 border-slate-200 border-2 border-b-4 active:border-b-2 hover:bg-slate-100 text-blue-500",
+        success:
+          "bg-green-500 text-white hover:bg-green-600 border-green-600 border-b-4 active:border-b-0",
+        successOutline:
+          "bg-white text-green-500 hover:bg-green-100 border-green-500 border-2",
       },
       size: {
         default: "h-11 px-4 py-2",

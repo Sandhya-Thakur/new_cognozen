@@ -71,17 +71,25 @@ export async function GET(
 
     const totalQuestions = questions.length;
     const correctAnswers = responses.filter(r => r.isCorrect).length;
-    const score = attempt.score || Math.round((correctAnswers / totalQuestions) * 100);
+    
+    // Calculate total score (out of 100)
+    const totalScore = Math.round((correctAnswers / totalQuestions) * 100);
+
+    // Calculate duration in seconds
+    const duration = attempt.completedAt 
+      ? Math.round((new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 1000) 
+      : null;
 
     return NextResponse.json({
       quizId,
       attemptId: attempt.id,
-      score,
+      totalScore,
       totalQuestions,
       correctAnswers,
       completed: attempt.completed,
       startedAt: attempt.startedAt,
       completedAt: attempt.completedAt,
+      duration, // Duration in seconds
       responses: fullResults
     });
   } catch (error) {

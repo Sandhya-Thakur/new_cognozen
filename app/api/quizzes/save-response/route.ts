@@ -1,5 +1,3 @@
-// File: app/api/quizzes/save-response/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from "@/lib/db";
 import { quizResponses, quizAttempts, quizQuestions } from "@/lib/db/schema";
@@ -7,7 +5,7 @@ import { eq, and } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   try {
-    const { quizId, userId, questionId, userAnswer } = await request.json();
+    const { quizId, userId, questionId, userAnswer, isLastQuestion } = await request.json();
 
     // Check if there's an existing attempt for this user and quiz
     let [attempt] = await db
@@ -50,13 +48,39 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    // Update the current question order in the attempt
+    // Update the attempt
+    const updateValues: {
+      currentQuestionOrder: number;
+      score?: number;
+      completed?: boolean;
+      completedAt?: Date;
+    } = {
+      currentQuestionOrder: attempt.currentQuestionOrder + 1,
+    };
+
+    // Update score if the answer is correct
+    if (isCorrect) {
+      updateValues.score = (attempt.score || 0) + 1;
+    }
+
+    // If it's the last question, mark as completed
+    if (isLastQuestion) {
+      updateValues.completed = true;
+      updateValues.completedAt = new Date();
+    }
+
+    // Perform the update
     await db
       .update(quizAttempts)
-      .set({ currentQuestionOrder: attempt.currentQuestionOrder + 1 })
+      .set(updateValues)
       .where(eq(quizAttempts.id, attempt.id));
 
-    return NextResponse.json({ success: true, responseId: response.id, isCorrect });
+    return NextResponse.json({ 
+      success: true, 
+      responseId: response.id, 
+      isCorrect,
+      attemptCompleted: isLastQuestion
+    });
   } catch (error) {
     console.error("Error saving quiz response:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

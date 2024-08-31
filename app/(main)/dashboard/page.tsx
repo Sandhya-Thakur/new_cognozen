@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import GetPdfAttentionData from "@/components/GetPdfAttentionData";
 import TodaysPdfAttentionData from "@/components/TodaysPdfAttentionData";
 import GetPdfEmotionData from "@/components/GetPdfEmotionData";
 import TodaysPdfEmotionData from "@/components/TodaysPdfEmotionData";
-import LiveAttentionData from "@/components/LiveAttentionData";
 import LiveEmotionData from "@/components/LiveEmotionData";
 import TodaysQuizAttentionData from "@/components/TodaysQuizAttentionData"
 import TodaysQuizEmotionData from "@/components/TodaysQuizEmotionData"
@@ -15,8 +15,6 @@ import AllsHabits from "@/components/AllHabits";
 import HabitCompleted from "@/components/HabitCompleted";
 import HabitVisualizationComponent from "@/components/HabitVisualizationComponent";
 import MoodHabitCorrelation from "@/components/MoodHabitCorrelation";
-import UserQuizPerformance from "@/components/UserQuizPerformance"
-
 
 interface Habit {
   id: number;
@@ -51,7 +49,12 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-blue-800">Dashboard</h1>
+          <Link href="/seeAllEmotionAttentionData" className="text-blue-600 hover:text-blue-800 font-medium">
+            See All Data →
+          </Link>
+        </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <DashboardCard title="">
@@ -86,9 +89,6 @@ export default function Dashboard() {
             <HabitCompleted />
           </DashboardCard>
 
-    
-
-
           <DashboardCard title="">
             <div>
               <h3 className="text-xl font-semibold mb-4 text-gray-700">
@@ -115,9 +115,6 @@ export default function Dashboard() {
           <DashboardCard title="">
             <MoodHabitCorrelation />
           </DashboardCard>
-          <div>
-
-          </div>
         </div>
       </div>
     </div>
