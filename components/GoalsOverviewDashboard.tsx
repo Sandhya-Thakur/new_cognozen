@@ -84,10 +84,10 @@ const GoalsOverviewDashboard: React.FC = () => {
         </CardHeader>
         <CardContent className="bg-white p-6">
           <p>
-            You&apos;re making great progress on your goals! Here are some insights:
+            You are making great progress on your goals! Here are some insights:
           </p>
           <ul className="list-disc pl-5 mt-2">
-            <li>You&apos;re excelling in your financial goals.</li>
+            <li>You are excelling in your financial goals.</li>
             <li>Your commitment to health is showing promising results.</li>
             <li>Consider allocating more time to your educational goals.</li>
             <li>Your personal development journey is on the right track.</li>

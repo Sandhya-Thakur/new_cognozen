@@ -67,15 +67,15 @@ const WeeklyChallengeStatus: React.FC = () => {
         </TabsList>
 
         <TabsContent value="currentWeek">
-          {renderChallengeChart(currentWeekData, "Current Week's Challenges")}
+          {renderChallengeChart(currentWeekData, "Current Week Challenges")}
         </TabsContent>
 
         <TabsContent value="lastWeek">
-          {renderChallengeChart(lastWeekData, "Last Week's Challenges")}
+          {renderChallengeChart(lastWeekData, "Last Week Challenges")}
         </TabsContent>
 
         <TabsContent value="thisMonth">
-          {renderChallengeChart(thisMonthData, "This Month's Challenges")}
+          {renderChallengeChart(thisMonthData, "This Month Challenges")}
         </TabsContent>
       </Tabs>
     </div>
