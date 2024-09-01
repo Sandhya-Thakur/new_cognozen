@@ -1,109 +1,131 @@
-// components/HabitCompleted.tsx
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
 
 interface Habit {
-  id: number;
+  id: string;
   name: string;
-}
-
-interface HabitCompletion {
-  habitId: number;
-  completedAt: string;
-  value: number;
+  description: string;
+  completedDates: string[];
+  streak: number;
 }
 
 const HabitCompleted: React.FC = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [completions, setCompletions] = useState<HabitCompletion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
-    fetchHabitsAndCompletions();
-
-    // Set up daily refresh at midnight
-    const setMidnightRefresh = () => {
-      const now = new Date();
-      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-      const timeUntilMidnight = tomorrow.getTime() - now.getTime();
-
-      timeoutRef.current = setTimeout(() => {
-        fetchHabitsAndCompletions();
-        setMidnightRefresh(); // Set up the next day's refresh
-      }, timeUntilMidnight);
-    };
-
-    setMidnightRefresh();
-
-    return () => {
-      // Clean up any running timers when the component unmounts
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
+    // In a real application, you&apos;d fetch this data from an API
+    const fetchedHabits: Habit[] = [
+      { id: '1', name: 'Daily Exercise', description: 'Work out for at least 30 minutes', completedDates: ['2024-09-01', '2024-09-02'], streak: 2 },
+      { id: '2', name: 'Meditation', description: 'Meditate for 10 minutes', completedDates: ['2024-09-01'], streak: 1 },
+      { id: '3', name: 'Read a Book', description: 'Read for 30 minutes', completedDates: ['2024-09-02'], streak: 1 },
+    ];
+    setHabits(fetchedHabits);
   }, []);
 
-  const fetchHabitsAndCompletions = async () => {
-    setLoading(true);
-    try {
-      const [habitsResponse, completionsResponse] = await Promise.all([
-        fetch('/api/habits/all'),
-        fetch('/api/habits/today-completion')
-      ]);
-
-      if (habitsResponse.ok && completionsResponse.ok) {
-        const habitsData = await habitsResponse.json();
-        const completionsData = await completionsResponse.json();
-        setHabits(habitsData.habits);
-        setCompletions(completionsData.completions);
-      } else {
-        toast.error('Failed to fetch habits and completions');
-      }
-    } catch (error) {
-      console.error('Error fetching habits and completions:', error);
-      toast.error('An error occurred while fetching data');
-    } finally {
-      setLoading(false);
-    }
+  const handleHabitCompletion = (habitId: string) => {
+    setHabits(prevHabits => 
+      prevHabits.map(habit => 
+        habit.id === habitId
+          ? {
+              ...habit,
+              completedDates: [...habit.completedDates, selectedDate?.toISOString().split('T')[0] || ''],
+              streak: habit.streak + 1
+            }
+          : habit
+      )
+    );
   };
 
-  const isHabitCompleted = (habitId: number) => {
-    return completions.some(completion => completion.habitId === habitId);
+  const isHabitCompletedToday = (habit: Habit) => {
+    const today = selectedDate?.toISOString().split('T')[0] || '';
+    return habit.completedDates.includes(today);
   };
-
-  const getCompletionValue = (habitId: number) => {
-    const completion = completions.find(c => c.habitId === habitId);
-    return completion ? completion.value : 0;
-  };
-
-  if (loading) {
-    return <div>Loading habits...</div>;
-  }
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Today's Habit Status</h2>
-      {habits.length === 0 ? (
-        <p className="text-gray-600">No habits found for today.</p>
-      ) : (
-        <ul className="space-y-4">
-          {habits.map(habit => (
-            <li key={habit.id} className="flex items-center justify-between bg-gray-100 p-4 rounded-lg">
-              <span className="text-lg font-medium text-gray-700">{habit.name}</span>
-              {isHabitCompleted(habit.id) ? (
-                <span className="text-green-500 font-semibold">
-                  Completed (Value: {getCompletionValue(habit.id)})
-                </span>
-              ) : (
-                <span className="text-red-500 font-semibold">Not Completed</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="container mx-auto px-4 py-12 bg-gray-50">
+      <h1 className="text-2xl font-bold mb-8 text-blue-600">Habit Tracker</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border-gray-200 col-span-2">
+          <CardHeader className="bg-blue-600 text-white">
+            <CardTitle className="text-xl">Your Habits</CardTitle>
+            <CardDescription className="text-blue-200">
+              Track your daily habits
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="bg-white p-6">
+            {habits.map(habit => (
+              <div key={habit.id} className="mb-6 last:mb-0">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-semibold">{habit.name}</h3>
+                  <Badge variant="outline">{`Streak: ${habit.streak}`}</Badge>
+                </div>
+                <p className="text-gray-600 mb-2">{habit.description}</p>
+                <Progress value={(habit.completedDates.length / 30) * 100} className="mb-2" />
+                <Button 
+                  onClick={() => handleHabitCompletion(habit.id)}
+                  disabled={isHabitCompletedToday(habit)}
+                >
+                  {isHabitCompletedToday(habit) ? 'Completed' : 'Mark as Completed'}
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="border-gray-200">
+          <CardHeader className="bg-blue-600 text-white">
+            <CardTitle className="text-xl">Calendar</CardTitle>
+            <CardDescription className="text-blue-200">
+              Select a date to view or update habits
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="bg-white p-6">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="rounded-md border"
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="border-gray-200 mt-8">
+        <CardHeader className="bg-blue-600 text-white">
+          <CardTitle className="text-xl">Habit Insights</CardTitle>
+          <CardDescription className="text-blue-200">
+            The power of consistency
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="bg-white p-6">
+          <p>
+            Developing good habits is key to achieving your long-term goals. Here&apos;s why consistency matters:
+          </p>
+          <ul className="list-disc pl-5 mt-2">
+            <li>It takes an average of 66 days to form a new habit.</li>
+            <li>Consistent habits lead to compound growth over time.</li>
+            <li>Good habits can help automate positive behaviors.</li>
+            <li>Tracking your habits increases your chances of sticking to them.</li>
+          </ul>
+          <p className="mt-4">
+            Remember, it&apos;s not about being perfect - it&apos;s about being consistent. Keep up the good work!
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -12,7 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import LiveAttentionData from "@/components/LiveAttentionData";
 
-
 interface AttentionData {
   timestamp: string;
   readingLevel: number;
@@ -62,7 +61,7 @@ const AttentionDataDashboard: React.FC = () => {
       <Tabs defaultValue="live" className="mb-12">
         <TabsList className="bg-[#0F52BA] text-white">
           <TabsTrigger value="live" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Live Data</TabsTrigger>
-          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Today's Data</TabsTrigger>
+          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Today&apos;s Data</TabsTrigger>
           <TabsTrigger value="tenDays" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Last 10 Days</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">This Month</TabsTrigger>
         </TabsList>
@@ -80,8 +79,8 @@ const AttentionDataDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="today">
-          {renderAttentionChart(todayData, "Today's Reading Attention Levels", "readingLevel", "text-lg")}
-          {renderAttentionChart(todayData, "Today's Quiz Attention Levels", "quizLevel", "text-lg")}
+          {renderAttentionChart(todayData, "Today&apos;s Reading Attention Levels", "readingLevel", "text-lg")}
+          {renderAttentionChart(todayData, "Today&apos;s Quiz Attention Levels", "quizLevel", "text-lg")}
         </TabsContent>
 
         <TabsContent value="tenDays">
@@ -90,8 +89,8 @@ const AttentionDataDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="month">
-          {renderAttentionChart(monthData, "This Month's Reading Attention Levels", "readingLevel", "text-lg")}
-          {renderAttentionChart(monthData, "This Month's Quiz Attention Levels", "quizLevel", "text-lg")}
+          {renderAttentionChart(monthData, "This Month&apos;s Reading Attention Levels", "readingLevel", "text-lg")}
+          {renderAttentionChart(monthData, "This Month&apos;s Quiz Attention Levels", "quizLevel", "text-lg")}
         </TabsContent>
       </Tabs>
     </div>

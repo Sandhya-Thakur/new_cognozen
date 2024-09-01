@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -8,99 +8,92 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
-interface GoalData {
-  name: string;
+interface Goal {
+  id: string;
+  title: string;
+  description: string;
   progress: number;
-  target: number;
+  category: string;
 }
 
 const GoalsOverviewDashboard: React.FC = () => {
-  // Example data - replace this with actual data from your backend
-  const [liveData] = useState<GoalData[]>([
-    { name: "Read 30 mins", progress: 15, target: 30 },
-    { name: "Exercise", progress: 25, target: 60 },
-    { name: "Learn new skill", progress: 45, target: 60 },
-    { name: "Meditate", progress: 8, target: 10 },
-  ]);
-  const [todayData] = useState<GoalData[]>([
-    { name: "Read 30 mins", progress: 30, target: 30 },
-    { name: "Exercise", progress: 45, target: 60 },
-    { name: "Learn new skill", progress: 30, target: 60 },
-    { name: "Meditate", progress: 10, target: 10 },
-  ]);
-  const [tenDaysData] = useState<GoalData[]>([
-    { name: "Read 5 books", progress: 3, target: 5 },
-    { name: "Exercise 10 times", progress: 7, target: 10 },
-    { name: "Complete online course", progress: 60, target: 100 },
-    { name: "Meditate 50 mins", progress: 35, target: 50 },
-  ]);
-  const [monthData] = useState<GoalData[]>([
-    { name: "Read 10 books", progress: 6, target: 10 },
-    { name: "Exercise 20 times", progress: 15, target: 20 },
-    { name: "Learn new language", progress: 40, target: 100 },
-    { name: "Meditate 200 mins", progress: 150, target: 200 },
-  ]);
+  const [goals, setGoals] = useState<Goal[]>([]);
 
-  const renderGoalChart = (data: GoalData[], title: string) => (
-    <Card className="border-[#C0C0C0] mb-6">
-      <CardHeader className="bg-[#0F52BA] text-white">
-        <CardTitle className="text-lg">{title}</CardTitle>
-        <CardDescription className="text-[#87CEEB]">Goal progress overview</CardDescription>
-      </CardHeader>
-      <CardContent className="bg-white p-6">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="progress" name="Progress" stackId="a">
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill="#0F52BA" />
-              ))}
-            </Bar>
-            <Bar dataKey="target" name="Target" stackId="a">
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill="#87CEEB" />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-  );
+  useEffect(() => {
+    // Fetch goals data here
+    // For example:
+    // fetchGoals().then(setGoals);
+    
+    // Placeholder data
+    setGoals([
+      { id: '1', title: 'Read 20 books', description: 'Expand knowledge through reading', progress: 45, category: 'Personal Development' },
+      { id: '2', title: 'Exercise 3 times a week', description: 'Improve physical health', progress: 67, category: 'Health' },
+      { id: '3', title: 'Learn a new language', description: 'Enhance communication skills', progress: 30, category: 'Education' },
+      { id: '4', title: 'Save $5000', description: 'Build financial security', progress: 80, category: 'Finance' },
+    ]);
+  }, []);
+
+  const getCategoryColor = (category: string) => {
+    switch(category) {
+      case 'Personal Development': return 'bg-blue-500';
+      case 'Health': return 'bg-green-500';
+      case 'Education': return 'bg-purple-500';
+      case 'Finance': return 'bg-yellow-500';
+      default: return 'bg-gray-500';
+    }
+  };
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-[#F8F9FA]">
-      <h1 className="text-xl font-bold mb-8 text-[#0F52BA]">Goals Overview</h1>
+    <div className="container mx-auto px-4 py-12 bg-gray-50">
+      <h1 className="text-2xl font-bold mb-8 text-blue-600">Goals Overview</h1>
 
-      <Tabs defaultValue="live" className="mb-12">
-        <TabsList className="bg-[#0F52BA] text-white">
-          <TabsTrigger value="live" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Live Goals</TabsTrigger>
-          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Today's Goals</TabsTrigger>
-          <TabsTrigger value="tenDays" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">10-Day Goals</TabsTrigger>
-          <TabsTrigger value="month" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Monthly Goals</TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {goals.map((goal) => (
+          <Card key={goal.id} className="border-gray-200">
+            <CardHeader className="bg-blue-600 text-white">
+              <CardTitle className="text-xl">{goal.title}</CardTitle>
+              <CardDescription className="text-blue-200">
+                {goal.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="bg-white p-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-700">Progress</span>
+                <span className="text-sm font-medium text-gray-700">{goal.progress}%</span>
+              </div>
+              <Progress value={goal.progress} className="w-full" />
+              <div className="mt-4">
+                <Badge className={`${getCategoryColor(goal.category)} text-white`}>
+                  {goal.category}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        <TabsContent value="live">
-          {renderGoalChart(liveData, "Live Goal Progress")}
-        </TabsContent>
-
-        <TabsContent value="today">
-          {renderGoalChart(todayData, "Today's Goal Progress")}
-        </TabsContent>
-
-        <TabsContent value="tenDays">
-          {renderGoalChart(tenDaysData, "10-Day Goal Progress")}
-        </TabsContent>
-
-        <TabsContent value="month">
-          {renderGoalChart(monthData, "Monthly Goal Progress")}
-        </TabsContent>
-      </Tabs>
+      <Card className="border-gray-200 mt-8">
+        <CardHeader className="bg-blue-600 text-white">
+          <CardTitle className="text-xl">Goal Insights</CardTitle>
+          <CardDescription className="text-blue-200">
+            Reflecting on your journey
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="bg-white p-6">
+          <p>
+            You&apos;re making great progress on your goals! Here are some insights:
+          </p>
+          <ul className="list-disc pl-5 mt-2">
+            <li>You&apos;re excelling in your financial goals.</li>
+            <li>Your commitment to health is showing promising results.</li>
+            <li>Consider allocating more time to your educational goals.</li>
+            <li>Your personal development journey is on the right track.</li>
+          </ul>
+        </CardContent>
+      </Card>
     </div>
   );
 };

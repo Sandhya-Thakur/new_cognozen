@@ -1,77 +1,110 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface GratitudeEntry {
-  id: number;
+  id: string;
+  date: string;
   content: string;
-  createdAt: string;
 }
 
 const GratitudeLog: React.FC = () => {
-  // Example data - replace this with actual data from your backend
-  const [todayEntries] = useState<GratitudeEntry[]>([
-    { id: 1, content: "I'm grateful for my supportive family.", createdAt: new Date().toISOString() },
-    { id: 2, content: "I appreciate the beautiful weather today.", createdAt: new Date().toISOString() },
-  ]);
+  const [entries, setEntries] = useState<GratitudeEntry[]>([]);
+  const [newEntry, setNewEntry] = useState("");
 
-  const [weekEntries] = useState<GratitudeEntry[]>([
-    { id: 3, content: "I'm thankful for the progress I made on my project.", createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 4, content: "I'm grateful for the delicious meal I had with friends.", createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 5, content: "I appreciate the help I received from my colleague.", createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
-  ]);
+  useEffect(() => {
+    // In a real application, you&apos;d fetch this data from an API
+    const fetchedEntries = [
+      { id: '1', date: '2024-09-01', content: "I&apos;m grateful for my supportive family." },
+      { id: '2', date: '2024-09-02', content: "I&apos;m thankful for the beautiful weather today." },
+      { id: '3', date: '2024-09-03', content: "I appreciate the opportunity to learn new things at work." },
+    ];
+    setEntries(fetchedEntries);
+  }, []);
 
-  const [monthEntries] = useState<GratitudeEntry[]>([
-    { id: 6, content: "I'm thankful for the opportunity to learn a new skill.", createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 7, content: "I'm grateful for my health and well-being.", createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 8, content: "I appreciate the support of my community during challenging times.", createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString() },
-  ]);
+  const handleNewEntryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewEntry(e.target.value);
+  };
 
-  const renderGratitudeEntries = (entries: GratitudeEntry[]) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {entries.map((entry) => (
-        <Card key={entry.id} className="border-[#C0C0C0]">
-          <CardHeader className="bg-[#0F52BA] text-white">
-            <CardTitle className="text-lg">{new Date(entry.createdAt).toLocaleDateString()}</CardTitle>
-          </CardHeader>
-          <CardContent className="bg-white p-4">
-            <p>{entry.content}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+  const handleSubmitEntry = () => {
+    if (newEntry.trim()) {
+      const newEntryObject: GratitudeEntry = {
+        id: Date.now().toString(),
+        date: new Date().toISOString().split('T')[0],
+        content: newEntry.trim()
+      };
+      setEntries([newEntryObject, ...entries]);
+      setNewEntry("");
+    }
+  };
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-[#F8F9FA]">
-      <h1 className="text-xl font-bold mb-8 text-[#0F52BA]">Gratitude Log</h1>
+    <div className="container mx-auto px-4 py-12 bg-gray-50">
+      <h1 className="text-2xl font-bold mb-8 text-blue-600">Gratitude Log</h1>
 
-      <Tabs defaultValue="today" className="mb-12">
-        <TabsList className="bg-[#0F52BA] text-white">
-          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Today's Entries</TabsTrigger>
-          <TabsTrigger value="week" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">This Week's Entries</TabsTrigger>
-          <TabsTrigger value="month" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">This Month's Entries</TabsTrigger>
-        </TabsList>
+      <Card className="border-gray-200 mb-6">
+        <CardHeader className="bg-blue-600 text-white">
+          <CardTitle className="text-xl">New Gratitude Entry</CardTitle>
+          <CardDescription className="text-blue-200">
+            What are you grateful for today?
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="bg-white p-6">
+          <Textarea
+            placeholder="I&apos;m grateful for..."
+            value={newEntry}
+            onChange={handleNewEntryChange}
+            className="mb-4"
+          />
+          <Button onClick={handleSubmitEntry}>Add Entry</Button>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="today">
-          {renderGratitudeEntries(todayEntries)}
-        </TabsContent>
+      <div className="space-y-4">
+        {entries.map((entry) => (
+          <Card key={entry.id} className="border-gray-200">
+            <CardHeader className="bg-blue-100 text-blue-800">
+              <CardTitle className="text-lg">{entry.date}</CardTitle>
+            </CardHeader>
+            <CardContent className="bg-white p-6">
+              <p>{entry.content}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        <TabsContent value="week">
-          {renderGratitudeEntries(weekEntries)}
-        </TabsContent>
-
-        <TabsContent value="month">
-          {renderGratitudeEntries(monthEntries)}
-        </TabsContent>
-      </Tabs>
+      <Card className="border-gray-200 mt-8">
+        <CardHeader className="bg-blue-600 text-white">
+          <CardTitle className="text-xl">Gratitude Insights</CardTitle>
+          <CardDescription className="text-blue-200">
+            The power of positive thinking
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="bg-white p-6">
+          <p>
+            Practicing gratitude has numerous benefits for your mental health and overall well-being:
+          </p>
+          <ul className="list-disc pl-5 mt-2">
+            <li>It can improve your mood and increase positive emotions.</li>
+            <li>Gratitude may help reduce stress and anxiety.</li>
+            <li>It can enhance your relationships and social connections.</li>
+            <li>Regular gratitude practice may lead to better sleep quality.</li>
+          </ul>
+          <p className="mt-4">
+            Remember, it&apos;s not about having everything perfect - it&apos;s about appreciating what you have.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 };
