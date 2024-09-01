@@ -86,7 +86,7 @@ const MoodSummary: React.FC = () => {
       <Tabs defaultValue="live" className="mb-12">
         <TabsList className="bg-[#0F52BA] text-white">
           <TabsTrigger value="live" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Live Data</TabsTrigger>
-          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Today Data</TabsTrigger>
+          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Current Day Data</TabsTrigger>
           <TabsTrigger value="tenDays" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Last 10 Days</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">This Month</TabsTrigger>
         </TabsList>
@@ -96,7 +96,7 @@ const MoodSummary: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="today">
-          {renderMoodChart(todayData, "Today's Mood Data")}
+          {renderMoodChart(todayData, "Current Day Mood Data")}
         </TabsContent>
 
         <TabsContent value="tenDays">
@@ -104,7 +104,7 @@ const MoodSummary: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="month">
-          {renderMoodChart(monthData, "This Month's Mood Data")}
+          {renderMoodChart(monthData, "This Month Mood Data")}
         </TabsContent>
       </Tabs>
     </div>

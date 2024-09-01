@@ -37,9 +37,6 @@ const AllEmotionsDataDashboard: React.FC = () => {
     <Card className="border-gray-200 mb-6">
       <CardHeader className="bg-blue-600 text-white">
         <CardTitle className="text-xl">{title}</CardTitle>
-        <CardDescription className="text-blue-200">
-          Tracking your emotional journey
-        </CardDescription>
       </CardHeader>
       <CardContent className="bg-white p-6">
         <ResponsiveContainer width="100%" height={300}>
@@ -60,16 +57,26 @@ const AllEmotionsDataDashboard: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-12 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-8 text-blue-600">Emotions Data Dashboard</h1>
+       <h1 className="text-xl font-bold mb-8 text-[#0F52BA]">Emotions Data Dashboard</h1>
 
-      <Tabs defaultValue="today" className="mb-12">
-        <TabsList className="bg-blue-600 text-white">
-        <TabsTrigger value="live" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Live Data</TabsTrigger>
-          <TabsTrigger value="today" className="data-[state=active]:bg-blue-400 data-[state=active]:text-white">Current Day Data</TabsTrigger>
-          <TabsTrigger value="week" className="data-[state=active]:bg-blue-400 data-[state=active]:text-white">This Week</TabsTrigger>
-          <TabsTrigger value="month" className="data-[state=active]:bg-blue-400 data-[state=active]:text-white">This Month</TabsTrigger>
+       <Tabs defaultValue="live" className="mb-12">
+        <TabsList className="bg-[#0F52BA] text-white">
+          <TabsTrigger value="live" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Live Data</TabsTrigger>
+          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Current Day Data</TabsTrigger>
+          <TabsTrigger value="tenDays" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Last 10 Days</TabsTrigger>
+          <TabsTrigger value="month" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">This Month</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="live">
+          <Card className="border-[#C0C0C0] mb-6">
+            <CardHeader className="bg-[#0F52BA] text-white">
+              <CardTitle className="text-lg">Live Emotions Data</CardTitle>
+              <CardDescription className="text-[#87CEEB]">Real-time emotion data</CardDescription>
+            </CardHeader>
+            <CardContent className="bg-white p-6">
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="today">
           {renderEmotionChart(todayData, "Current Day Emotional Journey")}
         </TabsContent>
