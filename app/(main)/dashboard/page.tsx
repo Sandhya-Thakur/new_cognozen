@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import GetPdfAttentionData from "@/components/GetPdfAttentionData";
 import TodaysPdfAttentionData from "@/components/TodaysPdfAttentionData";
-import GetPdfEmotionData from "@/components/GetPdfEmotionData";
 import TodaysPdfEmotionData from "@/components/TodaysPdfEmotionData";
 import TodaysQuizAttentionData from "@/components/TodaysQuizAttentionData"
 import TodaysQuizEmotionData from "@/components/TodaysQuizEmotionData"
