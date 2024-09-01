@@ -1,27 +1,28 @@
 "use client";
-import React from "react";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import MoodSelector from "@/components/MoodSelector";
-
 import GuidedBreathingExercise from "@/components/GuidedBreathingExercise";
 import InsightsAndTips from "@/components/InsightsAndTips";
-import { useState, useEffect } from "react";
 import SuggestedActivities from "@/components/SuggestedActivities";
 import JournalEntryForm from "@/components/JournalEntryForm";
 import GratitudeEntryForm from "@/components/GratitudeEntryForm";
 import GoalEntryForm from "@/components/GoalEntryForm";
+
 // Define your moods array here or import it from a separate file
 const moods = [
-  { image: "/happy.png", mood: "Happy", color: "bg-yellow-100" },
-  { image: "/sad.png", mood: "Sad", color: "bg-blue-100" },
-  { image: "/angry.png", mood: "Angry", color: "bg-red-100" },
-  { image: "/sleepy.png", mood: "Tired", color: "bg-purple-100" },
-  { image: "/cool.png", mood: "Cool", color: "bg-green-100" },
-  { image: "/confused.png", mood: "Confused", color: "bg-orange-100" },
+  { image: "/happy.png", mood: "Happy", color: "bg-[#E3F2FD]" },
+  { image: "/sad.png", mood: "Sad", color: "bg-[#BBDEFB]" },
+  { image: "/angry.png", mood: "Upset", color: "bg-[#90CAF9]" },
+  { image: "/sleepy.png", mood: "Tired", color: "bg-[#64B5F6]" },
+  { image: "/cool.png", mood: "Calm", color: "bg-[#42A5F5]" },
+  { image: "/confused.png", mood: "Unsure", color: "bg-[#2196F3]" },
 ];
 
 export default function EmotionsTrackerPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [currentDate, setCurrentDate] = useState<string>("");
 
   const handleMoodSelect = (mood: string | null) => {
     console.log("Mood selected in EmotionsTrackerPage:", mood);
@@ -30,50 +31,55 @@ export default function EmotionsTrackerPage() {
 
   useEffect(() => {
     console.log("selectedMood updated in EmotionsTrackerPage:", selectedMood);
+    const now = new Date();
+    setCurrentDate(now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
   }, [selectedMood]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200 text-white p-4 rounded-b-lg shadow-md">
-        <h1 className="text-xl font-bold">How are you feeling Today?</h1>
+    <div className="min-h-screen bg-[#F8F9FA]">
+      <header className="bg-[#0F52BA] text-white p-6 rounded-b-lg shadow-md">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-xl">{currentDate}</p>
+          </div>
+        </div>
+        <p className="mt-2 text-lg">Track your emotions and improve your well-being</p>
       </header>
 
       <main className="flex flex-col items-center p-4 mt-8">
         <MoodSelector moods={moods} onMoodSelect={handleMoodSelect} />
 
-        <div className="mt-12 w-full">
+        <div className="mt-12 w-full max-w-3xl">
           <JournalEntryForm />
         </div>
 
-        <div className="mt-12 w-full">
+        <div className="mt-12 w-full max-w-3xl">
           <GratitudeEntryForm />
         </div>
 
-        <div className="mt-12 w-full">
+        <div className="mt-12 w-full max-w-3xl">
           <GoalEntryForm />
         </div>
 
-        <div className="mt-12 w-full">
-          <div>
-            <InsightsAndTips />
-          </div>
+        <div className="mt-12 w-full max-w-3xl">
+          <InsightsAndTips />
         </div>
 
-        <div className="mt-12 w-full">
-          <div>
-            <SuggestedActivities />
-          </div>
+        <div className="mt-12 w-full max-w-3xl">
+          <SuggestedActivities />
         </div>
 
-        <div className="mt-12 w-full">
+        <div className="mt-12 w-full max-w-3xl">
           <GuidedBreathingExercise />
         </div>
       </main>
 
-      <footer className="flex flex-col items-center p-4 mt-8">
-        <button className="bg-indigo-500 text-white py-4 px-8 rounded-2xl hover:bg-indigo-300 transition-all duration-300">
-          <Link href="/habitsTracker">Continue</Link>
-        </button>
+      <footer className="flex flex-col items-center p-4 mt-8 mb-8">
+        <Link href="/habitsTracker">
+          <button className="bg-[#0F52BA] text-white py-4 px-8 rounded-2xl hover:bg-[#0D47A1] transition-all duration-300">
+            Continue
+          </button>
+        </Link>
       </footer>
     </div>
   );

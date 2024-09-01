@@ -38,56 +38,49 @@ export default function HabitsTrackerPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-6">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold">Habits Tracker</h1>
-          <p className="mt-2 text-blue-100">
+    <div className="min-h-screen bg-[#F8F9FA]">
+      <header className="bg-[#0F52BA] text-white py-8 rounded-b-3xl shadow-lg">
+        <div className="container mx-auto px-6">
+          <h1 className="text-4xl font-bold">Habits Tracker</h1>
+          <p className="mt-2 text-xl text-blue-100">
             Build better habits, achieve your goals
           </p>
         </div>
       </header>
 
-      <main className="container mx-auto mt-8 px-4">
-        <div className="flex justify-between items-center mb-6">
+      <main className="container mx-auto mt-12 px-6">
+        <div className="flex justify-between items-center mb-8">
           <button
             onClick={() => setShowCreationWizard(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="bg-[#0F52BA] hover:bg-[#0D47A1] text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-opacity-50 shadow-md"
           >
             Create New Habit
           </button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            <AllsHabits />
-            <div className="mt-8">
+            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
+              <AllsHabits />
+            </div>
+            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
               <ManualHabitCompletion />
             </div>
           </div>
 
           <div className="space-y-8">
-            <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300">
+            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
               <HabitInsightsComponent />
             </div>
-          </div>
-        </div>
-
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300">
-            <h3 className="text-xl font-semibold mb-4 text-gray-700">
-              Habit Journal
+            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
+            <h3 className="text-2xl font-semibold mb-4 text-[#0F52BA]">
+              Community Challenges
             </h3>
-            {/* TODO: Implement HabitJournalComponent */}
+            {/* TODO: Implement CommunitySocialComponent */}
+          </div>
           </div>
         </div>
 
-        <div className="mt-12 bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300">
-          <h3 className="text-xl font-semibold mb-4 text-gray-700">
-            Community Challenges
-          </h3>
-          {/* TODO: Implement CommunitySocialComponent */}
-        </div>
       </main>
 
       {showCreationWizard && (
@@ -96,17 +89,17 @@ export default function HabitsTrackerPage() {
         </div>
       )}
 
-      <footer className="flex flex-col items-center p-4 mt-8">
-        <div className="mb-4">
-          <button className="bg-indigo-500 text-white py-2 px-2 rounded-xl hover:bg-indigo-300 transition-all duration-300">
-            <Link href="/emotionsTracker">back</Link>
+      <footer className="flex justify-center space-x-4 p-8 mt-12">
+        <Link href="/emotionsTracker">
+          <button className="bg-[#0F52BA] text-white py-3 px-6 rounded-full hover:bg-[#0D47A1] transition-all duration-300 shadow-md">
+            Back
           </button>
-        </div>
-        <div>
-          <button className="bg-indigo-500 text-white py-2 px-2 rounded-xl hover:bg-indigo-300 transition-all duration-300">
-            <Link href="/dashboard">next</Link>
+        </Link>
+        <Link href="/dashboard">
+          <button className="bg-[#0F52BA] text-white py-3 px-6 rounded-full hover:bg-[#0D47A1] transition-all duration-300 shadow-md">
+            Next
           </button>
-        </div>
+        </Link>
       </footer>
     </div>
   );

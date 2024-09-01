@@ -14,11 +14,11 @@ import Link from "next/link";
 
 const HeroSection = () => {
   return (
-    <section className="text-center py-20 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+    <section className="text-center py-20 bg-[#0F52BA] text-white">
       <h1 className="text-4xl md:text-6xl font-bold mb-4">
         Empower Your Mind with CognoZen
       </h1>
-      <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
+      <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-[#87CEEB]">
         Transform your cognitive abilities with our AI-powered Empowerment Suite.
       </p>
     </section>
@@ -27,19 +27,19 @@ const HeroSection = () => {
 
 const FeatureCard = ({ title, description, icon }: { title: string; description: string; icon: string }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="text-3xl mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+    <div className="bg-white p-6 rounded-lg shadow-md border-2 border-[#0F52BA]">
+      <div className="text-3xl mb-4 text-[#0F52BA]">{icon}</div>
+      <h3 className="text-xl font-semibold mb-2 text-[#0F52BA]">{title}</h3>
+      <p className="text-[#2C3E50]">{description}</p>
     </div>
   );
 };
 
 const FeatureSection = () => {
   return (
-    <section className="py-20 bg-gray-100">
+    <section className="py-20 bg-[#E3F2FD]">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 text-[#0F52BA]">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
             title="Personalized Analytics"
@@ -69,14 +69,14 @@ const FeatureSection = () => {
 
 export default function Home() {
   return (
-    <main>
+    <main className="bg-white">
       <HeroSection />
       <FeatureSection />
-      <div className="max-w-[988px] mx-auto flex-1 w-full flex flex-col lg:flex-row items-center justify-center p-4 gap-2">
+      <div className="max-w-[988px] mx-auto flex-1 w-full flex flex-col lg:flex-row items-center justify-center p-4 gap-2 bg-[#E3F2FD]">
         <div className="flex flex-col items-center gap-y-8">
           <div className="flex flex-col items-center gap-y-3 max-w-[330px] w-full">
             <ClerkLoading>
-              <Loader className="h-5 w-5 text-muted-foreground animate-spin" />
+              <Loader className="h-5 w-5 text-[#0F52BA] animate-spin" />
             </ClerkLoading>
             <ClerkLoaded>
               <SignedOut>
@@ -85,7 +85,7 @@ export default function Home() {
                   afterSignInUrl="/emotionsTracker"
                   afterSignUpUrl="/emotionsTracker"
                 >
-                  <Button size="lg" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                  <Button size="lg" className="w-full bg-[#0F52BA] hover:bg-[#0D47A1] text-white">
                     Get Started
                   </Button>
                 </SignUpButton>
@@ -94,17 +94,17 @@ export default function Home() {
                   afterSignInUrl="/emotionsTracker"
                   afterSignUpUrl="/emotionsTracker"
                 >
-                  <Button size="lg" className="w-full bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-50">
+                  <Button size="lg" className="w-full bg-white border-2 border-[#0F52BA] text-[#0F52BA] hover:bg-[#E3F2FD]">
                     I already have an account
                   </Button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" asChild>
+                <Button size="lg" className="w-full bg-[#0F52BA] hover:bg-[#0D47A1] text-white" asChild>
                   <Link href="/emotionsTracker">Continue Learning</Link>
                 </Button>
                 <SignOutButton>
-                  <Button size="lg" className="w-full bg-red-600 hover:bg-red-700 text-white mt-2">
+                  <Button size="lg" className="w-full bg-white border-2 border-[#0F52BA] text-[#0F52BA] hover:bg-[#E3F2FD] mt-2">
                     Logout
                   </Button>
                 </SignOutButton>
