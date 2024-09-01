@@ -61,7 +61,7 @@ const TodaysQuizAttentionData: React.FC = () => {
   return (
     <Card className="w-full shadow-sm bg-gradient-to-br from-purple-50 to-indigo-50">
       <CardHeader className="bg-gradient-to-r from-purple-100 to-indigo-100">
-        <CardTitle className="text-sm font-semibold text-purple-800">Today's Quiz Attention Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-purple-800">Today Quiz Attention Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">

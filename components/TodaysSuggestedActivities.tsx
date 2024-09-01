@@ -74,7 +74,7 @@ const TodaysSuggestedActivities: React.FC = () => {
   return (
     <div className="bg-white rounded-xl shadow-xl overflow-hidden">
       <div className="bg-gradient-to-r from-indigo-200 to-purple-200 px-6 py-2">
-        <h2 className="text-sm font-bold text-black">Today's Suggested Activities</h2>
+        <h2 className="text-sm font-bold text-black">Today Suggested Activities</h2>
       </div>
       <div className="p-6">
         <div className="flex items-center mb-4">

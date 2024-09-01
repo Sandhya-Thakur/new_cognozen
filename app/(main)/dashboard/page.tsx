@@ -9,7 +9,6 @@ import TodaysPdfEmotionData from "@/components/TodaysPdfEmotionData";
 import LiveEmotionData from "@/components/LiveEmotionData";
 import TodaysQuizAttentionData from "@/components/TodaysQuizAttentionData"
 import TodaysQuizEmotionData from "@/components/TodaysQuizEmotionData"
-import MoodTrendsData from "@/components/MoodTrendsData";
 import DailyMoodComparison from "@/components/MoodComparison";
 import AllsHabits from "@/components/AllHabits";
 import HabitCompleted from "@/components/HabitCompleted";
@@ -57,9 +56,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          <DashboardCard title="">
-            <MoodTrendsData />
-          </DashboardCard>
+  
 
           <DashboardCard title="">
             <DailyMoodComparison />
