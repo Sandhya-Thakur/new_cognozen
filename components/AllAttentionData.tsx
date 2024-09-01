@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import LiveAttentionData from "@/components/LiveAttentionData";
 
 interface AttentionData {
@@ -27,12 +27,12 @@ const AttentionDataDashboard: React.FC = () => {
     // ... (rest of the useEffect code remains the same)
   }, []);
 
-  const renderAttentionChart = (data: AttentionData[], title: string, dataKey: 'readingLevel' | 'quizLevel', titleSize: string = 'text-2xl') => (
+  const renderAttentionChart = (data: AttentionData[], title: string, dataKey: "readingLevel" | "quizLevel", titleSize: string = "text-2xl") => (
     <Card className="border-[#C0C0C0] mb-6">
       <CardHeader className="bg-[#0F52BA] text-white">
         <CardTitle className={titleSize}>{title}</CardTitle>
         <CardDescription className="text-[#87CEEB]">
-          {dataKey === 'readingLevel' ? 'Reading Attention Levels' : 'Quiz Attention Levels'}
+          {dataKey === "readingLevel" ? "Reading Attention Levels" : "Quiz Attention Levels"}
         </CardDescription>
       </CardHeader>
       <CardContent className="bg-white p-6">
@@ -44,9 +44,9 @@ const AttentionDataDashboard: React.FC = () => {
             <Line
               type="monotone"
               dataKey={dataKey}
-              stroke={dataKey === 'readingLevel' ? "#0F52BA" : "#87CEEB"}
+              stroke={dataKey === "readingLevel" ? "#0F52BA" : "#87CEEB"}
               strokeWidth={2}
-              name={dataKey === 'readingLevel' ? "Reading" : "Quiz"}
+              name={dataKey === "readingLevel" ? "Reading" : "Quiz"}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -61,7 +61,7 @@ const AttentionDataDashboard: React.FC = () => {
       <Tabs defaultValue="live" className="mb-12">
         <TabsList className="bg-[#0F52BA] text-white">
           <TabsTrigger value="live" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Live Data</TabsTrigger>
-          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Today&apos;s Data</TabsTrigger>
+          <TabsTrigger value="today" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Current Day Data</TabsTrigger>
           <TabsTrigger value="tenDays" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Last 10 Days</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">This Month</TabsTrigger>
         </TabsList>
@@ -79,8 +79,8 @@ const AttentionDataDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="today">
-          {renderAttentionChart(todayData, "Today&apos;s Reading Attention Levels", "readingLevel", "text-lg")}
-          {renderAttentionChart(todayData, "Today&apos;s Quiz Attention Levels", "quizLevel", "text-lg")}
+          {renderAttentionChart(todayData, "Current Day Reading Attention Levels", "readingLevel", "text-lg")}
+          {renderAttentionChart(todayData, "Current Day Quiz Attention Levels", "quizLevel", "text-lg")}
         </TabsContent>
 
         <TabsContent value="tenDays">
@@ -89,8 +89,8 @@ const AttentionDataDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="month">
-          {renderAttentionChart(monthData, "This Month&apos;s Reading Attention Levels", "readingLevel", "text-lg")}
-          {renderAttentionChart(monthData, "This Month&apos;s Quiz Attention Levels", "quizLevel", "text-lg")}
+          {renderAttentionChart(monthData, "This Month Reading Attention Levels", "readingLevel", "text-lg")}
+          {renderAttentionChart(monthData, "This Month Quiz Attention Levels", "quizLevel", "text-lg")}
         </TabsContent>
       </Tabs>
     </div>

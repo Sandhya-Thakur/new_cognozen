@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 interface EmotionData {
   timestamp: string;
@@ -64,21 +64,22 @@ const AllEmotionsDataDashboard: React.FC = () => {
 
       <Tabs defaultValue="today" className="mb-12">
         <TabsList className="bg-blue-600 text-white">
-          <TabsTrigger value="today" className="data-[state=active]:bg-blue-400 data-[state=active]:text-white">Today&apos;s Data</TabsTrigger>
+        <TabsTrigger value="live" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Live Data</TabsTrigger>
+          <TabsTrigger value="today" className="data-[state=active]:bg-blue-400 data-[state=active]:text-white">Current Day Data</TabsTrigger>
           <TabsTrigger value="week" className="data-[state=active]:bg-blue-400 data-[state=active]:text-white">This Week</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-blue-400 data-[state=active]:text-white">This Month</TabsTrigger>
         </TabsList>
 
         <TabsContent value="today">
-          {renderEmotionChart(todayData, "Today&apos;s Emotional Journey")}
+          {renderEmotionChart(todayData, "Current Day Emotional Journey")}
         </TabsContent>
 
         <TabsContent value="week">
-          {renderEmotionChart(weekData, "This Week&apos;s Emotional Trends")}
+          {renderEmotionChart(weekData, "This Week Emotional Trends")}
         </TabsContent>
 
         <TabsContent value="month">
-          {renderEmotionChart(monthData, "This Month&apos;s Emotional Overview")}
+          {renderEmotionChart(monthData, "This Month Emotional Overview")}
         </TabsContent>
       </Tabs>
 
@@ -91,12 +92,12 @@ const AllEmotionsDataDashboard: React.FC = () => {
         </CardHeader>
         <CardContent className="bg-white p-6">
           <p>
-            Your emotions play a crucial role in your overall well-being. Here&apos;s what we&apos;ve observed:
+            Your emotions play a crucial role in your overall well-being. Here are our observations:
           </p>
           <ul className="list-disc pl-5 mt-2">
             <li>Your joy levels tend to peak in the mornings.</li>
             <li>Stress seems to be higher on weekdays compared to weekends.</li>
-            <li>You&apos;ve shown great resilience in managing anger over the past month.</li>
+            <li>You have shown great resilience in managing anger over the past month.</li>
           </ul>
         </CardContent>
       </Card>
