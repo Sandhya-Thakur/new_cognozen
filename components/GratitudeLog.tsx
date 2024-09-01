@@ -25,8 +25,8 @@ const GratitudeLog: React.FC = () => {
   useEffect(() => {
     // In a real application, you&apos;d fetch this data from an API
     const fetchedEntries = [
-      { id: '1', date: '2024-09-01', content: "I&apos;m grateful for my supportive family." },
-      { id: '2', date: '2024-09-02', content: "I&apos;m thankful for the beautiful weather today." },
+      { id: '1', date: '2024-09-01', content: "I m grateful for my supportive family." },
+      { id: '2', date: '2024-09-02', content: "I m thankful for the beautiful weather today." },
       { id: '3', date: '2024-09-03', content: "I appreciate the opportunity to learn new things at work." },
     ];
     setEntries(fetchedEntries);
@@ -101,7 +101,7 @@ const GratitudeLog: React.FC = () => {
             <li>Regular gratitude practice may lead to better sleep quality.</li>
           </ul>
           <p className="mt-4">
-            Remember, it&apos;s not about having everything perfect - it&apos;s about appreciating what you have.
+            Remember, it is not about having everything perfect - it is about appreciating what you have.
           </p>
         </CardContent>
       </Card>
