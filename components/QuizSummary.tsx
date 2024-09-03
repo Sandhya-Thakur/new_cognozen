@@ -89,7 +89,7 @@ const QuizSummary: React.FC = () => {
   return (
     <div className="bg-[#F8F9FA] p-8 rounded-2xl shadow-md">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-serif font-bold text-[#0F52BA]">Quiz Summary</h2>
+        <h2 className="text-2xl font-serif font-bold text-[#0F52BA]">Quiz Summary</h2>
         <button 
           onClick={viewAll} 
           className="flex items-center text-[#0F52BA] hover:text-[#0D47A1] transition-colors duration-200 font-semibold"

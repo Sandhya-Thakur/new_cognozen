@@ -15,10 +15,10 @@ import Link from "next/link";
 const HeroSection = () => {
   return (
     <section className="text-center py-20 bg-[#0F52BA] text-white">
-      <h1 className="text-4xl md:text-6xl font-bold mb-4">
+      <h1 className="text-3xl md:text-3xl font-bold mb-4">
         Empower Your Mind with CognoZen
       </h1>
-      <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-[#87CEEB]">
+      <p className="text-xl md:text-xl mb-8 max-w-xl mx-auto text-[#87CEEB]">
         Transform your cognitive abilities with our AI-powered Empowerment Suite.
       </p>
     </section>
@@ -39,7 +39,7 @@ const FeatureSection = () => {
   return (
     <section className="py-20 bg-[#E3F2FD]">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-[#0F52BA]">Key Features</h2>
+        <h2 className="text-2xl font-bold text-center mb-12 text-[#0F52BA]">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
             title="Personalized Analytics"

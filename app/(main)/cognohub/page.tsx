@@ -3,6 +3,7 @@
 import { Header } from "./cognoHeader";
 import CognoHubPdf from "@/components/CognoHubPdf";
 import FlashCardGroups from "@/components/GroupFlashCards";
+import QuizGroups from "@/components/QuizGroup"
 import QuizSummary from "@/components/QuizSummary"
 
 const CognoHub = () => {
@@ -11,7 +12,8 @@ const CognoHub = () => {
       <Header />
       <CognoHubPdf />
       <FlashCardGroups />
-     <QuizSummary/>
+      <QuizGroups/>
+      <QuizSummary/>
 
     </div>
   );

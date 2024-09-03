@@ -44,43 +44,58 @@ const FlashCardGroups: React.FC = () => {
     },
   });
 
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, string[]>>({});
-  const [groupedFlashcards, setGroupedFlashcards] = useState<FlashcardGroup[]>([]);
+  const [expandedGroups, setExpandedGroups] = useState<
+    Record<string, string[]>
+  >({});
+  const [groupedFlashcards, setGroupedFlashcards] = useState<FlashcardGroup[]>(
+    []
+  );
 
   useEffect(() => {
     if (data) {
-      const grouped: FlashcardGroup[] = data.reduce((acc: FlashcardGroup[], set) => {
-        let parsedContent;
-        try {
-          parsedContent = JSON.parse(set.content);
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-          return acc;
-        }
+      const grouped: FlashcardGroup[] = data.reduce(
+        (acc: FlashcardGroup[], set) => {
+          let parsedContent;
+          try {
+            parsedContent = JSON.parse(set.content);
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            return acc;
+          }
 
-        if (parsedContent && Array.isArray(parsedContent.flashcards)) {
-          acc.push({
-            pdfName: set.pdfName,
-            flashcards: parsedContent.flashcards,
-            createdAt: set.createdAt,
-          });
-        } else if (set.role === "system" && typeof parsedContent === "object") {
-          const flashcards = Object.entries(parsedContent).map(([key, value]) => ({
-            question: key,
-            answer: value as string,
-          }));
-          acc.push({
-            pdfName: set.pdfName,
-            flashcards,
-            createdAt: set.createdAt,
-          });
-        }
-        return acc;
-      }, []);
+          if (parsedContent && Array.isArray(parsedContent.flashcards)) {
+            acc.push({
+              pdfName: set.pdfName,
+              flashcards: parsedContent.flashcards,
+              createdAt: set.createdAt,
+            });
+          } else if (
+            set.role === "system" &&
+            typeof parsedContent === "object"
+          ) {
+            const flashcards = Object.entries(parsedContent).map(
+              ([key, value]) => ({
+                question: key,
+                answer: value as string,
+              })
+            );
+            acc.push({
+              pdfName: set.pdfName,
+              flashcards,
+              createdAt: set.createdAt,
+            });
+          }
+          return acc;
+        },
+        []
+      );
 
       // Sort by createdAt date (newest first) and take only the first 6
       const sortedAndLimited = grouped
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
         .slice(0, 6);
 
       setGroupedFlashcards(sortedAndLimited);
@@ -88,7 +103,12 @@ const FlashCardGroups: React.FC = () => {
   }, [data]);
 
   if (isLoading) return <Skeleton className="w-full h-48" />;
-  if (isError) return <div className="text-center text-[#0F52BA]">Error loading flashcard groups</div>;
+  if (isError)
+    return (
+      <div className="text-center text-[#0F52BA]">
+        Error loading flashcard groups
+      </div>
+    );
 
   const toggleGroup = (pdfName: string) => {
     setExpandedGroups((prev) => ({
@@ -113,9 +133,11 @@ const FlashCardGroups: React.FC = () => {
   return (
     <div className="bg-[#F8F9FA] p-8 rounded-2xl shadow-md">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-serif font-bold text-[#0F52BA]">Flashcards</h2>
-        <button 
-          onClick={viewAll} 
+        <h2 className="text-3xl font-serif font-bold text-[#0F52BA]">
+          Flashcards
+        </h2>
+        <button
+          onClick={viewAll}
           className="flex items-center text-[#0F52BA] hover:text-[#0D47A1] transition-colors duration-200 font-semibold"
         >
           View All
@@ -124,7 +146,10 @@ const FlashCardGroups: React.FC = () => {
       </div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {groupedFlashcards.map((group) => (
-          <Card key={group.pdfName} className="overflow-hidden border border-[#0F52BA] bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <Card
+            key={group.pdfName}
+            className="overflow-hidden border border-[#0F52BA] bg-white shadow-lg hover:shadow-xl transition-shadow duration-300"
+          >
             <CardHeader className="bg-[#E3F2FD] border-b border-[#0F52BA] p-4">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -133,7 +158,10 @@ const FlashCardGroups: React.FC = () => {
                     {group.pdfName.trim()}
                   </span>
                 </div>
-                <Badge variant="secondary" className="text-sm bg-[#0F52BA] text-white">
+                <Badge
+                  variant="secondary"
+                  className="text-sm bg-[#0F52BA] text-white"
+                >
                   {group.flashcards.length}
                 </Badge>
               </CardTitle>
@@ -174,7 +202,9 @@ const FlashCardGroups: React.FC = () => {
                           >
                             <AccordionItem value={`card-${index}`}>
                               <AccordionTrigger
-                                onClick={() => toggleFlashcard(group.pdfName, index)}
+                                onClick={() =>
+                                  toggleFlashcard(group.pdfName, index)
+                                }
                                 className="text-left p-3"
                               >
                                 <div className="flex items-center space-x-2">
