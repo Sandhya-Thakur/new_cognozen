@@ -16,7 +16,7 @@ const IncompleteHabitsList: React.FC<{
   habits: Habit[];
   onClose: () => void;
 }> = ({ habits, onClose }) => (
-  <div className="absolute right-0 mt-2 w-64 bg-gradient-to-r from-blue-600 to-purple-600 rounded-md shadow-lg z-10 text-white">
+  <div className="absolute right-0 mt-2 w-64 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg z-10 text-white">
     <div className="p-4">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg font-semibold">Incomplete Habits</h3>
@@ -35,6 +35,19 @@ const IncompleteHabitsList: React.FC<{
     </div>
   </div>
 );
+
+const getMoodEmoji = (mood: string): string => {
+  const moodMap: { [key: string]: string } = {
+    happy: "😊",
+    sad: "😢",
+    angry: "😠",
+    excited: "😃",
+    calm: "😌",
+    anxious: "😰",
+    neutral: "😐",
+  };
+  return moodMap[mood.toLowerCase()] || "🤔";
+};
 
 export const Header: React.FC = () => {
   const [timeRange, setTimeRange] = useState("Today");
@@ -156,7 +169,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 shadow-md">
+    <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-4 shadow-md">
       <div className="container mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="flex items-center mb-4 sm:mb-0">
@@ -166,7 +179,9 @@ export const Header: React.FC = () => {
 
           <div className="flex flex-wrap items-center justify-center sm:justify-end space-x-2 sm:space-x-4">
             <div className="flex items-center bg-white bg-opacity-20 px-3 py-1 rounded-full mb-2 sm:mb-0">
-              <Smile size={20} className="mr-2 text-yellow-300" />
+              <span className="mr-2 text-2xl">
+                {isLoading ? "🤔" : getMoodEmoji(currentMood || "Unknown")}
+              </span>
               <span>{isLoading ? "Loading..." : currentMood || "Not set"}</span>
             </div>
 
