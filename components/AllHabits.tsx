@@ -1,5 +1,4 @@
-"use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface Habit {
   id: number;
@@ -15,12 +14,7 @@ const AllsHabits: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTodaysHabits();
-  }, []);
-
-  const fetchTodaysHabits = async () => {
-    setIsLoading(true);
+  const fetchTodaysHabits = useCallback(async () => {
     try {
       const response = await fetch('/api/habits/all', {
         headers: {
@@ -32,13 +26,26 @@ const AllsHabits: React.FC = () => {
       }
       const data = await response.json();
       setHabits(data.habits);
+      setError(null);
     } catch (error) {
       console.error('Error fetching habits:', error);
       setError('Failed to load habits. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTodaysHabits();
+    
+    // Set up polling every 30 seconds
+    const intervalId = setInterval(() => {
+      fetchTodaysHabits();
+    }, 30000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [fetchTodaysHabits]);
 
   const toggleHabit = async (id: number) => {
     try {
@@ -48,12 +55,12 @@ const AllsHabits: React.FC = () => {
           'Content-Type': 'application/json',
         },
       });
-
+      
       if (!response.ok) {
         throw new Error('Failed to toggle habit');
       }
-
-      const data = await response.json();
+      
+      await response.json();
       setHabits(habits.map(habit => 
         habit.id === id ? { ...habit, isActive: !habit.isActive } : habit
       ));

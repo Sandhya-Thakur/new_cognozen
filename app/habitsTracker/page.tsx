@@ -72,12 +72,6 @@ export default function HabitsTrackerPage() {
             <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
               <HabitInsightsComponent />
             </div>
-            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
-            <h3 className="text-2xl font-semibold mb-4 text-[#0F52BA]">
-              Community Challenges
-            </h3>
-            {/* TODO: Implement CommunitySocialComponent */}
-          </div>
           </div>
         </div>
 
