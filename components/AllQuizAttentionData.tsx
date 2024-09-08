@@ -156,7 +156,7 @@ const AllQuizAttentionData: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-[#F8F9FA]">
+    <div className="container mx-auto px-4 py-4 bg-[#F8F9FA]">
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabValue)} className="mb-12">
         <TabsList className="bg-purple-100 text-purple-800">
           <TabsTrigger value="live" className="data-[state=active]:bg-purple-200 data-[state=active]:text-purple-900">Live Data</TabsTrigger>

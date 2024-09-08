@@ -2,10 +2,16 @@ import { db } from "@/lib/db";
 import { chats, flashcards } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export const runtime = "edge";
 
 export async function GET(request: Request) {
+  const { userId } = await auth();
+  if (!userId) {
+    return redirect("/sign-in");
+  }
     try {
       const { searchParams } = new URL(request.url);
       const idParam = searchParams.get('id');
@@ -20,7 +26,7 @@ export async function GET(request: Request) {
             role: flashcards.role,
             pdfName: chats.pdfName,
           })
-          .from(flashcards)
+          .from(flashcards).where(eq(chats.userId, userId))
           .leftJoin(chats, eq(flashcards.chatId, chats.id));
         return NextResponse.json(allFlashcards);
       }

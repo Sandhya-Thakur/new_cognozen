@@ -1,6 +1,6 @@
 // File: app/api/quizzes/summary/route.ts
 import { db } from "@/lib/db";
-import { quizzes, quizAttempts, quizResponses, quizQuestions } from "@/lib/db/schema";
+import { quizzes, quizAttempts, quizResponses, quizQuestions, chats } from "@/lib/db/schema";
 import { eq, and, count } from "drizzle-orm";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
 export async function GET(request: Request) {
-  const { userId } = await auth();
+  const { userId } = auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -19,7 +19,11 @@ export async function GET(request: Request) {
       id: quizzes.id,
       chatId: quizzes.chatId,
       title: quizzes.title,
+      description: quizzes.description,
       totalQuestions: quizzes.totalQuestions,
+      createdAt: quizzes.createdAt,
+      pdfName: chats.pdfName,
+      pdfUrl: chats.pdfUrl,
       attemptId: quizAttempts.id,
       completed: quizAttempts.completed,
       score: quizAttempts.score,
@@ -28,8 +32,10 @@ export async function GET(request: Request) {
       currentQuestionOrder: quizAttempts.currentQuestionOrder,
     })
     .from(quizzes)
+    .leftJoin(chats, eq(quizzes.chatId, chats.id))
     .leftJoin(quizAttempts, eq(quizzes.id, quizAttempts.quizId))
-    .orderBy(quizzes.id);
+    .where(eq(chats.userId, userId))
+    .orderBy(quizzes.createdAt);
 
     const quizzesWithDetails = await Promise.all(quizSummaries.map(async (quiz) => {
       if (quiz.attemptId) {
