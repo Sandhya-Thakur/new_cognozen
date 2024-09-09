@@ -330,3 +330,16 @@ export const moodHabitCorrelations = pgTable("mood_habit_correlations", {
 
 export type MoodHabitCorrelation = typeof moodHabitCorrelations.$inferSelect;
 
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  seen: boolean("seen").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+

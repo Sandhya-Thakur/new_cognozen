@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import HabitCreationWizard from "@/components/HabitCreationWizard";
 import AllsHabits from "@/components/AllHabits";
-import Link from "next/link";
 import ManualHabitCompletion from "@/components/ManualHabitCompletion";
 import HabitInsightsComponent from "@/components/HabitInsightsComponent";
 
@@ -84,16 +83,6 @@ export default function HabitsTrackerPage() {
       )}
 
       <footer className="flex justify-center space-x-4 p-8 mt-12">
-        <Link href="/emotionsTracker">
-          <button className="bg-[#0F52BA] text-white py-3 px-6 rounded-full hover:bg-[#0D47A1] transition-all duration-300 shadow-md">
-            Back
-          </button>
-        </Link>
-        <Link href="/dashboard">
-          <button className="bg-[#0F52BA] text-white py-3 px-6 rounded-full hover:bg-[#0D47A1] transition-all duration-300 shadow-md">
-            Next
-          </button>
-        </Link>
       </footer>
     </div>
   );

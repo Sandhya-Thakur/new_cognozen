@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
-import { useAuth } from '@clerk/nextjs';
-import { Mic, MicOff } from 'lucide-react';
+import React, { useState, useRef } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { Mic, MicOff } from "lucide-react";
 
 const JournalEntryForm: React.FC = () => {
-  const [journalEntry, setJournalEntry] = useState('');
+  const [journalEntry, setJournalEntry] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const { isLoaded, userId } = useAuth();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -15,12 +18,15 @@ const JournalEntryForm: React.FC = () => {
 
   const saveJournalEntry = async () => {
     if (!isLoaded || !userId) {
-      setFeedback({ message: "You must be logged in to save a journal entry.", type: 'error' });
+      setFeedback({
+        message: "You must be logged in to save a journal entry.",
+        type: "error",
+      });
       return;
     }
 
     if (!journalEntry.trim()) {
-      setFeedback({ message: "Journal entry cannot be empty.", type: 'error' });
+      setFeedback({ message: "Journal entry cannot be empty.", type: "error" });
       return;
     }
 
@@ -29,25 +35,31 @@ const JournalEntryForm: React.FC = () => {
 
     try {
       console.log("Saving journal entry...");
-      const response = await fetch('/api/upload-journal-data', {
-        method: 'POST',
+      const response = await fetch("/api/upload-journal-data", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ content: journalEntry }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save journal entry');
+        throw new Error("Failed to save journal entry");
       }
 
       const data = await response.json();
-      console.log('Journal entry saved:', data.entry);
-      setFeedback({ message: "Journal entry saved successfully!", type: 'success' });
-      setJournalEntry(''); // Clear the textarea after successful save
+      console.log("Journal entry saved:", data.entry);
+      setFeedback({
+        message: "Journal entry saved successfully!",
+        type: "success",
+      });
+      setJournalEntry(""); // Clear the textarea after successful save
     } catch (error) {
-      console.error('Error saving journal entry:', error);
-      setFeedback({ message: "Failed to save journal entry. Please try again.", type: 'error' });
+      console.error("Error saving journal entry:", error);
+      setFeedback({
+        message: "Failed to save journal entry. Please try again.",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -68,7 +80,9 @@ const JournalEntryForm: React.FC = () => {
 
       mediaRecorderRef.current.onstop = () => {
         console.log("Recording stopped, sending to Whisper...");
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
+        });
         sendAudioToWhisper(audioBlob);
       };
 
@@ -76,8 +90,11 @@ const JournalEntryForm: React.FC = () => {
       setIsRecording(true);
       console.log("Recording started successfully");
     } catch (error) {
-      console.error('Error starting recording:', error);
-      setFeedback({ message: "Unable to access microphone. Please check your permissions.", type: 'error' });
+      console.error("Error starting recording:", error);
+      setFeedback({
+        message: "Unable to access microphone. Please check your permissions.",
+        type: "error",
+      });
     }
   };
 
@@ -95,19 +112,21 @@ const JournalEntryForm: React.FC = () => {
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     console.log("Preparing to send audio to Whisper API...");
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'recording.wav');
+    formData.append("audio", audioBlob, "recording.wav");
 
     try {
       console.log("Sending request to Whisper API...");
-      const response = await fetch('/api/whisper-api', {
-        method: 'POST',
+      const response = await fetch("/api/whisper-api", {
+        method: "POST",
         body: formData,
       });
 
       console.log("Received response from Whisper API", response.status);
 
       if (!response.ok) {
-        throw new Error(`Failed to transcribe audio: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to transcribe audio: ${response.status} ${response.statusText}`
+        );
       }
 
       const data = await response.json();
@@ -115,18 +134,24 @@ const JournalEntryForm: React.FC = () => {
 
       if (data.text === undefined) {
         console.error("Received undefined text from API");
-        setFeedback({ message: "Received invalid response from transcription service.", type: 'error' });
+        setFeedback({
+          message: "Received invalid response from transcription service.",
+          type: "error",
+        });
         return;
       }
 
-      setJournalEntry(prev => {
-        const newEntry = prev + ' ' + data.text;
+      setJournalEntry((prev) => {
+        const newEntry = prev + " " + data.text;
         console.log("Updated journal entry:", newEntry);
         return newEntry;
       });
     } catch (error) {
-      console.error('Error transcribing audio:', error);
-      setFeedback({ message: "Failed to transcribe audio. Please try again.", type: 'error' });
+      console.error("Error transcribing audio:", error);
+      setFeedback({
+        message: "Failed to transcribe audio. Please try again.",
+        type: "error",
+      });
     }
   };
 
@@ -136,7 +161,9 @@ const JournalEntryForm: React.FC = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-800">Daily Journal</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-800">
+        Daily Journal
+      </h2>
       <div className="mb-4 relative">
         <textarea
           className="w-full h-64 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
@@ -147,28 +174,31 @@ const JournalEntryForm: React.FC = () => {
         ></textarea>
         <button
           className={`absolute bottom-4 right-4 p-2 rounded-full ${
-            isRecording ? 'bg-red-500' : 'bg-indigo-600'
-          } text-white`}
+            isRecording ? "bg-green-500" : "bg-indigo-600"
+          } text-white hover:${isRecording ? "bg-green-600" : "bg-indigo-700"} transition-colors duration-200`}
           onClick={isRecording ? stopRecording : startRecording}
         >
-          {isRecording ? <MicOff size={24} /> : <Mic size={24} />}
+          {isRecording ? <Mic size={24} /> : <MicOff size={24} />}
         </button>
       </div>
       <div className="flex justify-end mb-8">
         <button
           className={`px-6 py-2 rounded-lg text-white font-semibold
-            ${isSubmitting
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50'
+            ${
+              isSubmitting
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
             }`}
           onClick={saveJournalEntry}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : 'Save Entry'}
+          {isSubmitting ? "Saving..." : "Save Entry"}
         </button>
       </div>
       {feedback && (
-        <div className={`mb-4 p-3 rounded-lg ${feedback.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+        <div
+          className={`mb-4 p-3 rounded-lg ${feedback.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+        >
           {feedback.message}
         </div>
       )}

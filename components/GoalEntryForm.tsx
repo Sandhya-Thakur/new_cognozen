@@ -15,7 +15,27 @@ const PREDEFINED_GOALS = [
   "Limit social media use to 1 hour per day",
   "Write in a journal for 15 minutes",
   "Try a new hobby or activity",
-  "Set and enforce personal boundaries"
+  "Set and enforce personal boundaries",
+  "Meditate for 15 minutes each morning",
+  "Practice deep breathing exercises twice daily",
+  "Read a chapter of a self-help book weekly",
+  "Take a 20-minute nature walk",
+  "Perform one random act of kindness daily",
+  "Maintain a consistent sleep schedule",
+  "Practice positive self-talk throughout the day",
+  "Engage in a creative activity for 30 minutes",
+  "Try a new healthy recipe each week",
+  "Declutter a small space in your home",
+  "Practice active listening in conversations",
+  "Start a gratitude journal",
+  "Learn and practice a new coping skill",
+  "Engage in 10 minutes of stretching or yoga",
+  "Set aside time for a hobby you enjoy",
+  "Create and follow a weekly meal plan",
+  "Practice forgiveness towards yourself and others",
+  "Take regular breaks during work hours",
+  "Limit caffeine intake after 2 PM",
+  "Spend 15 minutes reflecting on personal growth"
 ];
 
 const GoalEntryForm: React.FC = () => {
@@ -60,15 +80,80 @@ const GoalEntryForm: React.FC = () => {
   };
 
   const startRecording = async () => {
-    // ... (previous recording logic remains the same)
+    console.log("Starting recording...");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        console.log("Recording stopped, sending to Whisper...");
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        sendAudioToWhisper(audioBlob);
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      console.log("Recording started successfully");
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      toast.error("Unable to access microphone. Please check your permissions.");
+    }
   };
 
   const stopRecording = () => {
-    // ... (previous recording logic remains the same)
+    console.log("Stopping recording...");
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      console.log("Recording stopped");
+    } else {
+      console.log("No active recording to stop");
+    }
   };
 
   const sendAudioToWhisper = async (audioBlob: Blob) => {
-    // ... (previous audio processing logic remains the same)
+    console.log("Preparing to send audio to Whisper API...");
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.wav');
+
+    try {
+      console.log("Sending request to Whisper API...");
+      const response = await fetch('/api/whisper-api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log("Received response from Whisper API", response.status);
+
+      if (!response.ok) {
+        throw new Error(`Failed to transcribe audio: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Transcription data:", data);
+
+      if (data.text === undefined) {
+        console.error("Received undefined text from API");
+        toast.error("Received invalid response from transcription service.");
+        return;
+      }
+
+      setNewGoal(prev => {
+        const newGoal = prev + ' ' + data.text;
+        console.log("Updated goal:", newGoal);
+        return newGoal;
+      });
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+      toast.error("Failed to transcribe audio. Please try again.");
+    }
   };
 
   const handleGoalChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
@@ -90,11 +175,11 @@ const GoalEntryForm: React.FC = () => {
 
       <form onSubmit={addGoal} className="mb-8">
         <div className="flex flex-col space-y-2">
-          <div className="flex items-center">
+          <div className="relative">
             <select
               value={isCustomGoal ? "custom" : newGoal}
               onChange={handleGoalChange}
-              className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
               disabled={isSubmitting}
             >
               <option value="custom">Custom Goal</option>
@@ -118,12 +203,12 @@ const GoalEntryForm: React.FC = () => {
               />
               <button
                 type="button"
-                className={`p-2 ${
-                  isRecording ? 'bg-red-500' : 'bg-indigo-600'
-                } text-white`}
+                className={`p-2 rounded-r-lg ${
+                  isRecording ? "bg-green-500" : "bg-indigo-600"
+                } text-white hover:${isRecording ? "bg-green-600" : "bg-indigo-700"} transition-colors duration-200`}
                 onClick={isRecording ? stopRecording : startRecording}
               >
-                {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                {isRecording ? <Mic size={20} /> : <MicOff size={20} />}
               </button>
             </div>
           )}

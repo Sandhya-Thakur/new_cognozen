@@ -51,7 +51,7 @@ const IconButton = ({ icon: Icon, title, href }: { icon: React.ElementType; titl
 
 export const PermanentSideBar = ({ className }: Props) => {
   return (
-    <div className={cn("fixed left-0.5 top-0.5 rounded-2xl h-full w-16 bg-indigo-900 flex flex-col items-center py-4", className)}>
+    <div className={cn("fixed left-0.5 top-0.5 rounded-2xl h-full w-16 flex flex-col items-center py-4", className)} style={{ background: 'var(--BG-Sidebar, #000066)' }}>
       <Sheet>
         <SheetTrigger asChild>
           <button className="mt-2 mb-16">

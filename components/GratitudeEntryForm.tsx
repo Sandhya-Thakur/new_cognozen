@@ -169,11 +169,11 @@ const GratitudeEntryForm: React.FC = () => {
         ></textarea>
         <button
           className={`absolute bottom-4 right-4 p-2 rounded-full ${
-            isRecording ? 'bg-red-500' : 'bg-indigo-600'
-          } text-white`}
+            isRecording ? "bg-green-500" : "bg-indigo-600"
+          } text-white hover:${isRecording ? "bg-green-600" : "bg-indigo-700"} transition-colors duration-200`}
           onClick={isRecording ? stopRecording : startRecording}
         >
-          {isRecording ? <MicOff size={24} /> : <Mic size={24} />}
+          {isRecording ? <Mic size={24} /> : <MicOff size={24} />}
         </button>
       </div>
       <div className="flex justify-end mb-8">

@@ -1,7 +1,6 @@
 import React from "react";
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import PDFViewer from "@/components/PDFViewer";
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
@@ -35,11 +34,6 @@ const ReadPdfPage = async ({ params: { chatId } }: Props) => {
           <h1 className="text-2xl font-bold text-gray-800">
             CognoHub PDF Reader
           </h1>
-          <Link href="/dashboard">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-              Dashboard
-            </button>
-          </Link>
         </div>
       </header>
 

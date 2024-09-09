@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import MoodSelector from "@/components/MoodSelector";
 import GuidedBreathingExercise from "@/components/GuidedBreathingExercise";
 import InsightsAndTips from "@/components/InsightsAndTips";
@@ -75,11 +74,6 @@ export default function EmotionsTrackerPage() {
       </main>
 
       <footer className="flex flex-col items-center p-4 mt-8 mb-8">
-        <Link href="/habitsTracker">
-          <button className="bg-[#0F52BA] text-white py-4 px-8 rounded-2xl hover:bg-[#0D47A1] transition-all duration-300">
-            Continue
-          </button>
-        </Link>
       </footer>
     </div>
   );
