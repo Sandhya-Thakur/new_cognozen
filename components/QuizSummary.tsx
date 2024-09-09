@@ -39,7 +39,9 @@ interface QuizSummary {
 
 const QuizSummary: React.FC = () => {
   const router = useRouter();
-  const [expandedGroups, setExpandedGroups] = useState<Record<number, string[]>>({});
+  const [expandedGroups, setExpandedGroups] = useState<
+    Record<number, string[]>
+  >({});
 
   const { data, isLoading, isError, error } = useQuery<QuizSummary[], Error>({
     queryKey: ["quizSummary"],
@@ -49,7 +51,11 @@ const QuizSummary: React.FC = () => {
     },
     select: (data) => {
       return [...data]
-        .sort((a, b) => new Date(b.startedAt || "").getTime() - new Date(a.startedAt || "").getTime())
+        .sort(
+          (a, b) =>
+            new Date(b.startedAt || "").getTime() -
+            new Date(a.startedAt || "").getTime()
+        )
         .slice(0, 6);
     },
   });

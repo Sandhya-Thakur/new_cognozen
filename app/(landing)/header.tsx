@@ -36,8 +36,8 @@ export const Header = () => {
           <SignedOut>
             <SignInButton
               mode="modal"
-              afterSignInUrl="/emotionsTracker"
-              afterSignUpUrl="/emotionsTracker"
+              afterSignInUrl="/dashboard"
+              afterSignUpUrl="/dashboard"
             >
               <Button size="lg" className="bg-white text-[#0F52BA] hover:bg-[#E3F2FD] border-2 border-white hover:border-[#87CEEB]">
                 Get Started

@@ -82,8 +82,8 @@ export default function Home() {
               <SignedOut>
                 <SignUpButton
                   mode="modal"
-                  afterSignInUrl="/emotionsTracker"
-                  afterSignUpUrl="/emotionsTracker"
+                  afterSignInUrl="/dashboard"
+                  afterSignUpUrl="/dashboard"
                 >
                   <Button size="lg" className="w-full bg-[#0F52BA] hover:bg-[#0D47A1] text-white">
                     Get Started
@@ -91,8 +91,8 @@ export default function Home() {
                 </SignUpButton>
                 <SignInButton
                   mode="modal"
-                  afterSignInUrl="/emotionsTracker"
-                  afterSignUpUrl="/emotionsTracker"
+                  afterSignInUrl="/dashboard"
+                  afterSignUpUrl="/dashboard"
                 >
                   <Button size="lg" className="w-full bg-white border-2 border-[#0F52BA] text-[#0F52BA] hover:bg-[#E3F2FD]">
                     I already have an account
@@ -101,7 +101,7 @@ export default function Home() {
               </SignedOut>
               <SignedIn>
                 <Button size="lg" className="w-full bg-[#0F52BA] hover:bg-[#0D47A1] text-white" asChild>
-                  <Link href="/emotionsTracker">Continue Learning</Link>
+                  <Link href="/dashboard">Continue Learning</Link>
                 </Button>
                 <SignOutButton>
                   <Button size="lg" className="w-full bg-white border-2 border-[#0F52BA] text-[#0F52BA] hover:bg-[#E3F2FD] mt-2">

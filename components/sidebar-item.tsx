@@ -19,18 +19,21 @@ export const SidebarItem = ({ label, iconSrc, href }: Props) => {
   return (
     <Button
       variant={active ? "sidebar" : "ghost"}
-      className="justify-start h-[52px]"
+      className={`justify-start h-[52px] w-full text-white hover:text-white hover:bg-white/10 transition-colors ${
+        active ? 'bg-white/20' : ''
+      }`}
       asChild
     >
-      <Link href={href}>
-        <Image
-          src={iconSrc}
-          alt={label}
-          className="mr-5"
-          height={32}
-          width={32}
-        />
-        {label}
+      <Link href={href} className="flex items-center">
+        <div className="relative w-5 h-5 mr-3">
+          <Image
+            src={iconSrc}
+            alt={label}
+            layout="fill"
+            className="invert"
+          />
+        </div>
+        <span>{label}</span>
       </Link>
     </Button>
   );
