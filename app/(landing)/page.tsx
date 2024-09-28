@@ -22,7 +22,7 @@ const HeroSection = () => {
         <img className="hidden md:block absolute top-[250px] md:top-[329px] right-[20px] md:right-[88px]" src="/spiral_line.png" alt="Hero" />
         <div className="max-w-5xl mx-auto">
           <p className="text-[16px] md:text-[18px] lg:text-[20px] leading-[26px] md:leading-[28px] lg:leading-[32px] font-normal text-center mt-5 mb-10 px-4 md:px-20 lg:px-28">
-            Empower your institution with CognoZen’s AI-driven platform, delivering personalized cognitive and emotional learning experiences at scale.
+            Empower your institution with CognoZen&apos;s AI-driven platform, delivering personalized cognitive and emotional learning experiences at scale.
           </p>
         </div>
         <div className="flex flex-row justify-center items-center">
@@ -59,11 +59,11 @@ const TechSection = () => {
             <div className="w-full md:w-5/12 md:px-4 p-4">
               <div className="w-full">
                 <h3 className="font-inter font-bold text-[20px] md:text-[24px] leading-[26px] md:leading-[29px] text-left">Personalized Analytics Dashboard</h3>
-                <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1rem]">Monitors your students’ progress in real-time, tracking key metrics such as attention level, emotional response, hours of study, problem-solving skills, etc., to make informed, data-driven decisions to better support your student’s learning and growth.</p>
+                <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1rem]">Monitors your students&apos; progress in real-time, tracking key metrics such as attention level, emotional response, hours of study, problem-solving skills, etc., to make informed, data-driven decisions to better support your student&apos;s learning and growth.</p>
               </div>
               <div className="w-full pt-[2rem]">
                 <h3 className="font-inter font-bold text-[20px] md:text-[24px] leading-[26px] md:leading-[29px] text-left">CognoHub</h3>
-                <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1rem]">A centralized library for students to upload and customize their course materials, create assignments, read books, organize notes, and generate summaries or quizzes. While they focus on learning, CognoZen quietly tracks emotions, attention, and problem-solving in the background, offering real-time insights to tailor and enhance each student's unique learning journey.</p>
+                <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1rem]">A centralized library for students to upload and customize their course materials, create assignments, read books, organize notes, and generate summaries or quizzes. While they focus on learning, CognoZen quietly tracks emotions, attention, and problem-solving in the background, offering real-time insights to tailor and enhance each student&apos;s unique learning journey.</p>
               </div>
             </div>
             <div className="relative w-full md:w-7/12 md:px-4 p-4 flex justify-center md:justify-end">
@@ -80,19 +80,6 @@ const TechSection = () => {
   );
 };
 
-// const FeatureCard = ({ title, description, icon }: { title: string; description: string; icon: string }) => {
-//   return (
-//     <div className="bg-white p-6 rounded-lg shadow-md border-2 border-[#0F52BA]">
-//       <div className="text-3xl mb-4 text-[#0F52BA]">{icon}</div>
-//       <h3 className="text-xl font-semibold mb-2 text-[#0F52BA]">{title}</h3>
-//       <p className="text-[#2C3E50]">{description}</p>
-//     </div>
-//   );
-// };
-
-
-
-
 const FeatureSection = () => {
   return (
     <section className="text-center feature-bg bg-[#6E88FF] py-20 mt-[3rem]">
@@ -107,7 +94,7 @@ const FeatureSection = () => {
                   </div>
                   <h3 className="font-inter font-bold text-[20px] md:text-[24px] leading-[26px] md:leading-[29px] text-left ml-[10px] md:ml-[15px]">CognoBuddy</h3>
                 </div>
-                <p className="font-inter font-normal text-[14px] md:text-[16px] text-[#767678] leading-[24px] md:leading-[28px] text-left pt-[1rem] px-[15px] md:px-[30px]">An AI-powered learning companion that instantly answers questions and offers real-time support to students. It adapts to each student’s unique learning style and needs, clarifies concepts, solves problems, and ensures continuous progress –anytime, anywhere.</p>
+                <p className="font-inter font-normal text-[14px] md:text-[16px] text-[#767678] leading-[24px] md:leading-[28px] text-left pt-[1rem] px-[15px] md:px-[30px]">An AI-powered learning companion that instantly answers questions and offers real-time support to students. It adapts to each student&apos;s unique learning style and needs, clarifies concepts, solves problems, and ensures continuous progress –anytime, anywhere.</p>
               </div>
               <div className="w-[560px] h-[288px] texh-mob md:w-auto pt-[1rem] pb-[1rem] bg-[#0000B2] text-[#FFFFFF] rounded-[8px] p-px-[40px] my-[25px]">
                 <div className="w-full flex items-center md:pl-[27px] pl-[10px]">
@@ -125,12 +112,12 @@ const FeatureSection = () => {
                   </div>
                   <h3 className="font-inter font-bold text-[20px] md:text-[24px] leading-[26px] md:leading-[29px] text-left ml-[10px] md:ml-[15px]">HabitBuilder</h3>
                 </div>
-                <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1rem] px-[15px] md:px-[30px]">The HabitBuilder monitors study habits, offering insights into productivity and areas for improvement. Integrated with CognoZen’s AI, it adjusts learning paths based on these behaviors to optimize learning efficiency.</p>
+                <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1rem] px-[15px] md:px-[30px]">The HabitBuilder monitors study habits, offering insights into productivity and areas for improvement. Integrated with CognoZen&apos;s AI, it adjusts learning paths based on these behaviors to optimize learning efficiency.</p>
               </div>
             </div>
             <div className="relative w-full md:w-6/12 pl-[2rem] md:pl-[5rem] p-4 text-[#FFFFFF]">
               <h2 className="font-inter font-bold text-[32px] md:text-[48px] leading-[40px] md:leading-[58px] text-left pt-[1rem] md:pt-[1.5rem]">Mindfulness <br />& Well-being <br />Features</h2>
-              <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1.5rem] md:pt-[2rem]">The HabitBuilder monitors study habits, offering insights into productivity and areas for improvement. Integrated with CognoZen’s AI, it adjusts learning paths based on these behaviors to optimize learning efficiency.</p>
+              <p className="font-inter font-normal text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-left pt-[1.5rem] md:pt-[2rem]">The HabitBuilder monitors study habits, offering insights into productivity and areas for improvement. Integrated with CognoZen&apos;s AI, it adjusts learning paths based on these behaviors to optimize learning efficiency.</p>
               <div className="img mt-[6rem] md:mt-[6rem]">
                 <img className="absolute z-10 feature-overlay-img-one w-[150px] md:w-[225px] h-[250px] md:h-[353px] top-[320px] md:top-[414px] right-[-20px] md:right-[-31px]" src="/Phone.png" alt="Technology" />
                 <img className="relative mt-4 md:mt-0" src="/data.png" alt="Technology" />
@@ -145,7 +132,7 @@ const FeatureSection = () => {
 
 const ContactSection = () => {
   return(
-<section className="text-center tech-bg text-[#1A1A1E]">
+    <section className="text-center tech-bg text-[#1A1A1E]">
       <div className="max-w-7xl pt-[7rem] md:pt-[7rem] pb-[2rem] mx-auto">
         <h2 className="font-inter font-bold text-[28px] md:text-[48px] leading-[40px] md:leading-[58px] text-center">Explore CognoZen with an<br /> Exclusive FREE Trial for Universities</h2>
       </div>
