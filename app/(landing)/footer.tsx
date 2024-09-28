@@ -7,12 +7,12 @@ export const Footer = () => {
     <footer className="bg-[#000066] text-white pt-[14rem] py-8 mt-[14rem]">
       <div className="relative max-w-7xl mx-auto px-4 items-center justify-between">
         <div className="absolute inset-x-0 w-[60%] md:w-[988px] bottom-[75px] mx-auto p-6 md:p-4 bg-[#0D39FF] rounded-lg">
-          <h2 className="font-inter font-bold text-[20px] md:text-[40px] leading-[34px] md:leading-[48px] text-center pt-[3rem] md:pt-[4rem]">Ready to Transform Your <br />University's Learning Experience?</h2>
+          <h2 className="font-inter font-bold text-[20px] md:text-[40px] leading-[34px] md:leading-[48px] text-center pt-[3rem] md:pt-[4rem]">Ready to Transform Your <br />University&apos;s Learning Experience?</h2>
           <div className="flex flex-row justify-center items-center mt-[2rem] mb-[4rem]">
-          <Button size="lg" className="font-inter text-[12px] md:text-[16px] bg-[#FFD30D] text-[#1A1A1E] px-6 hover:bg-[#E3F2FD] border-1 hover:border-[#87CEEB]">
-                Request Demo
-              </Button>
-          </div>          
+            <Button size="lg" className="font-inter text-[12px] md:text-[16px] bg-[#FFD30D] text-[#1A1A1E] px-6 hover:bg-[#E3F2FD] border-1 hover:border-[#87CEEB]">
+              Request Demo
+            </Button>
+          </div>
         </div>
       </div>
       <div className="container mx-auto px-4">
