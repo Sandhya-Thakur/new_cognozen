@@ -64,3 +64,79 @@ body,
     --chart-2: 340 75% 55%;
   }
 }
+
+.clearNav {
+  backdrop-filter: saturate(180%) blur(5px) !important;
+  background-color: #0D39FF !important;
+}
+
+.nav-buttom-font {
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19.36px;
+  text-align: left;
+}
+
+.hero-bg {
+  max-width: 100%;
+  min-height: 832px;
+  position: relative;
+  padding: 0px 0px 0px 0px;
+  display: flex;
+  align-items: center;
+  background: url('/background.png');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+}
+
+@media screen and (max-width: 768px) {
+  .hero-bg {
+    min-height: 500px;
+  }
+
+  .overlay-image-one {
+    width: 185px;
+    height: 105px;
+    top: 3px;
+    right: 117px;
+  }
+
+  .overlay-image-two {
+    width: 100px;
+    height: 116px;
+    top: 65px;
+    right: -28px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .tech-bg {
+    margin-bottom: 15rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .texh-mob {
+    width: 280px;
+    height: 370px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .feature-overlay-img-one {
+    top: 395px;
+    right: -45px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .mob-contact-content {
+    width: 300px;
+    height: 500px;
+  }
+  .contact-img {
+    top: 35rem;
+    right: 1px;
+  }
+}

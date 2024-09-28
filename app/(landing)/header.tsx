@@ -13,38 +13,60 @@ import Link from "next/link";
 
 export const Header = () => {
   return (
-    <header className="h-20 w-full border-b-2 border-[#87CEEB] px-4 bg-[#0F52BA]">
-      <div className="lg:max-w-screen-lg mx-auto flex items-center justify-between h-full">
-        <Link href="/" className="flex items-center gap-x-3">
-          <Image
-            src="/cognozen.svg"
-            height={50}
-            width={50}
-            alt="CognoZen Logo"
-          />
-          <h1 className="text-2xl font-extrabold text-white tracking-wide">
-            CognoZen
-          </h1>
-        </Link>
-        <ClerkLoading>
-          <Loader className="h-5 w-5 text-white animate-spin" />
-        </ClerkLoading>
-        <ClerkLoaded>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton
-              mode="modal"
-              afterSignInUrl="/dashboard"
-              afterSignUpUrl="/dashboard"
-            >
-              <Button size="lg" className="bg-white text-[#0F52BA] hover:bg-[#E3F2FD] border-2 border-white hover:border-[#87CEEB]">
-                Get Started
-              </Button>
-            </SignInButton>
-          </SignedOut>
-        </ClerkLoaded>
+    <header className="fixed top-0 w-full clearNav z-50">
+      <div className="max-w-7xl mx-auto p-4 md:p-5 flex items-center justify-between">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center gap-x-3">
+            <Image
+              src="/cognozen.svg"
+              height={41}
+              width={208}
+              alt="CognoZen Logo"
+            />
+            {/* <h1 className="text-2xl font-extrabold text-white tracking-wide">
+              CognoZen
+            </h1> */}
+          </Link>
+        </div>
+        <div className="hidden md:flex flex-grow items-center"></div>
+        {/* Authentication Buttons */}
+        <div className="flex items-center">
+          <ClerkLoading>
+            <Loader className="h-5 w-5 text-white animate-spin" />
+          </ClerkLoading>
+          <ClerkLoaded>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            <SignedOut>
+              <SignInButton
+                mode="modal"
+                afterSignInUrl="/dashboard"
+                afterSignUpUrl="/dashboard"
+              >
+                <Button
+                  size="lg"
+                  className="hidden md:block font-inter text-[16px] bg-[#B2FF0D] text-[#1A1A1E] px-6 hover:bg-[#E3F2FD] border-1 hover:border-[#87CEEB]"
+                >
+                  Start Free Trial Today
+                </Button>
+              </SignInButton>
+            </SignedOut>
+          </ClerkLoaded>
+        </div>
+
+        {/* Mobile Button - Shown on Small Screens */}
+        <div className="block md:hidden">
+          <ClerkLoaded>
+            <SignedOut>
+              <SignInButton mode="modal" afterSignInUrl="/dashboard">
+                <Button className="font-inter text-[14px] bg-[#B2FF0D] text-[#1A1A1E] px-4 hover:bg-[#E3F2FD] border-1 hover:border-[#87CEEB]">
+                Start Free Trial Today
+                </Button>
+              </SignInButton>
+            </SignedOut>
+          </ClerkLoaded>
+        </div>
       </div>
     </header>
   );
