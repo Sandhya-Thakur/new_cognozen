@@ -31,7 +31,7 @@ const HeroSection = () => {
               <input
                 type="email"
                 placeholder="Enter email address"
-                className="px-4 py-[0.7rem] w-full md:w-72 focus:outline-none"
+                className="px-4 py-[0.7rem] w-full md:w-72 focus:outline-none text-[#000]"
               />
               <button className="bg-blue-500 hover:bg-blue-600 text-white font-inter text-[16px] font-normal py-[0.7rem] px-6">
                 Request Demo
@@ -163,7 +163,7 @@ const ContactSection = () => {
                   <p className="font-inter font-bold text-[10px] md:text-[12px] leading-[14px] md:leading-[14.52px] bg-[#0D39FF] tracking-[1.5px] md:tracking-[1.63px] uppercase rounded-[25px] px-3 py-2 mx-auto w-max">Exclusive Offer</p>
                   <h4 className="font-inter text-[24px] md:text-[32px] leading-[32px] md:leading-[39px] font-bold text-center mt-[2rem] mb-[2rem]">Early Access Special</h4>
                   <p className="font-inter text-[14px] md:text-[16px] leading-[24px] md:leading-[28px] text-center mb-[2rem]">Try CognoZen FREE with our Basic University Trial, designed to introduce your faculty and students to the future of personalized learning.</p>
-                  <Button size="lg" className="font-inter text-[14px] md:text-[16px] bg-[#FFD30D] text-[#1A1A1E] px-6 py-3 hover:bg-[#E3F2FD] hover:border-[#87CEEB] transition duration-300">
+                  <Button size="lg" className="font-inter text-[14px] md:text-[16px] bg-[#B2FF0D] text-[#1A1A1E] px-6 py-3 hover:bg-[#E3F2FD] hover:border-[#87CEEB] transition duration-300">
                     Request Demo
                   </Button>
                 </div>
