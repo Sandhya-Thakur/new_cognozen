@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Music } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import Image from 'next/image';
+import React, { useState, useEffect, useRef } from "react";
+import { Play, Pause, Music } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
-type Phase = 'inhale' | 'exhale';
+type Phase = "inhale" | "exhale";
 
 const BreatheEaseSection: React.FC = () => {
   const [isActive, setIsActive] = useState<boolean>(false);
-  const [phase, setPhase] = useState<Phase>('inhale');
+  const [phase, setPhase] = useState<Phase>("inhale");
   const [timeLeft, setTimeLeft] = useState<number>(60);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const intervalRef = useRef<number | null>(null);
@@ -15,7 +15,7 @@ const BreatheEaseSection: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    audioRef.current = new Audio('/yogamusic.mp3');
+    audioRef.current = new Audio("/yogamusic.mp3");
     audioRef.current.loop = true;
 
     return () => {
@@ -36,11 +36,11 @@ const BreatheEaseSection: React.FC = () => {
   }, [isActive]);
 
   const startBreathingSession = (): void => {
-    setPhase('inhale');
+    setPhase("inhale");
     setTimeLeft(60);
 
     intervalRef.current = window.setInterval(() => {
-      setPhase((prevPhase) => (prevPhase === 'inhale' ? 'exhale' : 'inhale'));
+      setPhase((prevPhase) => (prevPhase === "inhale" ? "exhale" : "inhale"));
     }, 5000);
 
     timerRef.current = window.setInterval(() => {
@@ -79,7 +79,7 @@ const BreatheEaseSection: React.FC = () => {
         }
         setIsMusicPlaying(!isMusicPlaying);
       } catch (error) {
-        console.error('Error playing audio:', error);
+        console.error("Error playing audio:", error);
       }
     }
   };
@@ -96,10 +96,14 @@ const BreatheEaseSection: React.FC = () => {
               objectFit="contain"
             />
           </div>
-          <h2 className="text-xl font-bold text-indigo-900 mb-2">BreatheEase</h2>
+          <h2 className="text-xl font-bold text-indigo-900 mb-2">
+            BreatheEase
+          </h2>
           <p className="text-sm text-indigo-800 mb-1">1-minute mind ease</p>
           <p className="text-sm text-indigo-700">
-            {isActive ? `${phase.charAt(0).toUpperCase() + phase.slice(1)}... (${timeLeft}s)` : "Reconnect with your breath"}
+            {isActive
+              ? `${phase.charAt(0).toUpperCase() + phase.slice(1)}... (${timeLeft}s)`
+              : "Reconnect with your breath"}
           </p>
         </div>
         <div className="flex justify-center space-x-4">
@@ -111,7 +115,7 @@ const BreatheEaseSection: React.FC = () => {
           </button>
           <button
             onClick={toggleMusic}
-            className={`${isMusicPlaying ? 'bg-green-400' : 'bg-gray-300'} hover:opacity-80 text-white rounded-full p-4 transition-colors duration-200`}
+            className={`${isMusicPlaying ? "bg-green-400" : "bg-gray-300"} hover:opacity-80 text-white rounded-full p-4 transition-colors duration-200`}
           >
             <Music size={24} />
           </button>

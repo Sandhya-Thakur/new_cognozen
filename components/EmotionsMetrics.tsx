@@ -1,49 +1,64 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { InfoIcon } from "lucide-react";
 
-interface MetricProps {
-  label: string;
-  value: number;
-  change: number;
-  progress: number;
+interface EmotionMetric {
+  readingEmotions: {
+    avgHappy: number;
+    avgSad: number;
+    avgAngry: number;
+    avgSurprise: number;
+    avgNeutral: number;
+  };
+  quizEmotions: {
+    avgHappy: number;
+    avgSad: number;
+    avgAngry: number;
+    avgSurprise: number;
+    avgNeutral: number;
+  };
+  dominantEmotion: string;
+  emotionsChange: number;
 }
 
-const ReadingMetric: React.FC = () => {
-  const [metric, setMetric] = useState<MetricProps | null>(null);
+const EmotionMetrics: React.FC = () => {
+  const [metric, setMetric] = useState<EmotionMetric | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   useEffect(() => {
-    const fetchReadingMetric = async () => {
+    const fetchEmotionMetrics = async () => {
       try {
-        const response = await fetch("/api/reading-metrics");
+        const response = await fetch("/api/emotions-attention-metrics");
         if (!response.ok) {
-          throw new Error("Failed to fetch reading metric");
+          throw new Error("Failed to fetch emotion metrics");
         }
         const data = await response.json();
         setMetric(data);
       } catch (error) {
-        console.error("Error fetching reading metric:", error);
-        setError("Failed to load reading metric");
+        console.error("Error fetching emotion metrics:", error);
+        setError("Failed to load emotion metrics");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchReadingMetric();
+    fetchEmotionMetrics();
   }, []);
 
-  if (isLoading) return <div>Loading reading metric...</div>;
+  if (isLoading) return <div>Loading emotion metrics...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!metric) return null;
+
+  const calculateOverallEmotion = () => {
+    const readingSum = Object.values(metric.readingEmotions).reduce((a, b) => a + b, 0);
+    const quizSum = Object.values(metric.quizEmotions).reduce((a, b) => a + b, 0);
+    return ((readingSum + quizSum) / 10); // Assuming the API returns values between 0 and 1, and we have 5 emotions each for reading and quiz
+  };
+
+  const emotionValue = calculateOverallEmotion() * 100;
 
   return (
     <TooltipProvider>
@@ -53,7 +68,7 @@ const ReadingMetric: React.FC = () => {
           <CardHeader className="pb-1 relative z-10">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-semibold">
-                Reading Metrics
+                Emotion
               </CardTitle>
               <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
                 <TooltipTrigger asChild>
@@ -62,24 +77,18 @@ const ReadingMetric: React.FC = () => {
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="w-64 p-4 z-50 bg-white text-gray-800">
-                  <h4 className="font-semibold mb-2">PDF Reading Activity</h4>
+                  <h4 className="font-semibold mb-2">Emotion Metrics</h4>
                   <p className="text-sm mb-2">
-                    This card shows your PDF reading activity over the last 30
-                    days.
+                    This card shows your overall emotional state during learning activities.
                   </p>
                   <p className="text-sm mb-2">
-                    Track your reading progress and engagement.
+                    The main value represents your emotional positivity level.
                   </p>
                   <p className="text-sm mb-2">
-                    The main number represents your total PDF reading sessions.
-                  </p>
-                  <p className="text-sm mb-2">
-                    The percentage shows the change compared to the previous 30
-                    days.
+                    The percentage shows the change in emotional state compared to the previous period.
                   </p>
                   <p className="text-sm">
-                    The progress bar indicates your progress towards your 30-day
-                    reading goal.
+                    The progress bar indicates your current emotional positivity level.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -88,9 +97,11 @@ const ReadingMetric: React.FC = () => {
           <CardContent className="pt-4 relative z-10">
             <div className="mb-6">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-3xl font-bold">{metric.value}</span>
-                <span className={`text-sm font-medium px-2 py-1 rounded ${metric.change >= 0 ? 'bg-green-400 text-green-800' : 'bg-red-400 text-red-800'}`}>
-                  {metric.change >= 0 ? '+' : ''}{metric.change.toFixed(2)}%
+                <span className="text-3xl font-bold">{emotionValue.toFixed(1)}%</span>
+                <span className={`text-sm font-medium px-2 py-1 rounded ${
+                  metric.emotionsChange >= 0 ? 'bg-green-400 text-green-800' : 'bg-red-400 text-red-800'
+                }`}>
+                  {metric.emotionsChange >= 0 ? '+' : ''}{metric.emotionsChange.toFixed(2)}%
                 </span>
               </div>
             </div>
@@ -99,7 +110,7 @@ const ReadingMetric: React.FC = () => {
                 <div
                   className="absolute top-0 left-0 h-full rounded-full bg-white"
                   style={{
-                    width: `${metric.progress}%`,
+                    width: `${emotionValue}%`,
                   }}
                 />
               </div>
@@ -111,4 +122,4 @@ const ReadingMetric: React.FC = () => {
   );
 };
 
-export default ReadingMetric;
+export default EmotionMetrics;

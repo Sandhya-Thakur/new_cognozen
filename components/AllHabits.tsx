@@ -68,42 +68,41 @@ const AllsHabits: React.FC = () => {
     return <div className="text-red-500 text-center py-4">{error}</div>;
   }
 
-  // Display only the top 4 habits
-  const topHabits = habits.slice(0, 4);
-
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300">
+    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300 h-[325px] flex flex-col">
       <h3 className="text-xl font-semibold mb-4 text-black-700">Habits</h3>
-      {topHabits.length === 0 ? (
+      {habits.length === 0 ? (
         <p className="text-gray-500">
           No habits scheduled for today. Why not add one?
         </p>
       ) : (
-        <ul className="space-y-3">
-          {topHabits.map((habit) => (
-            <li
-              key={habit.id}
-              className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
-            >
-              <h4 className="font-medium text-black-700">{habit.name}</h4>
-              <div className="flex items-center space-x-2">
-                <span
-                  className={`text-sm ${
-                    habit.isActive ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  {habit.isActive ? "Active" : "Inactive"}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={isHabitCompleted(habit.id)}
-                  onChange={() => toggleCompletion(habit.id)}
-                  className="w-4 h-4"
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-y-auto flex-grow">
+          <ul className="space-y-3">
+            {habits.map((habit) => (
+              <li
+                key={habit.id}
+                className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
+              >
+                <h4 className="font-medium text-black-700">{habit.name}</h4>
+                <div className="flex items-center space-x-2">
+                  <span
+                    className={`text-sm ${
+                      habit.isActive ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {habit.isActive ? "Active" : "Inactive"}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={isHabitCompleted(habit.id)}
+                    onChange={() => toggleCompletion(habit.id)}
+                    className="w-4 h-4"
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

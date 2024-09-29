@@ -1,21 +1,19 @@
 import React from 'react';
 import ReadingMetric from './ReadingMetric';
 import QuizMetrics from './QuizMetrics';
-import EmotionsAttentionMetrics from './EmotionsAttentionMetrics';
+import AttentionMetrics from './EmotionsAttentionMetrics';
+import EmotionMetrics from "./EmotionsMetrics";
+import EmotionalWellbeingSection from "./EmotionalWellbeingSection"
 
 const MetricsSection: React.FC = () => {
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="lg:col-span-1">
-          <ReadingMetric />
-        </div>
-        <div className="lg:col-span-1">
-          <QuizMetrics />
-        </div>
-        <div className="lg:col-span-2">
-          <EmotionsAttentionMetrics />
-        </div>
+    <div className="mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+        <ReadingMetric />
+        <QuizMetrics />
+        <AttentionMetrics />
+        <EmotionMetrics />
+        <EmotionalWellbeingSection/>
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import HabitCompleted from "@/components/HabitCompleted";
 import AllsHabits from "@/components/AllHabits"
 
 const HabitsMetricsSection: React.FC = () => {

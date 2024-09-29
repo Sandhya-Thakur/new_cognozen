@@ -3,123 +3,59 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { InfoIcon } from "lucide-react";
 
-interface EmotionsAttentionMetric {
-  readingEmotions: {
-    avgHappy: number;
-    avgSad: number;
-    avgAngry: number;
-    avgSurprise: number;
-    avgNeutral: number;
-  };
-  quizEmotions: {
-    avgHappy: number;
-    avgSad: number;
-    avgAngry: number;
-    avgSurprise: number;
-    avgNeutral: number;
-  };
+interface AttentionMetric {
   readingAttention: number;
   quizAttention: number;
-  dominantEmotion: string;
-  emotionsChange: number;
   attentionChange: number;
 }
 
-const EmotionsAttentionMetrics: React.FC = () => {
-  const [metrics, setMetrics] = useState<EmotionsAttentionMetric | null>(null);
+const AttentionMetrics: React.FC = () => {
+  const [metric, setMetric] = useState<AttentionMetric | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   useEffect(() => {
-    const fetchMetrics = async () => {
+    const fetchAttentionMetrics = async () => {
       try {
         const response = await fetch("/api/emotions-attention-metrics");
         if (!response.ok) {
-          throw new Error("Failed to fetch emotions and attention metrics");
+          throw new Error("Failed to fetch attention metrics");
         }
         const data = await response.json();
-        console.log("API response:", data);
-        setMetrics(data);
+        setMetric(data);
       } catch (error) {
-        console.error("Error fetching emotions and attention metrics:", error);
-        setError("Failed to load emotions and attention metrics");
+        console.error("Error fetching attention metrics:", error);
+        setError("Failed to load attention metrics");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchMetrics();
+    fetchAttentionMetrics();
   }, []);
 
-  if (isLoading) return <div>Loading emotions and attention metrics...</div>;
+  if (isLoading) return <div>Loading attention metrics...</div>;
   if (error) return <div>Error: {error}</div>;
-  if (!metrics) return null;
+  if (!metric) return null;
 
   const calculateOverallAttention = () => {
-    return ((metrics.readingAttention + metrics.quizAttention) / 2) * 100;
+    return ((metric.readingAttention + metric.quizAttention) / 2) * 100;
   };
 
   const attentionValue = calculateOverallAttention();
 
   return (
     <TooltipProvider>
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white w-full max-w-sm rounded-xl shadow-md overflow-hidden">
+      <div className="relative">
+      <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white w-full max-w-sm rounded-xl shadow-md overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CiAgPHBhdGggZD0iTTAgMGg2MHY2MEgweiIgZmlsbD0ibm9uZSIgLz4KICA8cGF0aCBkPSJNMzAgMzBtLTI4LjUgMGEyOC41IDI4LjUgMCAxIDAgNTcgMGEyOC41IDI4LjUgMCAxIDAgLTU3IDBsNTcgME0zMCAzMG0tMjcgMGEyNyAyNyAwIDEgMCA1NCAwYTI3IDI3IDAgMSAwIC01NCAwbDU0IDBNMzAgMzBtLTI1LjUgMGEyNS41IDI1LjUgMCAxIDAgNTEgMGEyNS41IDI1LjUgMCAxIDAgLTUxIDBsNTEgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iMC4xIiAvPgo8L3N2Zz4=')] opacity-30"></div>
           <CardHeader className="pb-1 relative z-10">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-semibold">Emotions</CardTitle>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button className="focus:outline-none">
-                    <InfoIcon className="w-5 h-5 text-white opacity-80" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="w-64 p-4 z-50 bg-white text-gray-800">
-                  <h4 className="font-semibold mb-2">Emotion Metrics</h4>
-                  <p className="text-sm mb-2">
-                    This card shows your dominant emotion during learning activities.
-                  </p>
-                  <p className="text-sm mb-2">
-                    The main value represents your dominant emotion.
-                  </p>
-                  <p className="text-sm">
-                    The percentage shows the change in emotional state compared to the previous period.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 relative z-10">
-            <div className="mb-6">
-              <div className="flex justify-between items-baseline mb-1">
-                <span className="text-3xl font-bold">{metrics.dominantEmotion}</span>
-                <span className={`text-sm font-medium px-2 py-1 rounded ${
-                  metrics.emotionsChange >= 0 ? 'bg-green-400 text-green-800' : 'bg-red-400 text-red-800'
-                }`}>
-                  {metrics.emotionsChange >= 0 ? '+' : ''}{metrics.emotionsChange.toFixed(2)}%
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="relative h-2 bg-blue-300 bg-opacity-30 rounded-full overflow-hidden">
-                <div
-                  className="absolute top-0 left-0 h-full rounded-full bg-white"
-                  style={{
-                    width: '100%',
-                  }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white w-full max-w-sm rounded-xl shadow-md overflow-hidden">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CiAgPHBhdGggZD0iTTAgMGg2MHY2MEgweiIgZmlsbD0ibm9uZSIgLz4KICA8cGF0aCBkPSJNMzAgMzBtLTI4LjUgMGEyOC41IDI4LjUgMCAxIDAgNTcgMGEyOC41IDI4LjUgMCAxIDAgLTU3IDBsNTcgME0zMCAzMG0tMjcgMGEyNyAyNyAwIDEgMCA1NCAwYTI3IDI3IDAgMSAwIC01NCAwbDU0IDBNMzAgMzBtLTI1LjUgMGEyNS41IDI1LjUgMCAxIDAgNTEgMGEyNS41IDI1LjUgMCAxIDAgLTUxIDBsNTEgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iMC4xIiAvPgo8L3N2Zz4=')] opacity-30"></div>
-          <CardHeader className="pb-1 relative z-10">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-semibold">Attention</CardTitle>
-              <Tooltip>
+              <CardTitle className="text-xl font-semibold">
+                Attention
+              </CardTitle>
+              <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
                 <TooltipTrigger asChild>
                   <button className="focus:outline-none">
                     <InfoIcon className="w-5 h-5 text-white opacity-80" />
@@ -133,8 +69,11 @@ const EmotionsAttentionMetrics: React.FC = () => {
                   <p className="text-sm mb-2">
                     The main value represents your overall attention level.
                   </p>
-                  <p className="text-sm">
+                  <p className="text-sm mb-2">
                     The percentage shows the change in attention level compared to the previous period.
+                  </p>
+                  <p className="text-sm">
+                    The progress bar indicates your current attention level.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -145,9 +84,9 @@ const EmotionsAttentionMetrics: React.FC = () => {
               <div className="flex justify-between items-baseline mb-1">
                 <span className="text-3xl font-bold">{attentionValue.toFixed(1)}%</span>
                 <span className={`text-sm font-medium px-2 py-1 rounded ${
-                  metrics.attentionChange >= 0 ? 'bg-green-400 text-green-800' : 'bg-red-400 text-red-800'
+                  metric.attentionChange >= 0 ? 'bg-green-400 text-green-800' : 'bg-red-400 text-red-800'
                 }`}>
-                  {metrics.attentionChange >= 0 ? '+' : ''}{metrics.attentionChange.toFixed(2)}%
+                  {metric.attentionChange >= 0 ? '+' : ''}{metric.attentionChange.toFixed(2)}%
                 </span>
               </div>
             </div>
@@ -168,4 +107,4 @@ const EmotionsAttentionMetrics: React.FC = () => {
   );
 };
 
-export default EmotionsAttentionMetrics;
+export default AttentionMetrics;

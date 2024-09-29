@@ -3,7 +3,6 @@
 import React from "react";
 import WelcomeLine from "@/components/WelcomeLine";
 import MetricsSection from "@/components/MetricsSection";
-import EmotionalWellbeingSection from "@/components/EmotionalWellbeingSection";
 import HabitsMetricsSection from "@/components/HabitsMetricsSection";
 import LatestActivitySection from "@/components/LatestActivitySection";
 import BreatheEaseSection from "@/components/BreatheEaseSection";
@@ -12,31 +11,30 @@ import DailyProgressSection from "@/components/DailyProgressSection";
 
 export default function Dashboard() {
   return (
-    <div className="container mx-auto px-8">
-      <WelcomeLine />
-      <div className="grid grid-cols-5 gap-2">
-        <div className="col-span-4">
-          <MetricsSection />
-          <div className="grid grid-cols-4 gap-2 mt-8">
-            <div className="col-span-1">
-              <HabitsMetricsSection />
-            </div>
-            <div className="col-span-3 pl-16">
-              <LatestActivitySection />
-            </div>
-          </div>
-          <div className="mt-4">
-            <OverallPerformanceSection />
-          </div>
+    <div className="px-8">
+      <div>
+        <WelcomeLine />
+      </div>
+      <div>
+        <MetricsSection />
+      </div>
+      <div className="grid grid-cols-12 gap-4 mt-4">
+        <div className="col-span-12 md:col-span-3">
+          <HabitsMetricsSection/>
         </div>
-        <div className="col-span-1 space-y-2">
-          <EmotionalWellbeingSection />
-          <div className="pt-5">
-            <BreatheEaseSection />
-            <div className="mt-4 ml-4 pt-4">
-            <DailyProgressSection/>
-            </div>
-          </div>
+        <div className="col-span-12 md:col-span-5">
+          <LatestActivitySection/>
+        </div>
+        <div className="col-span-12 md:col-span-3 md:col-start-10 lg:col-start-10 ml-16">
+          <BreatheEaseSection/>
+        </div>
+      </div>
+      <div className="grid grid-cols-12 gap-4 mt-4">
+        <div className="col-span-12 md:col-span-10">
+          <OverallPerformanceSection />
+        </div>
+        <div className="col-span-12 md:col-span-2">
+          <DailyProgressSection />
         </div>
       </div>
     </div>
