@@ -68,16 +68,19 @@ const AllsHabits: React.FC = () => {
     return <div className="text-red-500 text-center py-4">{error}</div>;
   }
 
+  // Display only the top 4 habits
+  const topHabits = habits.slice(0, 4);
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300">
       <h3 className="text-xl font-semibold mb-4 text-black-700">Habits</h3>
-      {habits.length === 0 ? (
+      {topHabits.length === 0 ? (
         <p className="text-gray-500">
           No habits scheduled for today. Why not add one?
         </p>
       ) : (
         <ul className="space-y-3">
-          {habits.map((habit) => (
+          {topHabits.map((habit) => (
             <li
               key={habit.id}
               className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"

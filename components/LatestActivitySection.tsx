@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 
 interface Activity {
@@ -8,85 +8,108 @@ interface Activity {
   stage: number;
 }
 
-interface CircularProgressProps {
-  percentage: number;
+interface ApiError {
+  error: string;
+  details?: string;
 }
 
-const CircularProgress: React.FC<CircularProgressProps> = ({ percentage }) => {
-  const circumference = 2 * Math.PI * 10;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  const color = percentage === 100 ? '#22C55E' : '#FDE047';
+const StatusBadge: React.FC<{ stage: number }> = ({ stage }) => {
+  let status: string;
+  let colorClass: string;
+
+  if (stage === 100) {
+    status = 'Completed';
+    colorClass = 'bg-green-200 text-green-800';
+  } else if (stage > 50) {
+    status = 'In Progress';
+    colorClass = 'bg-blue-200 text-blue-800';
+  } else if (stage > 0) {
+    status = 'Started';
+    colorClass = 'bg-orange-200 text-orange-800';
+  } else {
+    status = 'Not Started';
+    colorClass = 'bg-gray-200 text-gray-800';
+  }
 
   return (
-    <div className="relative w-8 h-8 inline-flex items-center justify-center">
-      <svg className="w-full h-full" viewBox="0 0 24 24">
-        <circle
-          className="text-gray-200"
-          strokeWidth="3"
-          stroke="currentColor"
-          fill="transparent"
-          r="10"
-          cx="12"
-          cy="12"
-        />
-        <circle
-          stroke={color}
-          strokeWidth="3"
-          strokeLinecap="round"
-          fill="transparent"
-          r="10"
-          cx="12"
-          cy="12"
-          style={{
-            strokeDasharray: circumference,
-            strokeDashoffset: strokeDashoffset,
-            transition: 'stroke-dashoffset 0.5s ease 0s',
-          }}
-        />
-      </svg>
-    </div>
+    <span className={`px-3 py-1 rounded-full text-xs font-medium ${colorClass}`}>
+      {status}
+    </span>
   );
 };
 
 const LatestActivitySection: React.FC = () => {
-  const activities: Activity[] = [
-    { title: "Climate & Environment Study", type: "Reading", date: "09/21/2024", stage: 98 },
-    { title: "Beyond Science", type: "Flashcards", date: "09/21/2024", stage: 57 },
-    { title: "Political Science Test", type: "Quiz", date: "09/21/2024", stage: 92 },
-    { title: "Political Science Report", type: "Reading", date: "09/21/2024", stage: 100 },
-  ];
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/latest-activities-metrics');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw data as ApiError;
+        }
+
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received from API');
+        }
+
+        setActivities(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching activities:', err);
+        if (err && typeof err === 'object' && 'error' in err) {
+          setError(err as ApiError);
+        } else {
+          setError({ error: 'An unknown error occurred while fetching activities' });
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchActivities();
+  }, []);
 
   return (
-    <Card className="w-[70%] ml-16 shadow-md rounded-xl">
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Latest Activity</h2>
-        <table className="w-full">
-          <thead>
-            <tr className="text-left text-sm text-gray-500">
-              <th className="pb-4 font-medium">Title</th>
-              <th className="pb-4 font-medium">Type</th>
-              <th className="pb-4 font-medium">Date</th>
-              <th className="pb-4 font-medium text-right">Stage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {activities.map((activity, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                <td className="py-4 pr-4">
-                  <span className="text-gray-700 font-medium">{activity.title}</span>
-                </td>
-                <td className="py-4 pr-4 text-gray-500">{activity.type}</td>
-                <td className="py-4 pr-4 text-gray-500">{activity.date}</td>
-                <td className="py-4 text-right">
-                  <div className="flex items-center justify-end">
-                    <span className="mr-2 text-gray-700 font-medium">{activity.stage}%</span>
-                    <CircularProgress percentage={activity.stage} />
+    <Card className="w-[754px] h-[325px] shadow-md rounded-xl overflow-hidden">
+      <div className="p-6 flex flex-col h-full">
+        <h2 className="text-2xl font-bold mb-4">Recent Activity</h2>
+        {isLoading ? (
+          <p>Loading activities...</p>
+        ) : error ? (
+          <div className="text-red-500">
+            <p>Error: {error.error}</p>
+            {error.details && <p className="text-sm mt-2">Details: {error.details}</p>}
+            <p className="text-sm mt-2">Please check the console and server logs for more information.</p>
+          </div>
+        ) : (
+          <div className="space-y-4 overflow-y-auto flex-grow">
+            {activities.length > 0 ? (
+              activities.map((activity, index) => (
+                <div key={index} className="flex justify-between items-center">
+                  <div className="w-1/3">
+                    <h3 className="font-medium text-lg">{activity.title}</h3>
+                    <p className="text-sm text-gray-500">{activity.type}</p>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <div className="w-1/3 text-right">
+                    <p className="text-sm text-gray-700">{activity.type}</p>
+                    <p className="text-sm text-gray-500">{activity.date}</p>
+                  </div>
+                  <div className="w-1/3 flex justify-end">
+                    <StatusBadge stage={activity.stage} />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No activities found.</p>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );

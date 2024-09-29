@@ -20,7 +20,7 @@ const MainLayout = ({ children }: Props) => {
       </div>
       <div className="flex">
         <PermanentSideBar className="hidden lg:flex" />
-        <main className="flex-grow pl-16 h-full lg:pt-0">
+        <main className="flex-grow pl-16 h-full lg:pt-2">
           <div className="mx-auto pt-6 lg:pt-0 h-full">{children}</div>
         </main>
       </div>

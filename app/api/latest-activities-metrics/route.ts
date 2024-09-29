@@ -11,19 +11,19 @@ import {
   moodData,
   habits,
   habitCompletions,
-  emotionalWellbeingGoals
+  habitInsights
 } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
 export async function GET(request: Request) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const latestActivities = await db
       .select({
         title: sql<string>`CASE
@@ -31,48 +31,61 @@ export async function GET(request: Request) {
           WHEN type = 'Quiz' THEN quizzes.title
           WHEN type = 'Flashcards' THEN 'Flashcard Review'
           WHEN type = 'Summary' THEN 'Summary Review'
-          WHEN type = 'Mood' THEN 'Mood Entry'
+          WHEN type = 'Mood' THEN CONCAT('Mood: ', "moodData".mood)
           WHEN type = 'Habit' THEN habits.name
-          WHEN type = 'Goal' THEN emotional_wellbeing_goals.content
+          WHEN type = 'HabitInsight' THEN 'Habit Insight Generated'
           ELSE 'Unknown'
         END`,
         type: sql<string>`type`,
         date: sql<string>`TO_CHAR(CASE
           WHEN type = 'Reading' THEN chats.created_at
-          WHEN type = 'Quiz' THEN quiz_attempts.started_at
+          WHEN type = 'Quiz' THEN COALESCE(quiz_attempts.completed_at, quiz_attempts.started_at)
           WHEN type = 'Flashcards' THEN flashcards.created_at
           WHEN type = 'Summary' THEN summaries.created_at
-          WHEN type = 'Mood' THEN mood_data.timestamp
+          WHEN type = 'Mood' THEN "moodData".timestamp
           WHEN type = 'Habit' THEN habit_completions.completed_at
-          WHEN type = 'Goal' THEN emotional_wellbeing_goals.created_at
+          WHEN type = 'HabitInsight' THEN habit_insights.created_at
           ELSE NOW()
         END, 'MM/DD/YYYY')`,
         stage: sql<number>`CASE
           WHEN type = 'Reading' THEN 100
-          WHEN type = 'Quiz' THEN COALESCE((quiz_attempts.score::float / quizzes.total_questions::float) * 100, 0)
+          WHEN type = 'Quiz' THEN 
+            CASE 
+              WHEN quiz_attempts.completed THEN 100
+              ELSE COALESCE((quiz_attempts.score::float / quizzes.total_questions::float) * 100, 0)
+            END
           WHEN type = 'Flashcards' THEN 100
           WHEN type = 'Summary' THEN 100
           WHEN type = 'Mood' THEN 100
           WHEN type = 'Habit' THEN COALESCE(habit_completions.value, 0)
-          WHEN type = 'Goal' THEN CASE WHEN emotional_wellbeing_goals.completed THEN 100 ELSE 50 END
+          WHEN type = 'HabitInsight' THEN 100
           ELSE 0
+        END`,
+        status: sql<string>`CASE
+          WHEN type = 'Quiz' THEN 
+            CASE 
+              WHEN quiz_attempts.completed THEN 'Completed'
+              ELSE 'Started'
+            END
+          WHEN type = 'Reading' THEN 'Completed'
+          ELSE 'Completed'
         END`,
       })
       .from(
         sql`(
-          SELECT 'Reading' as type, id FROM ${chats} WHERE user_id = ${userId}
+          SELECT 'Reading' as type, id, created_at as timestamp FROM ${chats} WHERE user_id = ${userId}
           UNION ALL
-          SELECT 'Quiz' as type, id FROM ${quizAttempts} WHERE quiz_id IN (SELECT id FROM ${quizzes} WHERE chat_id IN (SELECT id FROM ${chats} WHERE user_id = ${userId}))
+          SELECT 'Quiz' as type, id, COALESCE(completed_at, started_at) as timestamp FROM ${quizAttempts} WHERE quiz_id IN (SELECT id FROM ${quizzes} WHERE chat_id IN (SELECT id FROM ${chats} WHERE user_id = ${userId}))
           UNION ALL
-          SELECT 'Flashcards' as type, id FROM ${flashcards} WHERE chat_id IN (SELECT id FROM ${chats} WHERE user_id = ${userId})
+          SELECT 'Flashcards' as type, id, created_at as timestamp FROM ${flashcards} WHERE chat_id IN (SELECT id FROM ${chats} WHERE user_id = ${userId})
           UNION ALL
-          SELECT 'Summary' as type, id FROM ${summaries} WHERE chat_id IN (SELECT id FROM ${chats} WHERE user_id = ${userId})
+          SELECT 'Summary' as type, id, created_at as timestamp FROM ${summaries} WHERE chat_id IN (SELECT id FROM ${chats} WHERE user_id = ${userId})
           UNION ALL
-          SELECT 'Mood' as type, id FROM ${moodData} WHERE user_id = ${userId}
+          SELECT 'Mood' as type, id, timestamp FROM ${moodData} WHERE user_id = ${userId}
           UNION ALL
-          SELECT 'Habit' as type, id FROM ${habitCompletions} WHERE habit_id IN (SELECT id FROM ${habits} WHERE user_id = ${userId})
+          SELECT 'Habit' as type, id, completed_at as timestamp FROM ${habitCompletions} WHERE habit_id IN (SELECT id FROM ${habits} WHERE user_id = ${userId})
           UNION ALL
-          SELECT 'Goal' as type, id FROM ${emotionalWellbeingGoals} WHERE user_id = ${userId}
+          SELECT 'HabitInsight' as type, id, created_at as timestamp FROM ${habitInsights} WHERE user_id = ${userId}
         ) as activities`
       )
       .leftJoin(chats, eq(sql`activities.id`, chats.id))
@@ -83,17 +96,8 @@ export async function GET(request: Request) {
       .leftJoin(moodData, eq(sql`activities.id`, moodData.id))
       .leftJoin(habitCompletions, eq(sql`activities.id`, habitCompletions.id))
       .leftJoin(habits, eq(habitCompletions.habitId, habits.id))
-      .leftJoin(emotionalWellbeingGoals, eq(sql`activities.id`, emotionalWellbeingGoals.id))
-      .orderBy(desc(sql`CASE
-        WHEN type = 'Reading' THEN chats.created_at
-        WHEN type = 'Quiz' THEN quiz_attempts.started_at
-        WHEN type = 'Flashcards' THEN flashcards.created_at
-        WHEN type = 'Summary' THEN summaries.created_at
-        WHEN type = 'Mood' THEN mood_data.timestamp
-        WHEN type = 'Habit' THEN habit_completions.completed_at
-        WHEN type = 'Goal' THEN emotional_wellbeing_goals.created_at
-        ELSE NOW()
-      END`))
+      .leftJoin(habitInsights, eq(sql`activities.id`, habitInsights.id))
+      .orderBy(desc(sql`activities.timestamp`))
       .limit(5);
 
     if (latestActivities.length > 0) {
@@ -103,9 +107,17 @@ export async function GET(request: Request) {
     }
   } catch (error) {
     console.error("Failed to fetch latest activities", error);
+    
+    if (error instanceof Error) {
+      console.error(error.stack);
+    }
+
     return NextResponse.json(
-      { error: "Failed to fetch latest activities" },
-      { status: 500 },
+      { 
+        error: "Failed to fetch latest activities",
+        details: error instanceof Error ? error.message : "Unknown error occurred"
+      },
+      { status: 500 }
     );
   }
 }
