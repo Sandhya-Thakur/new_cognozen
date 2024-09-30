@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     const fetchMoodData = async (startDate: Date, endDate: Date) => {
       return await db
         .select({
-          avgIntensity: sql<number>`AVG(${moodData.intensity})`,
+          avgIntensity: sql<number>`COALESCE(AVG(${moodData.intensity}), 0)`,
         })
         .from(moodData)
         .where(
@@ -37,8 +37,8 @@ export async function GET(request: Request) {
     const [todayMood] = await fetchMoodData(today, new Date());
     const [yesterdayMood] = await fetchMoodData(yesterday, today);
 
-    const todayScore = todayMood?.avgIntensity || 0;
-    const yesterdayScore = yesterdayMood?.avgIntensity || 0;
+    const todayScore = Number(todayMood?.avgIntensity || 0);
+    const yesterdayScore = Number(yesterdayMood?.avgIntensity || 0);
 
     let change = 0;
     if (yesterdayScore !== 0) {
@@ -53,13 +53,15 @@ export async function GET(request: Request) {
       change: Number(change.toFixed(2)),
     };
 
+    console.log("Emotional wellbeing data:", emotionalWellbeing);
+
     return NextResponse.json(emotionalWellbeing);
   } catch (error) {
     console.error("Failed to fetch emotional wellbeing data", error);
     return NextResponse.json(
       {
         error: "Failed to fetch emotional wellbeing data",
-        details: (error as Error).message,
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

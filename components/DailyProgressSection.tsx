@@ -1,41 +1,57 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 
-const DailyProgressSection: React.FC = () => {
+const DailyProgressSection = () => {
   const dailyProgress = [
-    { day: 'Mo', progress: 49, color: '#3b82f6' }, // Blue
-    { day: 'Tu', progress: 31, color: '#ef4444' }, // Red
-    { day: 'We', progress: 77, color: '#10b981' }, // Green
-    { day: 'Th', progress: 50, color: '#f59e0b' }, // Yellow
-    { day: 'Fr', progress: 68, color: '#8b5cf6' }, // Purple
-    { day: 'Sa', progress: 91, color: '#ec4899' }, // Pink
-    { day: 'Su', progress: 57, color: '#f97316' }, // Orange
+    { day: 'Mo', progress: 49 },
+    { day: 'Tu', progress: 31 },
+    { day: 'We', progress: 77 },
+    { day: 'Th', progress: 50 },
+    { day: 'Fr', progress: 68 },
+    { day: 'Sa', progress: 91 },
+    { day: 'Su', progress: 57 },
   ];
 
+  const getPlantColor = (progress: number) => {
+    if (progress < 33) return 'from-green-200 to-green-400';
+    if (progress < 66) return 'from-green-300 to-green-500';
+    return 'from-green-400 to-green-600';
+  };
+
   return (
-    <Card className="bg-white rounded-3xl shadow-lg h-[512px]">
-      <CardContent>
-        <h2 className="text-xl font-bold mb-6">Daily Progress (%)</h2>
-        <div className="flex justify-between items-end h-[400px]">
+    <Card className="bg-white rounded-3xl shadow-lg p-4 w-full max-w-[1600px]"> {/* Increased the max width */}
+      <CardContent className="p-0">
+        <h2 className="text-2xl font-bold mb-6 text-center text-green-800">Last 4 days Growth Garden</h2>
+        <div className="flex justify-start items-end h-[400px] bg-[url('/api/placeholder/800/400')] bg-cover bg-bottom rounded-xl p-4 space-x-4 overflow-x-auto"> {/* Added overflow-x-auto to handle any overflow */}
           {dailyProgress.map((day, index) => (
-            <div key={index} className="flex flex-col items-center w-1/7">
-              <div className="relative w-full bg-gray-200 rounded-full" style={{ height: '100%' }}>
-                <div 
-                  className="absolute bottom-0 w-full rounded-full transition-all duration-500 ease-in-out"
-                  style={{ 
-                    height: `${day.progress}%`,
-                    backgroundColor: day.color // Inline style for color
-                  }}
+            <motion.div
+              key={index}
+              className="flex flex-col items-center space-y-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <motion.div
+                className={`w-6 rounded-t-full bg-gradient-to-t ${getPlantColor(day.progress)}`} // Width is kept reduced (w-6)
+                initial={{ height: 0 }}
+                animate={{ height: `${day.progress * 3}px` }}
+                transition={{ duration: 1, delay: index * 0.1 }}
+              >
+                <motion.div
+                  className="w-8 h-8 -mt-8 -ml-1 text-green-800" // Leaf size adjusted for the new bar width
+                  initial={{ rotate: -20, scale: 0 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
                 >
-                  {day.progress > 0 && (
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-sm font-semibold">
-                      {day.progress}
-                    </div>
-                  )}
-                </div>
+                  🍃
+                </motion.div>
+              </motion.div>
+              <div className="bg-white rounded-full py-1 text-xs font-bold text-green-800">
+                {day.progress}%
               </div>
-              <div className="mt-4 text-sm font-medium">{day.day}</div>
-            </div>
+              <span className="text-sm font-medium text-green-800">{day.day}</span>
+            </motion.div>
           ))}
         </div>
       </CardContent>

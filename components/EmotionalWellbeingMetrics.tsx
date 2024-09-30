@@ -16,13 +16,35 @@ const EmotionalWellbeingMetrics: React.FC = () => {
       try {
         const response = await fetch("/api/emotional-wellbeing-metrics");
         if (!response.ok) {
-          throw new Error("Failed to fetch emotional wellbeing data");
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setWellbeingData(data);
+        
+        console.log("Received data:", data); // Log the received data
+
+        // Validate the data
+        if (typeof data.todayScore !== 'number' || typeof data.yesterdayScore !== 'number') {
+          console.error("Invalid data format:", data);
+          throw new Error("Invalid data format: scores must be numbers");
+        }
+        
+        // Calculate the change
+        const change = data.yesterdayScore !== 0
+          ? ((data.todayScore - data.yesterdayScore) / data.yesterdayScore) * 100
+          : 0;
+        
+        setWellbeingData({
+          todayScore: data.todayScore,
+          yesterdayScore: data.yesterdayScore,
+          change: isNaN(change) ? 0 : change
+        });
       } catch (error) {
         console.error("Error fetching emotional wellbeing data:", error);
-        setError("Failed to load emotional wellbeing data");
+        if (error instanceof TypeError && error.message.includes("toFixed")) {
+          setError("Data format error: Expected number values for scores");
+        } else {
+          setError(error instanceof Error ? error.message : "Failed to load emotional wellbeing data");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -39,34 +61,34 @@ const EmotionalWellbeingMetrics: React.FC = () => {
   const isPositive = wellbeingData.change >= 0;
 
   return (
-    <div className="flex items-center justify-between h-full">
-      <div className="relative w-20 h-20"> {/* Slightly reduced size */}
-        <svg className="w-full h-full" viewBox="0 0 36 36">
+    <div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
+      <div className="relative w-28 h-28">
+        <svg className="w-full h-full" viewBox="0 0 50 50">
           <defs>
             <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor={isPositive ? "#4ade80" : "#ef4444"} />
               <stop offset="100%" stopColor={isPositive ? "#facc15" : "#f87171"} />
             </linearGradient>
           </defs>
-          <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#E5E7EB" strokeWidth="5" />
+          <circle cx="25" cy="25" r="22" fill="none" stroke="#E5E7EB" strokeWidth="5" />
           <circle
-            cx="18"
-            cy="18"
-            r="15.9155"
+            cx="25"
+            cy="25"
+            r="22"
             fill="none"
             stroke="url(#gradient)"
-            strokeWidth="6"
-            strokeDasharray={`${progress * 1.005}, 100`}
+            strokeWidth="5"
+            strokeDasharray={`${progress * 1.38}, 100`}
             strokeLinecap="round"
-            transform="rotate(-90 18 18)"
+            transform="rotate(-90 25 25)"
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-bold text-gray-800">{isPositive ? '+' : '-'}{progress.toFixed(0)}%</span>
+          <span className="text-xl font-bold text-gray-800">{isPositive ? '+' : '-'}{progress.toFixed(0)}%</span>
         </div>
       </div>
-      <div className="ml-4 flex-grow"> {/* Increased margin-left */}
-        <h3 className="text-sm text-gray-500">Today vs Yesterday</h3>
+      <div className="ml-6 flex-grow">
+        <h4 className="text-sm text-gray-500">Today vs Yesterday</h4>
         <p className="text-base font-semibold mt-1">Emotional Wellbeing</p>
       </div>
     </div>
