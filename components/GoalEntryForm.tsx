@@ -6,7 +6,7 @@ import { Mic, MicOff, ChevronDown } from 'lucide-react';
 const PREDEFINED_GOALS = [
   "Dedicate 10 minutes each day to mindfulness meditation",
   "Commit to 30 minutes of exercise at least three times a week to boost endorphins",
-  "Write down three things you're grateful for each day to cultivate positivity",
+  "Write down three things you&apos;re grateful for each day to cultivate positivity",
   "Aim for 7-9 hours of quality sleep each night to improve mood and energy levels",
   "Take up a new hobby or skill that excites you, dedicating at least an hour a week to it",
   "Implement short breaks every 90 minutes during workdays to prevent burnout",
