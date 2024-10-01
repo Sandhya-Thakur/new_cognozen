@@ -179,7 +179,7 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ onMoodSelect }) => {
         {step === 3 && (
           <>
             <p className="text-gray-600 mb-6">
-              What's influencing your mood?
+              What is influencing your mood?
               Choose from recently selected or search for the best fit.
             </p>
             <div className="flex mb-4">
