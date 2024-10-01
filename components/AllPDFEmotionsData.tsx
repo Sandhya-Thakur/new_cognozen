@@ -2,41 +2,72 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { Loader } from "lucide-react";
 import { format, isToday, startOfWeek, startOfMonth, isAfter, parseISO } from 'date-fns';
 
 type EmotionData = {
   id: number;
+  timestamp: string;
+  userId: string;
+  dominantEmotion: string;
+  happy: number;
   angry: number;
   disgust: number;
   fear: number;
-  happy: number;
   neutral: number;
   sad: number;
   surprise: number;
-  dominantEmotion: string;
-  timestamp: string;
-  userId: string;
 };
 
 type TabValue = 'live' | 'today' | 'week' | 'month';
 
-const emotionColors = {
-  angry: "#FF6B6B",
-  disgust: "#4ECDC4",
-  fear: "#45B7D1",
-  happy: "#FDE74C",
-  neutral: "#C5C6C7",
-  sad: "#5D5C61",
-  surprise: "#FF9FF3"
+// Emotion names as received from the API
+const EMOTIONS = ['Happy', 'Angry', 'Disgust', 'Fear', 'Neutral', 'Sad', 'Surprise'];
+
+// Mappings for user-friendly display names
+const EMOTION_LABELS: { [key: string]: string } = {
+  Happy: "Confidence",
+  Angry: "Frustration",
+  Disgust: "Boredom",
+  Fear: "Anxiety",
+  Neutral: "Satisfaction",
+  Sad: "Disappointment",
+  Surprise: "Curiosity"
 };
 
-const graphColorSchemes = {
-  live: { stroke: "#38BDF8", fill: "#7DD3FC" },
-  today: { stroke: "#0EA5E9", fill: "#38BDF8" },
-  week: { stroke: "#0284C7", fill: "#0EA5E9" },
-  month: { stroke: "#0369A1", fill: "#0284C7" }
+// Colors for each emotion
+const COLORS = {
+  Happy: "#22c55e",
+  Angry: "#dc2626",
+  Disgust: "#7c3aed",
+  Fear: "#eab308",
+  Neutral: "#64748b",
+  Sad: "#0ea5e9",
+  Surprise: "#db2777"
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-rose-50 p-2 shadow-md rounded-md text-sm border border-rose-200">
+        <p className="font-semibold text-rose-800">{`Time: ${label}`}</p>
+        <p className="text-rose-600">
+          {`Dominant: ${EMOTION_LABELS[data.dominantEmotion] || data.dominantEmotion}`}
+        </p>
+        {EMOTIONS.map(emotion => (
+          <p key={emotion} className="flex justify-between">
+            <span style={{ color: COLORS[emotion as keyof typeof COLORS] }}>
+              {EMOTION_LABELS[emotion] || emotion}
+            </span>
+            <span>{data[emotion.toLowerCase()].toFixed(2)}</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
 };
 
 const AllPDFEmotionsData: React.FC = () => {
@@ -66,14 +97,14 @@ const AllPDFEmotionsData: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex h-64 justify-center items-center">
-        <Loader className="animate-spin text-sky-500" />
+        <Loader className="animate-spin text-rose-500" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-64 justify-center items-center text-sky-500">
+      <div className="flex h-64 justify-center items-center text-rose-500">
         <p>No PDF emotion data available</p>
       </div>
     );
@@ -106,7 +137,6 @@ const AllPDFEmotionsData: React.FC = () => {
   const getDateFormat = (range: TabValue): string => {
     switch (range) {
       case 'live':
-        return "HH:mm";
       case 'today':
         return "HH:mm";
       case 'week':
@@ -120,21 +150,11 @@ const AllPDFEmotionsData: React.FC = () => {
 
   const formatData = (data: EmotionData[], range: TabValue) => {
     return data
-      .map(entry => {
-        try {
-          const date = parseISO(entry.timestamp);
-          return {
-            ...entry,
-            timestamp: format(date, getDateFormat(range)),
-            fullTimestamp: format(date, "yyyy-MM-dd HH:mm:ss")
-          };
-        } catch (error) {
-          console.error("Error formatting date:", entry.timestamp);
-          return null;
-        }
-      })
-      .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
-      .sort((a, b) => new Date(a.fullTimestamp).getTime() - new Date(b.fullTimestamp).getTime());
+      .map(entry => ({
+        ...entry,
+        timestamp: format(parseISO(entry.timestamp), getDateFormat(range)),
+      }))
+      .sort((a, b) => parseISO(a.timestamp).getTime() - parseISO(b.timestamp).getTime());
   };
 
   const renderEmotionChart = (range: TabValue) => {
@@ -143,59 +163,38 @@ const AllPDFEmotionsData: React.FC = () => {
       filteredData = filteredData.slice(-20);
     }
     const formattedData = formatData(filteredData, range);
-    const colors = graphColorSchemes[range];
-
-    const getAxisInterval = (range: TabValue) => {
-      switch (range) {
-        case 'live':
-          return 4;
-        case 'today':
-          return Math.floor(formattedData.length / 6);
-        case 'week':
-          return 'preserveStartEnd';
-        case 'month':
-          return Math.floor(formattedData.length / 8);
-        default:
-          return 0;
-      }
-    };
 
     return (
-      <Card className="w-full shadow-sm bg-gradient-to-br from-sky-50 to-blue-50">
-        <CardHeader className="bg-gradient-to-r from-sky-100 to-blue-100">
-          <CardTitle className="text-sm font-semibold text-sky-800">
-            {range.charAt(0).toUpperCase() + range.slice(1)} PDF Emotion Intensities
+      <Card className="w-full shadow-sm bg-gradient-to-br from-rose-50 to-pink-50">
+        <CardHeader className="bg-gradient-to-r from-rose-100 to-pink-100">
+          <CardTitle className="text-sm font-semibold text-rose-800">
+            {range.charAt(0).toUpperCase() + range.slice(1)} PDF Emotion Levels
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={formattedData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#7dd3fc" />
-                <XAxis 
-                  dataKey="timestamp" 
-                  stroke="#0284c7"
-                  tick={{ fontSize: 12 }}
-                  interval={getAxisInterval(range)}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                />
-                <YAxis stroke="#0284c7" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'white', border: 'none', boxShadow: '0 2px 4px rgba(2,132,199,0.1)' }}
-                  labelStyle={{ fontWeight: 'bold', color: '#0284c7' }}
-                  formatter={(value, name) => [Number(value).toFixed(2), name]}
-                  labelFormatter={(label, payload) => {
-                    if (payload && payload[0] && payload[0].payload) {
-                      return `${payload[0].payload.fullTimestamp}\nDominant: ${payload[0].payload.dominantEmotion}`;
-                    }
-                    return label;
-                  }}
-                />
-                <Legend />
-                {Object.entries(emotionColors).map(([emotion, color]) => (
-                  <Bar key={emotion} dataKey={emotion} fill={color} />
+              <BarChart data={formattedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#fecdd3" />
+                <XAxis dataKey="timestamp" stroke="#e11d48" />
+                <YAxis stroke="#e11d48" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend formatter={(value) => EMOTION_LABELS[value as keyof typeof EMOTION_LABELS]} />
+                {EMOTIONS.map(emotion => (
+                  <Bar
+                    key={emotion}
+                    dataKey={emotion.toLowerCase()}
+                    name={emotion}
+                    stroke={COLORS[emotion as keyof typeof COLORS]}
+                    fill={COLORS[emotion as keyof typeof COLORS]}
+                  >
+                    {formattedData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.dominantEmotion === emotion ? COLORS[emotion as keyof typeof COLORS] : `${COLORS[emotion as keyof typeof COLORS]}80`}
+                      />
+                    ))}
+                  </Bar>
                 ))}
               </BarChart>
             </ResponsiveContainer>
@@ -208,11 +207,11 @@ const AllPDFEmotionsData: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-4 bg-[#F8F9FA]">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-12">
-        <TabsList className="bg-sky-100 text-sky-800">
-          <TabsTrigger value="live" className="data-[state=active]:bg-sky-200 data-[state=active]:text-sky-900">Live Data</TabsTrigger>
-          <TabsTrigger value="today" className="data-[state=active]:bg-sky-200 data-[state=active]:text-sky-900">Today</TabsTrigger>
-          <TabsTrigger value="week" className="data-[state=active]:bg-sky-200 data-[state=active]:text-sky-900">This Week</TabsTrigger>
-          <TabsTrigger value="month" className="data-[state=active]:bg-sky-200 data-[state=active]:text-sky-900">This Month</TabsTrigger>
+        <TabsList className="bg-rose-100 text-rose-800">
+          <TabsTrigger value="live" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">Live Data</TabsTrigger>
+          <TabsTrigger value="today" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">Today</TabsTrigger>
+          <TabsTrigger value="week" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">This Week</TabsTrigger>
+          <TabsTrigger value="month" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">This Month</TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab}>

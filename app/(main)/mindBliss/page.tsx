@@ -13,9 +13,9 @@ export default function MindBliss() {
     <div>
       <TodaysPdfAttentionData/>
       <TodaysPdfEmotionData/>
-   
-      
-      
+      <TodaysQuizAttentionData/>
+      <TodaysQuizEmotionData/>
+
     </div>
   )
 }

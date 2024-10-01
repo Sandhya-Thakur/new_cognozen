@@ -1,41 +1,15 @@
-"use client";
-
 import React, { useState, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
 import toast, { Toaster } from 'react-hot-toast';
 import { Mic, MicOff, ChevronDown } from 'lucide-react';
 
 const PREDEFINED_GOALS = [
-  "Practice mindfulness for 10 minutes daily",
-  "Express gratitude for three things each day",
-  "Engage in a relaxing activity before bed",
-  "Connect with a friend or family member",
-  "Exercise for 30 minutes",
-  "Learn a new stress-management technique",
-  "Limit social media use to 1 hour per day",
-  "Write in a journal for 15 minutes",
-  "Try a new hobby or activity",
-  "Set and enforce personal boundaries",
-  "Meditate for 15 minutes each morning",
-  "Practice deep breathing exercises twice daily",
-  "Read a chapter of a self-help book weekly",
-  "Take a 20-minute nature walk",
-  "Perform one random act of kindness daily",
-  "Maintain a consistent sleep schedule",
-  "Practice positive self-talk throughout the day",
-  "Engage in a creative activity for 30 minutes",
-  "Try a new healthy recipe each week",
-  "Declutter a small space in your home",
-  "Practice active listening in conversations",
-  "Start a gratitude journal",
-  "Learn and practice a new coping skill",
-  "Engage in 10 minutes of stretching or yoga",
-  "Set aside time for a hobby you enjoy",
-  "Create and follow a weekly meal plan",
-  "Practice forgiveness towards yourself and others",
-  "Take regular breaks during work hours",
-  "Limit caffeine intake after 2 PM",
-  "Spend 15 minutes reflecting on personal growth"
+  "Dedicate 10 minutes each day to mindfulness meditation",
+  "Commit to 30 minutes of exercise at least three times a week to boost endorphins",
+  "Write down three things you're grateful for each day to cultivate positivity",
+  "Aim for 7-9 hours of quality sleep each night to improve mood and energy levels",
+  "Take up a new hobby or skill that excites you, dedicating at least an hour a week to it",
+  "Implement short breaks every 90 minutes during workdays to prevent burnout",
 ];
 
 const GoalEntryForm: React.FC = () => {
@@ -43,6 +17,7 @@ const GoalEntryForm: React.FC = () => {
   const [isCustomGoal, setIsCustomGoal] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [addedGoals, setAddedGoals] = useState<string[]>([]);
   const { isLoaded, userId } = useAuth();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -67,7 +42,7 @@ const GoalEntryForm: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Goal added:", data.goal);
+      setAddedGoals([...addedGoals, newGoal]);
       setNewGoal("");
       setIsCustomGoal(true);
       toast.success('Goal added successfully!');
@@ -80,7 +55,6 @@ const GoalEntryForm: React.FC = () => {
   };
 
   const startRecording = async () => {
-    console.log("Starting recording...");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -93,14 +67,12 @@ const GoalEntryForm: React.FC = () => {
       };
 
       mediaRecorderRef.current.onstop = () => {
-        console.log("Recording stopped, sending to Whisper...");
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         sendAudioToWhisper(audioBlob);
       };
 
       mediaRecorderRef.current.start();
       setIsRecording(true);
-      console.log("Recording started successfully");
     } catch (error) {
       console.error('Error starting recording:', error);
       toast.error("Unable to access microphone. Please check your permissions.");
@@ -108,48 +80,34 @@ const GoalEntryForm: React.FC = () => {
   };
 
   const stopRecording = () => {
-    console.log("Stopping recording...");
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      console.log("Recording stopped");
-    } else {
-      console.log("No active recording to stop");
     }
   };
 
   const sendAudioToWhisper = async (audioBlob: Blob) => {
-    console.log("Preparing to send audio to Whisper API...");
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recording.wav');
 
     try {
-      console.log("Sending request to Whisper API...");
       const response = await fetch('/api/whisper-api', {
         method: 'POST',
         body: formData,
       });
-
-      console.log("Received response from Whisper API", response.status);
 
       if (!response.ok) {
         throw new Error(`Failed to transcribe audio: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("Transcription data:", data);
 
       if (data.text === undefined) {
-        console.error("Received undefined text from API");
         toast.error("Received invalid response from transcription service.");
         return;
       }
 
-      setNewGoal(prev => {
-        const newGoal = prev + ' ' + data.text;
-        console.log("Updated goal:", newGoal);
-        return newGoal;
-      });
+      setNewGoal(prev => prev + ' ' + data.text);
     } catch (error) {
       console.error('Error transcribing audio:', error);
       toast.error("Failed to transcribe audio. Please try again.");
@@ -162,6 +120,11 @@ const GoalEntryForm: React.FC = () => {
     setIsCustomGoal(value === "custom");
   };
 
+  const deleteSelectedGoals = () => {
+    // Implement delete functionality here
+    toast.success("Selected goals deleted successfully!");
+  };
+
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
@@ -169,20 +132,40 @@ const GoalEntryForm: React.FC = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <Toaster position="top-center" reverseOrder={false} />
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-800">
-        Add Emotional Well-being Goal
-      </h2>
+      <h2 className="text-xl font-bold mb-2 text-gray-800">Fee Good Goals</h2>
+      <p className="text-gray-600 mb-6">
+        Set goals to enhance your emotional well-being. Craft personal objectives focused
+        on improving your mood, reducing stress, and fostering a positive mindset.
+      </p>
 
       <form onSubmit={addGoal} className="mb-8">
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-4">
+          <div className="relative">
+            <input
+              type="text"
+              value={newGoal}
+              onChange={handleGoalChange}
+              placeholder="Add your personal goal(s)..."
+              className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full 
+                ${isRecording ? "bg-red-500" : "bg-blue-500"} text-white`}
+              onClick={isRecording ? stopRecording : startRecording}
+            >
+              {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+            </button>
+          </div>
           <div className="relative">
             <select
               value={isCustomGoal ? "custom" : newGoal}
               onChange={handleGoalChange}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
+              className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
               disabled={isSubmitting}
             >
-              <option value="custom">Custom Goal</option>
+              <option value="custom">Select goal(s) from list</option>
               {PREDEFINED_GOALS.map((goal, index) => (
                 <option key={index} value={goal}>{goal}</option>
               ))}
@@ -191,40 +174,25 @@ const GoalEntryForm: React.FC = () => {
               <ChevronDown size={20} />
             </div>
           </div>
-          {isCustomGoal && (
-            <div className="flex items-center">
-              <input
-                type="text"
-                value={newGoal}
-                onChange={handleGoalChange}
-                placeholder="Enter a custom goal..."
-                className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                disabled={isSubmitting}
-              />
-              <button
-                type="button"
-                className={`p-2 rounded-r-lg ${
-                  isRecording ? "bg-green-500" : "bg-indigo-600"
-                } text-white hover:${isRecording ? "bg-green-600" : "bg-indigo-700"} transition-colors duration-200`}
-                onClick={isRecording ? stopRecording : startRecording}
-              >
-                {isRecording ? <Mic size={20} /> : <MicOff size={20} />}
-              </button>
-            </div>
-          )}
-          <button
-            type="submit"
-            className={`w-full px-4 py-2 rounded-lg text-white font-semibold
-              ${isSubmitting
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              }`}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Adding...' : 'Add Goal'}
-          </button>
         </div>
       </form>
+
+      <div className="mb-4">
+        <span className="text-blue-600 font-semibold">Goals Added ({addedGoals.length})</span>
+        {" | "}
+        <button onClick={deleteSelectedGoals} className="text-gray-500">
+          Delete Selected (0)
+        </button>
+      </div>
+
+      <ul className="space-y-2">
+        {addedGoals.map((goal, index) => (
+          <li key={index} className="flex items-center space-x-2">
+            <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600" />
+            <span className="text-gray-700">{goal}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

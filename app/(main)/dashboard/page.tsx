@@ -14,8 +14,6 @@ import TodaysQuizAttentionData from "@/components/TodaysQuizAttentionData"
 import TodaysQuizEmotionData from "@/components/TodaysQuizEmotionData"
 import MoodTrendsData from "@/components/MoodTrendsData";
 import DailyMoodComparison from "@/components/MoodComparison";
-import HabitVisualizationComponent from "@/components/HabitVisualizationComponent";
-import MoodHabitCorrelation from "@/components/MoodHabitCorrelation";
 
 export default function Dashboard() {
   return (
@@ -45,7 +43,30 @@ export default function Dashboard() {
           <DailyProgressSection />
         </div>
       </div>
-  
-    </div>
+      <div className="grid grid-cols-12 gap-4 mt-4">
+        <div className="col-span-12 md:col-span-6">
+          <TodaysPdfAttentionData />
+        </div>
+        <div className="col-span-12 md:col-span-6">
+          <TodaysPdfEmotionData />
+        </div>
+      </div>
+      <div className="grid grid-cols-12 gap-4 mt-4">
+        <div className="col-span-12 md:col-span-6">
+          <TodaysQuizAttentionData />
+        </div>
+        <div className="col-span-12 md:col-span-6">
+          <TodaysQuizEmotionData />
+        </div>
+      </div>
+      <div className="grid grid-cols-12 gap-4 mt-4">
+        <div className="col-span-12 md:col-span-6">
+          <MoodTrendsData />
+        </div>
+        <div className="col-span-12 md:col-span-6">
+          <DailyMoodComparison />
+        </div>
+      </div>
+      </div>
   );
 }

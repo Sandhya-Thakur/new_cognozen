@@ -7,14 +7,21 @@ import { Loader } from "lucide-react";
 import { format, isToday, startOfWeek, startOfMonth, isAfter, parseISO } from 'date-fns';
 
 type EmotionData = {
+  surprise: any;
+  sad: any;
+  neutral: any;
+  disgust: any;
+  angry: any;
+  happy: any;
+  fear: any;
   id: number;
-  angry: number;
-  disgust: number;
-  fear: number;
-  happy: number;
-  neutral: number;
-  sad: number;
-  surprise: number;
+  confidence: number;
+  frustration: number;
+  boredom: number;
+  anxiety: number;
+  satisfaction: number;
+  disappointment: number;
+  curiosity: number;
   dominantEmotion: string;
   timestamp: string;
   userId: string;
@@ -22,14 +29,29 @@ type EmotionData = {
 
 type TabValue = 'live' | 'today' | 'week' | 'month';
 
-const emotionColors = {
-  angry: "#FF4136",
-  disgust: "#B10DC9",
-  fear: "#FF851B",
-  happy: "#2ECC40",
-  neutral: "#AAAAAA",
-  sad: "#0074D9",
-  surprise: "#FFDC00"
+// Updated emotion names
+const EMOTIONS = ['Confidence', 'Frustration', 'Boredom', 'Anxiety', 'Satisfaction', 'Disappointment', 'Curiosity'];
+
+// Updated mappings for API to display names
+const EMOTION_LABELS: { [key: string]: string } = {
+  Happy: "Confidence",
+  Angry: "Frustration",
+  Disgust: "Boredom",
+  Fear: "Anxiety",
+  Neutral: "Satisfaction",
+  Sad: "Disappointment",
+  Surprise: "Curiosity"
+};
+
+// Updated colors for each emotion
+const COLORS = {
+  Confidence: "#22c55e",
+  Frustration: "#dc2626",
+  Boredom: "#7c3aed",
+  Anxiety: "#eab308",
+  Satisfaction: "#64748b",
+  Disappointment: "#0ea5e9",
+  Curiosity: "#db2777"
 };
 
 const graphColorSchemes = {
@@ -37,6 +59,29 @@ const graphColorSchemes = {
   today: { stroke: "#EC4899", fill: "#F472B6" },
   week: { stroke: "#DB2777", fill: "#EC4899" },
   month: { stroke: "#BE185D", fill: "#DB2777" }
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-rose-50 p-2 shadow-md rounded-md text-sm border border-rose-200">
+        <p className="font-semibold text-rose-800">{`Time: ${label}`}</p>
+        <p className="text-rose-600">
+          {`Dominant: ${data.dominantEmotion}`}
+        </p>
+        {EMOTIONS.map(emotion => (
+          <p key={emotion} className="flex justify-between">
+            <span style={{ color: COLORS[emotion as keyof typeof COLORS] }}>
+              {emotion}
+            </span>
+            <span>{data[emotion.toLowerCase()].toFixed(2)}</span>
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
 };
 
 const AllQuizEmotionsData: React.FC = () => {
@@ -48,7 +93,19 @@ const AllQuizEmotionsData: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get<EmotionData[]>("/api/get-quiz-emotions-data");
-        setData(response.data);
+        // Transform the data to use new emotion names
+        const transformedData = response.data.map(item => ({
+          ...item,
+          confidence: item.happy,
+          frustration: item.angry,
+          boredom: item.disgust,
+          anxiety: item.fear,
+          satisfaction: item.neutral,
+          disappointment: item.sad,
+          curiosity: item.surprise,
+          dominantEmotion: EMOTION_LABELS[item.dominantEmotion] || item.dominantEmotion
+        }));
+        setData(transformedData);
       } catch (error) {
         console.error("Failed to fetch quiz emotion data", error);
       }
@@ -182,20 +239,10 @@ const AllQuizEmotionsData: React.FC = () => {
                   height={60}
                 />
                 <YAxis stroke="#db2777" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'white', border: 'none', boxShadow: '0 2px 4px rgba(219,39,119,0.1)' }}
-                  labelStyle={{ fontWeight: 'bold', color: '#db2777' }}
-                  formatter={(value, name) => [Number(value).toFixed(2), name]}
-                  labelFormatter={(label, payload) => {
-                    if (payload && payload[0] && payload[0].payload) {
-                      return `${payload[0].payload.fullTimestamp}\nDominant: ${payload[0].payload.dominantEmotion}`;
-                    }
-                    return label;
-                  }}
-                />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                {Object.entries(emotionColors).map(([emotion, color]) => (
-                  <Bar key={emotion} dataKey={emotion} fill={color} />
+                {EMOTIONS.map(emotion => (
+                  <Bar key={emotion} dataKey={emotion.toLowerCase()} fill={COLORS[emotion as keyof typeof COLORS]} />
                 ))}
               </BarChart>
             </ResponsiveContainer>

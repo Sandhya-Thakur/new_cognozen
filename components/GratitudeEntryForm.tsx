@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { Mic, MicOff } from 'lucide-react';
+import { Mic, MicOff, ChevronRight } from 'lucide-react';
 
 const GratitudeEntryForm: React.FC = () => {
   const [gratitudeEntry, setGratitudeEntry] = useState("");
@@ -12,6 +12,7 @@ const GratitudeEntryForm: React.FC = () => {
     type: "success" | "error";
   } | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const { isLoaded, userId } = useAuth();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -156,50 +157,67 @@ const GratitudeEntryForm: React.FC = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-800">
-        Gratitude Journal
-      </h2>
-      <div className="mb-4 relative">
-        <textarea
-          className="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-          placeholder="What are you grateful for today?"
-          value={gratitudeEntry}
-          onChange={(e) => setGratitudeEntry(e.target.value)}
-          disabled={isSubmitting}
-        ></textarea>
-        <button
-          className={`absolute bottom-4 right-4 p-2 rounded-full ${
-            isRecording ? "bg-green-500" : "bg-indigo-600"
-          } text-white hover:${isRecording ? "bg-green-600" : "bg-indigo-700"} transition-colors duration-200`}
-          onClick={isRecording ? stopRecording : startRecording}
+      <h2 className="text-xl font-bold text-gray-800">Gratitude Journal</h2>
+      
+      <div className="flex justify-between mb-6">
+        <p className="text-gray-600">
+          Reflect on the good in your day. Write down what you're thankful for to
+          cultivate a habit of gratitude and boost your overall well-being.
+        </p>
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-blue-600 hover:text-blue-800"
         >
-          {isRecording ? <Mic size={24} /> : <MicOff size={24} />}
+          {isExpanded ? 'Collapse' : 'Expand'}
         </button>
       </div>
-      <div className="flex justify-end mb-8">
-        <button
-          className={`px-6 py-2 rounded-lg text-white font-semibold
-            ${
-              isSubmitting
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-            }`}
-          onClick={saveGratitudeEntry}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Saving..." : "Save Entry"}
-        </button>
-      </div>
-      {feedback && (
-        <div
-          className={`mb-4 p-3 rounded-lg ${
-            feedback.type === "success"
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {feedback.message}
-        </div>
+
+      {isExpanded && (
+        <>
+          <div className="mb-4 relative">
+            <textarea
+              className="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              placeholder="What are you grateful for today?"
+              value={gratitudeEntry}
+              onChange={(e) => setGratitudeEntry(e.target.value)}
+              disabled={isSubmitting}
+            ></textarea>
+            <button
+              className={`absolute bottom-4 left-4 p-2 rounded-full ${
+                isRecording ? "bg-red-500" : "bg-blue-500"
+              } text-white hover:${isRecording ? "bg-red-600" : "bg-blue-500"} transition-colors duration-200`}
+              onClick={isRecording ? stopRecording : startRecording}
+            >
+              {isRecording ? <Mic size={24} /> : <MicOff size={24} />}
+            </button>
+          </div>
+          <div className="flex justify-end">
+            <button
+              className={`px-6 py-2 rounded-full text-white font-semibold flex items-center
+                ${
+                  isSubmitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                }`}
+              onClick={saveGratitudeEntry}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Save Entry"}
+              <ChevronRight size={20} className="ml-2" />
+            </button>
+          </div>
+          {feedback && (
+            <div
+              className={`mt-4 p-3 rounded-lg ${
+                feedback.type === "success"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {feedback.message}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

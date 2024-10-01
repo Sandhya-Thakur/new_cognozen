@@ -1,5 +1,6 @@
 import React from "react";
 import { useUser } from "@clerk/nextjs";
+import CurrentMood from "@/components/CurrentMood";
 
 const WelcomeLine: React.FC = () => {
   const { user } = useUser();
@@ -21,10 +22,17 @@ const WelcomeLine: React.FC = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
-      <p className="text-sm text-gray-500 mb-2">{formattedDate}</p>
-      <h1 className="text-2xl font-bold text-gray-800">
-        {getGreeting()}, {firstName}
-      </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm text-gray-500 mb-1">{formattedDate}</p>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2 sm:mb-0">
+            {getGreeting()}, {firstName}
+          </h1>
+        </div>
+        <div className="mt-2 sm:mt-0">
+          <CurrentMood />
+        </div>
+      </div>
     </div>
   );
 };

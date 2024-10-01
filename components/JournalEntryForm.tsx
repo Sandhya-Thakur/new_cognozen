@@ -1,10 +1,8 @@
-"use client";
-
 import React, { useState, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { Mic, MicOff } from "lucide-react";
 
-const JournalEntryForm: React.FC = () => {
+const DailyJournal: React.FC = () => {
   const [journalEntry, setJournalEntry] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -12,6 +10,7 @@ const JournalEntryForm: React.FC = () => {
     type: "success" | "error";
   } | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const { isLoaded, userId } = useAuth();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -160,35 +159,49 @@ const JournalEntryForm: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-800">
-        Daily Journal
-      </h2>
-      <div className="mb-4 relative">
-        <textarea
-          className="w-full h-64 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-          placeholder="Write about your day..."
-          value={journalEntry}
-          onChange={(e) => setJournalEntry(e.target.value)}
-          disabled={isSubmitting}
-        ></textarea>
+    <div className="w-full max-w-4xl mx-auto p-4 pt-8">
+      <h1 className="text-xl font-bold mb-2">Daily Journal</h1>
+      <p className="text-gray-600 mb-4">
+        Capture your day, one thought at a time. Log your experiences,{" "}
+        <span className="bg-yellow-200 px-1">fee</span>lings, and reflections to
+        keep track of your personal journey.
+      </p>
+      <div className="flex justify-end mb-4">
         <button
-          className={`absolute bottom-4 right-4 p-2 rounded-full ${
-            isRecording ? "bg-green-500" : "bg-indigo-600"
-          } text-white hover:${isRecording ? "bg-green-600" : "bg-indigo-700"} transition-colors duration-200`}
-          onClick={isRecording ? stopRecording : startRecording}
+          className="text-blue-600 hover:text-blue-800"
+          onClick={() => setIsExpanded(!isExpanded)}
         >
-          {isRecording ? <Mic size={24} /> : <MicOff size={24} />}
+          {isExpanded ? "Collapse" : "Expanded"}
         </button>
       </div>
-      <div className="flex justify-end mb-8">
+      {isExpanded && (
+        <div className="relative">
+          <textarea
+            className="w-full h-40 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            placeholder="Write about your day..."
+            value={journalEntry}
+            onChange={(e) => setJournalEntry(e.target.value)}
+            disabled={isSubmitting}
+          ></textarea>
+          <button
+            className={`absolute bottom-4 right-4 p-2 rounded-full ${
+              isRecording ? "bg-green-500" : "bg-blue-500"
+            } text-white hover:${
+              isRecording ? "bg-green-600" : "bg-blue-700"
+            } transition-colors duration-200`}
+            onClick={isRecording ? stopRecording : startRecording}
+          >
+            {isRecording ? <Mic size={24} /> : <MicOff size={24} />}
+          </button>
+        </div>
+      )}
+      <div className="flex justify-end mt-4">
         <button
-          className={`px-6 py-2 rounded-lg text-white font-semibold
-            ${
-              isSubmitting
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-            }`}
+          className={`px-6 py-2 rounded-full text-white font-semibold ${
+            isSubmitting
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          }`}
           onClick={saveJournalEntry}
           disabled={isSubmitting}
         >
@@ -197,7 +210,11 @@ const JournalEntryForm: React.FC = () => {
       </div>
       {feedback && (
         <div
-          className={`mb-4 p-3 rounded-lg ${feedback.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+          className={`mt-4 p-3 rounded-lg ${
+            feedback.type === "success"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
         >
           {feedback.message}
         </div>
@@ -206,4 +223,4 @@ const JournalEntryForm: React.FC = () => {
   );
 };
 
-export default JournalEntryForm;
+export default DailyJournal;

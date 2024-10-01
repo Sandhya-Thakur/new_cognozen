@@ -3,7 +3,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Scatter, Cell } from 'recharts';
 import { Loader } from "lucide-react";
-import { format, isToday } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 
 type EmotionData = {
   id: number;
@@ -19,25 +19,26 @@ type EmotionData = {
   surprise: number;
 };
 
-const EMOTIONS = ['happy', 'angry', 'disgust', 'fear', 'neutral', 'sad', 'surprise'];
-const COLORS = {
-  happy: "#10b981",
-  angry: "#ef4444",
-  disgust: "#8b5cf6",
-  fear: "#f59e0b",
-  neutral: "#6b7280",
-  sad: "#3b82f6",
-  surprise: "#ec4899"
+const EMOTIONS = ['Happy', 'Angry', 'Disgust', 'Fear', 'Neutral', 'Sad', 'Surprise'];
+
+const EMOTION_LABELS: { [key: string]: string } = {
+  Happy: "Confidence",
+  Angry: "Frustration",
+  Disgust: "Boredom",
+  Fear: "Anxiety",
+  Neutral: "Satisfaction",
+  Sad: "Disappointment",
+  Surprise: "Curiosity"
 };
 
-const EMOTION_VALUES = {
-  happy: 1,
-  angry: 2,
-  disgust: 3,
-  fear: 4,
-  neutral: 5,
-  sad: 6,
-  surprise: 7
+const COLORS = {
+  Happy: "#22c55e",
+  Angry: "#dc2626",
+  Disgust: "#7c3aed",
+  Fear: "#eab308",
+  Neutral: "#64748b",
+  Sad: "#0ea5e9",
+  Surprise: "#db2777"
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -46,11 +47,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-teal-50 p-2 shadow-md rounded-md text-sm border border-teal-200">
         <p className="font-semibold text-teal-800">{`Time: ${label}`}</p>
-        <p className="text-teal-600">{`Dominant: ${data.dominantEmotion}`}</p>
+        <p className="text-teal-600">
+          {`Dominant: ${EMOTION_LABELS[data.dominantEmotion] || data.dominantEmotion}`}
+        </p>
         {EMOTIONS.map(emotion => (
           <p key={emotion} className="flex justify-between">
-            <span style={{ color: COLORS[emotion as keyof typeof COLORS] }}>{emotion}</span>
-            <span>{data[emotion].toFixed(2)}</span>
+            <span style={{ color: COLORS[emotion as keyof typeof COLORS] }}>
+              {EMOTION_LABELS[emotion] || emotion}
+            </span>
+            <span>{data[emotion.toLowerCase()].toFixed(2)}</span>
           </p>
         ))}
       </div>
@@ -69,11 +74,15 @@ const TodaysQuizEmotionData: React.FC = () => {
         const response = await axios.get("/api/get-quiz-emotions-data");
         const allData: EmotionData[] = response.data;
         
-        const todaysData = allData.filter(entry => 
-          isToday(new Date(entry.timestamp))
+        const today = new Date();
+        const weekStart = startOfWeek(today);
+        const weekEnd = endOfWeek(today);
+
+        const thisWeekData = allData.filter(entry =>
+          isWithinInterval(new Date(entry.timestamp), { start: weekStart, end: weekEnd })
         );
         
-        setData(todaysData);
+        setData(thisWeekData);
       } catch (error) {
         console.error("Failed to fetch quiz emotion data", error);
       }
@@ -93,21 +102,20 @@ const TodaysQuizEmotionData: React.FC = () => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="flex h-64 justify-center items-center text-teal-500">
-        <p>No quiz emotion data available for today</p>
+        <p>No quiz emotion data available for this week</p>
       </div>
     );
   }
 
   const formattedData = data.map(entry => ({
     ...entry,
-    timestamp: format(new Date(entry.timestamp), "HH:mm"),
-    dominantEmotionValue: EMOTION_VALUES[entry.dominantEmotion as keyof typeof EMOTION_VALUES] || 0
+    timestamp: format(new Date(entry.timestamp), "EEE HH:mm"),
   })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   return (
-    <Card className="w-full shadow-sm bg-gradient-to-br from-teal-50 to-emerald-50">
+    <Card className="w-full rounded-2xl shadow-sm bg-gradient-to-br from-teal-50 to-emerald-50">
       <CardHeader className="bg-gradient-to-r from-teal-100 to-emerald-100">
-        <CardTitle className="text-sm font-semibold text-teal-800">Today Quiz Emotion Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-teal-800">This Week's Quiz Emotion Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">
@@ -116,14 +124,13 @@ const TodaysQuizEmotionData: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#99f6e4" />
               <XAxis dataKey="timestamp" stroke="#0d9488" />
               <YAxis yAxisId="left" stroke="#0d9488" />
-              <YAxis yAxisId="right" orientation="right" domain={[0, 8]} ticks={[1, 2, 3, 4, 5, 6, 7]} stroke="#0d9488" />
               <Tooltip content={<CustomTooltip />} />
-              <Legend />
+              <Legend formatter={(value) => EMOTION_LABELS[value as keyof typeof EMOTION_LABELS]} />
               {EMOTIONS.map(emotion => (
                 <Line
                   key={emotion}
                   type="monotone"
-                  dataKey={emotion}
+                  dataKey={emotion.toLowerCase()}
                   stroke={COLORS[emotion as keyof typeof COLORS]}
                   strokeWidth={2}
                   dot={false}
@@ -134,7 +141,6 @@ const TodaysQuizEmotionData: React.FC = () => {
                 name="Dominant Emotion"
                 data={formattedData}
                 fill="#14b8a6"
-                yAxisId="right"
               >
                 {formattedData.map((entry, index) => (
                   <Cell

@@ -3,7 +3,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader } from "lucide-react";
-import { format, isToday } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 
 type AttentionData = {
   id: number;
@@ -21,12 +21,16 @@ const TodaysPdfAttentionData: React.FC = () => {
       try {
         const response = await axios.get("/api/get-pdf-attention-data");
         const allData: AttentionData[] = response.data;
-        
-        const todaysData = allData.filter(entry => 
-          isToday(new Date(entry.timestamp))
+
+        const today = new Date();
+        const weekStart = startOfWeek(today);
+        const weekEnd = endOfWeek(today);
+
+        const thisWeekData = allData.filter(entry =>
+          isWithinInterval(new Date(entry.timestamp), { start: weekStart, end: weekEnd })
         );
-        
-        setData(todaysData);
+
+        setData(thisWeekData);
       } catch (error) {
         console.error("Failed to fetch PDF attention data", error);
       }
@@ -46,7 +50,7 @@ const TodaysPdfAttentionData: React.FC = () => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="flex h-64 justify-center items-center text-amber-500">
-        <p>No PDF attention data available for today</p>
+        <p>No PDF attention data available for this week</p>
       </div>
     );
   }
@@ -54,14 +58,14 @@ const TodaysPdfAttentionData: React.FC = () => {
   const formattedData = data
     .map(entry => ({
       ...entry,
-      timestamp: format(new Date(entry.timestamp), "HH:mm")
+      timestamp: format(new Date(entry.timestamp), "EEE HH:mm")
     }))
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   return (
-    <Card className="w-full shadow-sm bg-gradient-to-br from-amber-50 to-orange-50">
+    <Card className="w-full shadow-sm rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50">
       <CardHeader className="bg-gradient-to-r from-amber-100 to-orange-100">
-        <CardTitle className="text-sm font-semibold text-amber-800">Today PDF Reading Attention Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-amber-800">This Week's PDF Reading Attention Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">
