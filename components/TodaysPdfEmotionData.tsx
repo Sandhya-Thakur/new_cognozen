@@ -115,7 +115,7 @@ const TodaysPdfEmotionData: React.FC = () => {
   return (
     <Card className="w-full rounded-2xl shadow-sm bg-gradient-to-br from-rose-50 to-pink-50">
       <CardHeader className="bg-gradient-to-r from-rose-100 to-pink-100">
-        <CardTitle className="text-sm font-semibold text-rose-800">This Week's PDF Reading Emotion Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-rose-800">Current Week PDF Reading Emotion Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">

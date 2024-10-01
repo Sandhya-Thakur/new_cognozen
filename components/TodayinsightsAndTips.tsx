@@ -100,7 +100,7 @@ const TodaysInsightAndTips: React.FC = () => {
 
   return (
     <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-     Today insite and tips
+     Current day insite and tips
     </div>
   );
 };

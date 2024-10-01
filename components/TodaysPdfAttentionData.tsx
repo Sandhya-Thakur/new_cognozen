@@ -65,7 +65,7 @@ const TodaysPdfAttentionData: React.FC = () => {
   return (
     <Card className="w-full shadow-sm rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50">
       <CardHeader className="bg-gradient-to-r from-amber-100 to-orange-100">
-        <CardTitle className="text-sm font-semibold text-amber-800">This Week's PDF Reading Attention Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-amber-800">Current Week PDF Reading Attention Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">

@@ -115,7 +115,7 @@ const TodaysQuizEmotionData: React.FC = () => {
   return (
     <Card className="w-full rounded-2xl shadow-sm bg-gradient-to-br from-teal-50 to-emerald-50">
       <CardHeader className="bg-gradient-to-r from-teal-100 to-emerald-100">
-        <CardTitle className="text-sm font-semibold text-teal-800">This Week's Quiz Emotion Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-teal-800">Current Week Quiz Emotion Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">
