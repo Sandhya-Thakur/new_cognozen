@@ -45,10 +45,10 @@ const GoalEntryForm: React.FC = () => {
       setAddedGoals([...addedGoals, newGoal]);
       setNewGoal("");
       setIsCustomGoal(true);
-      toast.success('Goal added successfully!');
+      toast.success('Goal added successfully!'); // Corrected
     } catch (error) {
       console.error("Error adding goal:", error);
-      toast.error('Failed to add goal. Please try again.');
+      toast.error('Failed to add goal. Please try again.'); // Corrected
     } finally {
       setIsSubmitting(false);
     }
