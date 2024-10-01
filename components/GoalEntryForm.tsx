@@ -7,7 +7,7 @@ const PREDEFINED_GOALS = [
   "Dedicate 10 minutes each day to mindfulness meditation",
   "Commit to 30 minutes of exercise at least three times a week to boost endorphins",
   "Write down three things you are grateful for each day to cultivate positivity",
-  "Aim for 7-9 hours of quality sleep each night to improve mood and energy levels",
+  "Aim for 7 hours of quality sleep each night to improve mood and energy levels",
   "Take up a new hobby or skill that excites you, dedicating at least an hour a week to it",
   "Implement short breaks every 90 minutes during workdays to prevent burnout",
 ];
@@ -130,66 +130,7 @@ const GoalEntryForm: React.FC = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
-      <Toaster position="top-center" reverseOrder={false} />
-      <h2 className="text-xl font-bold mb-2 text-gray-800">Feel Good Goals</h2>
-      <p className="text-gray-600 mb-6">
-        Set goals to enhance your emotional well-being.
-      </p>
 
-      <form onSubmit={addGoal} className="mb-8">
-        <div className="flex flex-col space-y-4">
-          <div className="relative">
-            <input
-              type="text"
-              value={newGoal}
-              onChange={handleGoalChange}
-              placeholder="Add your personal goal(s)..."
-              className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isSubmitting}
-            />
-            <button
-              type="button"
-              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full 
-                ${isRecording ? "bg-red-500" : "bg-blue-500"} text-white`}
-              onClick={isRecording ? stopRecording : startRecording}
-            >
-              {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
-            </button>
-          </div>
-          <div className="relative">
-            <select
-              value={isCustomGoal ? "custom" : newGoal}
-              onChange={handleGoalChange}
-              className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
-              disabled={isSubmitting}
-            >
-              <option value="custom">Select goals from list</option>
-              {PREDEFINED_GOALS.map((goal, index) => (
-                <option key={index} value={goal}>{goal}</option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <ChevronDown size={20} />
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <div className="mb-4">
-        <span className="text-blue-600 font-semibold">Goals Added ({addedGoals.length})</span>
-        <button onClick={deleteSelectedGoals} className="text-gray-500">
-          Delete Selected
-        </button>
-      </div>
-
-      <ul className="space-y-2">
-        {addedGoals.map((goal, index) => (
-          <li key={index} className="flex items-center space-x-2">
-            <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600" />
-            <span className="text-gray-700">{goal}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
