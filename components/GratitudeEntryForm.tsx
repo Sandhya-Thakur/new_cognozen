@@ -161,7 +161,7 @@ const GratitudeEntryForm: React.FC = () => {
       
       <div className="flex justify-between mb-6">
         <p className="text-gray-600">
-          Reflect on the good in your day. Write down what you're thankful for to
+          Reflect on the good in your day. Write down what you are thankful for to
           cultivate a habit of gratitude and boost your overall well-being.
         </p>
         <button 
