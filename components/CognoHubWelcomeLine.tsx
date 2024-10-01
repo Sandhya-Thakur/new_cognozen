@@ -11,7 +11,6 @@ const CognoHubWelcomeLine: React.FC = () => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
       <p className="text-sm text-gray-500 mb-2">{formattedDate}</p>
-      <h1>Cognohub</h1>
     </div>
   );
 };

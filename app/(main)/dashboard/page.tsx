@@ -25,7 +25,7 @@ export default function Dashboard() {
         <div className="col-span-12 md:col-span-5">
           <LatestActivitySection/>
         </div>
-        <div className="col-span-12 md:col-span-3 md:col-start-10 lg:col-start-10 ml-16">
+        <div className="p-2 col-span-12 md:col-span-3 md:col-start-10 lg:col-start-10 ml-16">
           <BreatheEaseSection/>
         </div>
       </div>

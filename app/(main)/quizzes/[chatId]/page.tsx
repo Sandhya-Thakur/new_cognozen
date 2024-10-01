@@ -7,8 +7,6 @@ import React from "react";
 import QuizSideBar from "@/components/QuizSideBar";
 import QuizHeader from "@/components/QuizHeader";
 import QuizGenerator from "@/components/QuizGenerator";
-import QuizSidebarContent from "@/components/QuizSidebarContent";
-import SidebarToggle from "@/components/ReadPdfSidebarToggle";
 import { Toaster } from "@/components/ui/toaster";
 
 type Props = {
@@ -53,14 +51,6 @@ const QuizPage: React.FC<Props> = async ({ params: { chatId } }) => {
             userId={userId}
           />
         </div>
-
-        {/* Sidebar for QuizWebcamAnalyzer */}
-        <div className="sidebar w-96 bg-white shadow-lg absolute right-0 top-0 bottom-0 transition-transform duration-300 transform translate-x-full">
-          <QuizSidebarContent />
-        </div>
-
-        {/* Sidebar Toggle Button */}
-        <SidebarToggle />
       </div>
 
       {/* Toast component for notifications */}

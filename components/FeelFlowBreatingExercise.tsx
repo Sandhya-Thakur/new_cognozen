@@ -5,7 +5,7 @@ import Image from "next/image";
 
 type Phase = "inhale" | "exhale";
 
-const BreatheEaseSection: React.FC = () => {
+const FeelFlowBreathingExercise: React.FC = () => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [phase, setPhase] = useState<Phase>("inhale");
   const [timeLeft, setTimeLeft] = useState<number>(60);
@@ -85,10 +85,10 @@ const BreatheEaseSection: React.FC = () => {
   };
 
   return (
-    <Card className="bg-gradient-to-b from-blue-200 to-green-100 rounded-xl overflow-hidden shadow-2xl w-[240px] h-[325px] ml-2">
+    <Card className="bg-gradient-to-b from-blue-200 to-green-100 rounded-xl overflow-hidden shadow-2xl w-[250px] h-[400px]">
       <CardContent className="p-6 flex flex-col justify-between h-full">
-        <div className="flex flex-col items-center text-center">
-          <div className="mb-4 relative w-24 h-24">
+        <div className="flex flex-col items-center text-center mt-4">
+          <div className="mb-4 relative w-28 h-28">
             <Image
               src="/yoga.png"
               alt="Yoga pose"
@@ -96,28 +96,28 @@ const BreatheEaseSection: React.FC = () => {
               objectFit="contain"
             />
           </div>
-          <h2 className="text-xl font-bold text-indigo-900 mb-2">
+          <h2 className="text-2xl font-bold text-indigo-900 mb-2">
             BreatheEase
           </h2>
-          <p className="text-sm text-indigo-800 mb-1">1-minute mind ease</p>
-          <p className="text-sm text-indigo-700">
+          <p className="text-base text-indigo-800 mb-2">1-minute mind ease</p>
+          <p className="text-base text-indigo-700">
             {isActive
               ? `${phase.charAt(0).toUpperCase() + phase.slice(1)}... (${timeLeft}s)`
               : "Reconnect with your breath"}
           </p>
         </div>
-        <div className="flex justify-center space-x-4">
+        <div className="flex justify-center space-x-6 mt-10">
           <button
             onClick={handleToggle}
-            className="bg-orange-400 hover:bg-orange-500 text-white rounded-full p-4 transition-colors duration-200"
+            className="bg-orange-400 hover:bg-orange-500 text-white rounded-full p-5 transition-colors duration-200"
           >
-            {isActive ? <Pause size={24} /> : <Play size={24} />}
+            {isActive ? <Pause size={28} /> : <Play size={28} />}
           </button>
           <button
             onClick={toggleMusic}
-            className={`${isMusicPlaying ? "bg-green-400" : "bg-gray-300"} hover:opacity-80 text-white rounded-full p-4 transition-colors duration-200`}
+            className={`${isMusicPlaying ? "bg-green-400" : "bg-gray-300"} hover:opacity-80 text-white rounded-full p-5 transition-colors duration-200`}
           >
-            <Music size={24} />
+            <Music size={28} />
           </button>
         </div>
       </CardContent>
@@ -125,4 +125,4 @@ const BreatheEaseSection: React.FC = () => {
   );
 };
 
-export default BreatheEaseSection;
+export default FeelFlowBreathingExercise;

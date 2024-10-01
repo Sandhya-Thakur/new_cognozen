@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { mood, intensity } = body;
+    const { mood, intensity, reasons } = body;
 
     console.log("Received mood data:", body); // Log received data
 
@@ -24,6 +24,7 @@ export async function POST(req: Request) {
         userId: userId,
         mood: mood,
         intensity: intensity,
+        reasons: reasons,
         timestamp: new Date(),
       })
       .returning({

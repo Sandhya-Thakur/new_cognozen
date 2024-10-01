@@ -5,8 +5,7 @@ import PDFViewer from "@/components/PDFViewer";
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import SidebarContent from "@/components/ReadPdfSidebarContent";
-import SidebarToggle from "@/components/ReadPdfSidebarToggle";
+
 
 type Props = {
   params: {
@@ -47,13 +46,6 @@ const ReadPdfPage = async ({ params: { chatId } }: Props) => {
             </div>
           )}
         </div>
-
-
-        <div className="sidebar w-96 bg-white shadow-lg absolute right-0 top-0 bottom-0 transition-transform duration-300 transform translate-x-full">
-          <SidebarContent />
-        </div>
-
-        <SidebarToggle />
       </main>
     </div>
   );

@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 
 const WebcamAnalyzer: React.FC = () => {
@@ -11,7 +10,15 @@ const WebcamAnalyzer: React.FC = () => {
   const setCameraStatus = useStore((state) => state.setCameraStatus);
   const setEmotionData = useStore((state) => state.setEmotionData);
   const setAttentionData = useStore((state) => state.setAttentionData);
-  const isCameraOn = useStore((state) => state.isCameraOn);
+  const [isCameraOn, setIsCameraOn] = useState(false);
+
+  const toggleCamera = async () => {
+    if (isCameraOn) {
+      stopCamera();
+    } else {
+      await startCamera();
+    }
+  };
 
   const startCamera = async () => {
     try {
@@ -22,7 +29,8 @@ const WebcamAnalyzer: React.FC = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
       }
-      setCameraStatus(true); // Notify global state that camera is on
+      setCameraStatus(true);
+      setIsCameraOn(true);
     } catch (error) {
       console.error("Error starting camera: ", error);
     }
@@ -38,9 +46,10 @@ const WebcamAnalyzer: React.FC = () => {
       if (stopSdk) {
         stopSdk();
       }
-      setCameraStatus(false); // Notify global state that camera is off
+      setCameraStatus(false);
       setEmotionData(null);
       setAttentionData(null);
+      setIsCameraOn(false);
     }
   };
 
@@ -162,10 +171,8 @@ const WebcamAnalyzer: React.FC = () => {
               console.log("FACE_ATTENTION event data:", e.detail);
               setAttentionData(e.detail);
 
-              // Store the latest attention data
               latestAttentionData = e.detail;
 
-              // Start the interval if it's not already running
               if (!attentionInterval) {
                 attentionInterval = setInterval(() => {
                   if (latestAttentionData) {
@@ -180,11 +187,9 @@ const WebcamAnalyzer: React.FC = () => {
                         .then((response) => response.json())
                         .then((data) => {
                           console.log("Data sent to server:", data);
-                          // Clear the interval after data is sent once
                           clearInterval(attentionInterval as NodeJS.Timeout);
                           attentionInterval = null;
 
-                          // Restart the interval to ensure it continues to send data every 10 seconds
                           if (isCameraOn) {
                             attentionInterval = setInterval(() => {
                               if (latestAttentionData) {
@@ -199,7 +204,6 @@ const WebcamAnalyzer: React.FC = () => {
                                     .then((response) => response.json())
                                     .then((data) => {
                                       console.log("Data sent to server:", data);
-                                      // Clear the interval after data is sent once
                                       clearInterval(
                                         attentionInterval as NodeJS.Timeout
                                       );
@@ -219,10 +223,9 @@ const WebcamAnalyzer: React.FC = () => {
                       console.error("Error sending attention data: ", error);
                     }
                   }
-                }, 10000); // 10000 milliseconds = 10 seconds
+                }, 10000);
               }
             } else {
-              // Clear the interval when the camera is off
               if (attentionInterval) {
                 clearInterval(attentionInterval);
                 attentionInterval = null;
@@ -242,10 +245,8 @@ const WebcamAnalyzer: React.FC = () => {
               console.log("FACE_EMOTION event data:", e.detail);
               setEmotionData(e.detail);
 
-              // Store the latest emotion data
               latestEmotionData = e.detail;
 
-              // Start the interval if it's not already running
               if (!emotionInterval) {
                 emotionInterval = setInterval(() => {
                   if (latestEmotionData) {
@@ -260,11 +261,9 @@ const WebcamAnalyzer: React.FC = () => {
                         .then((response) => response.json())
                         .then((data) => {
                           console.log("Data sent to server:", data);
-                          // Clear the interval after data is sent once
                           clearInterval(emotionInterval as NodeJS.Timeout);
                           emotionInterval = null;
 
-                          // Restart the interval to ensure it continues to send data every 10 seconds
                           if (isCameraOn) {
                             emotionInterval = setInterval(() => {
                               if (latestEmotionData) {
@@ -279,7 +278,6 @@ const WebcamAnalyzer: React.FC = () => {
                                     .then((response) => response.json())
                                     .then((data) => {
                                       console.log("Data sent to server:", data);
-                                      // Clear the interval after data is sent once
                                       clearInterval(
                                         emotionInterval as NodeJS.Timeout
                                       );
@@ -299,10 +297,9 @@ const WebcamAnalyzer: React.FC = () => {
                       console.error("Error sending emotion data: ", error);
                     }
                   }
-                }, 10000); // 10000 milliseconds = 10 seconds
+                }, 10000);
               }
             } else {
-              // Clear the interval when the camera is off
               if (emotionInterval) {
                 clearInterval(emotionInterval);
                 emotionInterval = null;
@@ -324,30 +321,46 @@ const WebcamAnalyzer: React.FC = () => {
       initializeSDK();
     }
 
-    // Cleanup function to stop the camera when component unmounts
     return () => {
       stopCamera();
     };
   }, [stream, isCameraOn, setCameraStatus, setEmotionData, setAttentionData]);
+
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center space-y-2">
-      <div className="relative w-full aspect-video">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-full object-cover border-2 border-gray-300 rounded-lg"
-        />
-      </div>
-      <Button
-        onClick={isCameraOn ? stopCamera : startCamera}
-        variant={isCameraOn ? "danger" : "default"}
-        className="mt-2"
+    <button
+      onClick={toggleCamera}
+      className="relative w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center focus:outline-none"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="white"
+        className="w-5 h-5"
       >
-        {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
-      </Button>
-    </div>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+        />
+      </svg>
+      {!isCameraOn && (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="white"
+          className="w-10 h-10 absolute"
+        >
+          <line x1="4" y1="4" x2="20" y2="20" strokeWidth="2" />
+        </svg>
+      )}
+      {isCameraOn && (
+        <div className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full"></div>
+      )}
+      <video ref={videoRef} className="hidden" autoPlay playsInline muted />
+    </button>
   );
 };
 

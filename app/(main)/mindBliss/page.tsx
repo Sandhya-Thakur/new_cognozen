@@ -6,6 +6,7 @@ export default function MindBliss() {
         Coming....
       </h1>
       
+      
     </div>
   )
 }
