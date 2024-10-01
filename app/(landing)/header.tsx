@@ -23,9 +23,6 @@ export const Header = () => {
               width={208}
               alt="CognoZen Logo"
             />
-            {/* <h1 className="text-2xl font-extrabold text-white tracking-wide">
-              CognoZen
-            </h1> */}
           </Link>
         </div>
         <div className="hidden md:flex flex-grow items-center"></div>
@@ -37,6 +34,14 @@ export const Header = () => {
           <ClerkLoaded>
             <SignedIn>
               <UserButton afterSignOutUrl="/" />
+              <Link href="/dashboard">
+                <Button
+                  size="lg"
+                  className="ml-4 font-inter text-[16px] bg-[#B2FF0D] text-[#1A1A1E] px-6 hover:bg-[#E3F2FD] border-1 hover:border-[#87CEEB]"
+                >
+                  Go to Home Page
+                </Button>
+              </Link>
             </SignedIn>
             <SignedOut>
               <SignInButton
@@ -54,14 +59,21 @@ export const Header = () => {
             </SignedOut>
           </ClerkLoaded>
         </div>
-
+        
         {/* Mobile Button - Shown on Small Screens */}
         <div className="block md:hidden">
           <ClerkLoaded>
+            <SignedIn>
+              <Link href="/dashboard">
+                <Button className="font-inter text-[14px] bg-[#B2FF0D] text-[#1A1A1E] px-4 hover:bg-[#E3F2FD] border-1 hover:border-[#87CEEB]">
+                  Home
+                </Button>
+              </Link>
+            </SignedIn>
             <SignedOut>
               <SignInButton mode="modal" afterSignInUrl="/dashboard">
                 <Button className="font-inter text-[14px] bg-[#B2FF0D] text-[#1A1A1E] px-4 hover:bg-[#E3F2FD] border-1 hover:border-[#87CEEB]">
-                Start Free Trial Today
+                  Start Free Trial Today
                 </Button>
               </SignInButton>
             </SignedOut>
