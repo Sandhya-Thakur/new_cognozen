@@ -79,7 +79,7 @@ const SuggestedActivities: React.FC = () => {
           </span>
         </div>
         <p className="text-gray-600 mt-2">
-          Based on your latest mood check-in, we've curated a list of activities
+          Based on your latest mood check-in, we have curated a list of activities
           designed to either uplift or sustain your current state. Choose one to
           start feeling even better, or perhaps shift your mood towards
           positivity.
