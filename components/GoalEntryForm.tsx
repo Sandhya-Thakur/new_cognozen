@@ -134,8 +134,7 @@ const GoalEntryForm: React.FC = () => {
       <Toaster position="top-center" reverseOrder={false} />
       <h2 className="text-xl font-bold mb-2 text-gray-800">Fee Good Goals</h2>
       <p className="text-gray-600 mb-6">
-        Set goals to enhance your emotional well-being. Craft personal objectives focused
-        on improving your mood, reducing stress, and fostering a positive mindset.
+        Set goals to enhance your emotional well-being.
       </p>
 
       <form onSubmit={addGoal} className="mb-8">
@@ -179,7 +178,6 @@ const GoalEntryForm: React.FC = () => {
 
       <div className="mb-4">
         <span className="text-blue-600 font-semibold">Goals Added ({addedGoals.length})</span>
-        {" | "}
         <button onClick={deleteSelectedGoals} className="text-gray-500">
           Delete Selected
         </button>
