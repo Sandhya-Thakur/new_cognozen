@@ -181,7 +181,7 @@ const GoalEntryForm: React.FC = () => {
         <span className="text-blue-600 font-semibold">Goals Added ({addedGoals.length})</span>
         {" | "}
         <button onClick={deleteSelectedGoals} className="text-gray-500">
-          Delete Selected (0)
+          Delete Selected
         </button>
       </div>
 
