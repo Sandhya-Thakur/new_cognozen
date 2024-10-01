@@ -164,7 +164,7 @@ const GoalEntryForm: React.FC = () => {
               className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
               disabled={isSubmitting}
             >
-              <option value="custom">Select goal(s) from list</option>
+              <option value="custom">Select goals from list</option>
               {PREDEFINED_GOALS.map((goal, index) => (
                 <option key={index} value={goal}>{goal}</option>
               ))}
