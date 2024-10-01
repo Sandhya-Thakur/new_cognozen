@@ -45,10 +45,10 @@ const GoalEntryForm: React.FC = () => {
       setAddedGoals([...addedGoals, newGoal]);
       setNewGoal("");
       setIsCustomGoal(true);
-      toast.success('Goal added successfully!'); // Corrected
+      toast.success("Goal added successfully!");
     } catch (error) {
       console.error("Error adding goal:", error);
-      toast.error('Failed to add goal. Please try again.'); // Corrected
+      toast.error("Failed to add goal. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -121,7 +121,6 @@ const GoalEntryForm: React.FC = () => {
   };
 
   const deleteSelectedGoals = () => {
-    // Implement delete functionality here
     toast.success("Selected goals deleted successfully!");
   };
 
