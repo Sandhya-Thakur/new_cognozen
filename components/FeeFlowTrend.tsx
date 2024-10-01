@@ -75,7 +75,7 @@ const FeeFlowTrend: React.FC = () => {
         </div>
       </div>
       <div className="w-[260px] h-[50px] ml-2 mt-19 relative flex justify-center items-center">
-        <h4>Today's Check-ins</h4>
+        <h4>Current day Check-ins</h4>
       </div>
       
       <div className="w-[260px] h-[130px] ml-2 relative">
