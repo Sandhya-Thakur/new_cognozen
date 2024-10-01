@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 
 const QuizWebcamAnalyzer: React.FC = () => {
@@ -13,6 +12,14 @@ const QuizWebcamAnalyzer: React.FC = () => {
   const setAttentionData = useStore((state) => state.setAttentionData);
   const isCameraOn = useStore((state) => state.isCameraOn);
 
+  const toggleCamera = async () => {
+    if (isCameraOn) {
+      stopCamera();
+    } else {
+      await startCamera();
+    }
+  };
+
   const startCamera = async () => {
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({
@@ -22,7 +29,7 @@ const QuizWebcamAnalyzer: React.FC = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
       }
-      setCameraStatus(true); // Notify global state that camera is on
+      setCameraStatus(true);
     } catch (error) {
       console.error("Error starting camera: ", error);
     }
@@ -38,7 +45,7 @@ const QuizWebcamAnalyzer: React.FC = () => {
       if (stopSdk) {
         stopSdk();
       }
-      setCameraStatus(false); // Notify global state that camera is off
+      setCameraStatus(false);
       setEmotionData(null);
       setAttentionData(null);
     }
@@ -162,10 +169,8 @@ const QuizWebcamAnalyzer: React.FC = () => {
               console.log("QUIZ FACE_ATTENTION event data:", e.detail);
               setAttentionData(e.detail);
 
-              // Store the latest attention data
               latestQuizAttentionData = e.detail;
 
-              // Start the interval if it's not already running
               if (!quizAttentionInterval) {
                 quizAttentionInterval = setInterval(() => {
                   if (latestQuizAttentionData) {
@@ -180,11 +185,9 @@ const QuizWebcamAnalyzer: React.FC = () => {
                         .then((response) => response.json())
                         .then((data) => {
                           console.log("Quiz attention data sent to server:", data);
-                          // Clear the interval after data is sent once
                           clearInterval(quizAttentionInterval as NodeJS.Timeout);
                           quizAttentionInterval = null;
 
-                          // Restart the interval to ensure it continues to send data every 10 seconds
                           if (isCameraOn) {
                             quizAttentionInterval = setInterval(() => {
                               if (latestQuizAttentionData) {
@@ -199,7 +202,6 @@ const QuizWebcamAnalyzer: React.FC = () => {
                                     .then((response) => response.json())
                                     .then((data) => {
                                       console.log("Quiz attention data sent to server:", data);
-                                      // Clear the interval after data is sent once
                                       clearInterval(
                                         quizAttentionInterval as NodeJS.Timeout
                                       );
@@ -219,10 +221,9 @@ const QuizWebcamAnalyzer: React.FC = () => {
                       console.error("Error sending quiz attention data: ", error);
                     }
                   }
-                }, 10000); // 10000 milliseconds = 10 seconds
+                }, 10000);
               }
             } else {
-              // Clear the interval when the camera is off
               if (quizAttentionInterval) {
                 clearInterval(quizAttentionInterval);
                 quizAttentionInterval = null;
@@ -242,10 +243,8 @@ const QuizWebcamAnalyzer: React.FC = () => {
               console.log("QUIZ FACE_EMOTION event data:", e.detail);
               setEmotionData(e.detail);
 
-              // Store the latest emotion data
               latestQuizEmotionData = e.detail;
 
-              // Start the interval if it's not already running
               if (!quizEmotionInterval) {
                 quizEmotionInterval = setInterval(() => {
                   if (latestQuizEmotionData) {
@@ -260,11 +259,9 @@ const QuizWebcamAnalyzer: React.FC = () => {
                         .then((response) => response.json())
                         .then((data) => {
                           console.log("Quiz emotion data sent to server:", data);
-                          // Clear the interval after data is sent once
                           clearInterval(quizEmotionInterval as NodeJS.Timeout);
                           quizEmotionInterval = null;
 
-                          // Restart the interval to ensure it continues to send data every 10 seconds
                           if (isCameraOn) {
                             quizEmotionInterval = setInterval(() => {
                               if (latestQuizEmotionData) {
@@ -279,7 +276,6 @@ const QuizWebcamAnalyzer: React.FC = () => {
                                     .then((response) => response.json())
                                     .then((data) => {
                                       console.log("Quiz emotion data sent to server:", data);
-                                      // Clear the interval after data is sent once
                                       clearInterval(
                                         quizEmotionInterval as NodeJS.Timeout
                                       );
@@ -299,10 +295,9 @@ const QuizWebcamAnalyzer: React.FC = () => {
                       console.error("Error sending quiz emotion data: ", error);
                     }
                   }
-                }, 10000); // 10000 milliseconds = 10 seconds
+                }, 10000);
               }
             } else {
-              // Clear the interval when the camera is off
               if (quizEmotionInterval) {
                 clearInterval(quizEmotionInterval);
                 quizEmotionInterval = null;
@@ -324,30 +319,47 @@ const QuizWebcamAnalyzer: React.FC = () => {
       initializeSDK();
     }
 
-    // Cleanup function to stop the camera when component unmounts
     return () => {
       stopCamera();
     };
   }, [stream, isCameraOn, setCameraStatus, setEmotionData, setAttentionData]);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center space-y-2">
-      <div className="relative w-full aspect-video">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-full object-cover border-2 border-gray-300 rounded-lg"
-        />
-      </div>
-      <Button
-        onClick={isCameraOn ? stopCamera : startCamera}
-        variant={isCameraOn ? "danger" : "default"}
-        className="mt-2"
+    <div className="flex flex-col items-center justify-center space-y-2">
+      <button
+        onClick={toggleCamera}
+        className="relative w-10 h-10 bg-green-600 rounded-full flex items-center justify-center focus:outline-none"
       >
-        {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
-      </Button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="white"
+          className="w-5 h-5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+          />
+        </svg>
+        {!isCameraOn && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="white"
+            className="w-10 h-10 absolute"
+          >
+            <line x1="4" y1="4" x2="20" y2="20" strokeWidth="2" />
+          </svg>
+        )}
+        {isCameraOn && (
+          <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+        )}
+      </button>
+      <video ref={videoRef} className="hidden" autoPlay playsInline muted />
     </div>
   );
 };

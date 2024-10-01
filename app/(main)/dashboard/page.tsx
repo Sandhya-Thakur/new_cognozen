@@ -8,6 +8,14 @@ import LatestActivitySection from "@/components/LatestActivitySection";
 import BreatheEaseSection from "@/components/BreatheEaseSection";
 import OverallPerformanceSection from "@/components/OverallPerformanceSection";
 import DailyProgressSection from "@/components/DailyProgressSection";
+import TodaysPdfAttentionData from "@/components/TodaysPdfAttentionData";
+import TodaysPdfEmotionData from "@/components/TodaysPdfEmotionData";
+import TodaysQuizAttentionData from "@/components/TodaysQuizAttentionData"
+import TodaysQuizEmotionData from "@/components/TodaysQuizEmotionData"
+import MoodTrendsData from "@/components/MoodTrendsData";
+import DailyMoodComparison from "@/components/MoodComparison";
+import HabitVisualizationComponent from "@/components/HabitVisualizationComponent";
+import MoodHabitCorrelation from "@/components/MoodHabitCorrelation";
 
 export default function Dashboard() {
   return (
@@ -37,6 +45,7 @@ export default function Dashboard() {
           <DailyProgressSection />
         </div>
       </div>
+  
     </div>
   );
 }

@@ -69,7 +69,7 @@ export const PermanentSideBar = ({ className }: Props) => {
       </Sheet>
 
       <IconButton icon={Home} title="Home" href="/dashboard" />
-      <IconButton icon={BarChart} title="Insights" href="/insights" />
+      <IconButton icon={BarChart} title="Analytics" href="/seeAllEmotionAttentionData" />
       <IconButton icon={Activity} title="FeelFlow" href="/emotionsTracker" />
       <IconButton icon={Layers} title="CognoHub" href="/cognohub" />
       <IconButton icon={Heart} title="CognoBuddy" />

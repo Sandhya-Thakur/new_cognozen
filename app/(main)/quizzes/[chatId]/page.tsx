@@ -9,6 +9,7 @@ import QuizHeader from "@/components/QuizHeader";
 import QuizGenerator from "@/components/QuizGenerator";
 import { Toaster } from "@/components/ui/toaster";
 
+
 type Props = {
   params: {
     chatId: string;
