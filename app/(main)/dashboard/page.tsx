@@ -8,12 +8,6 @@ import LatestActivitySection from "@/components/LatestActivitySection";
 import BreatheEaseSection from "@/components/BreatheEaseSection";
 import OverallPerformanceSection from "@/components/OverallPerformanceSection";
 import DailyProgressSection from "@/components/DailyProgressSection";
-import TodaysPdfAttentionData from "@/components/TodaysPdfAttentionData";
-import TodaysPdfEmotionData from "@/components/TodaysPdfEmotionData";
-import TodaysQuizAttentionData from "@/components/TodaysQuizAttentionData"
-import TodaysQuizEmotionData from "@/components/TodaysQuizEmotionData"
-import MoodTrendsData from "@/components/MoodTrendsData";
-import DailyMoodComparison from "@/components/MoodComparison";
 
 export default function Dashboard() {
   return (
@@ -41,30 +35,6 @@ export default function Dashboard() {
         </div>
         <div className="col-span-12 md:col-span-2">
           <DailyProgressSection />
-        </div>
-      </div>
-      <div className="grid grid-cols-12 gap-4 mt-4">
-        <div className="col-span-12 md:col-span-6">
-          <TodaysPdfAttentionData />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <TodaysPdfEmotionData />
-        </div>
-      </div>
-      <div className="grid grid-cols-12 gap-4 mt-4">
-        <div className="col-span-12 md:col-span-6">
-          <TodaysQuizAttentionData />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <TodaysQuizEmotionData />
-        </div>
-      </div>
-      <div className="grid grid-cols-12 gap-4 mt-4">
-        <div className="col-span-12 md:col-span-6">
-          <MoodTrendsData />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <DailyMoodComparison />
         </div>
       </div>
       </div>

@@ -137,7 +137,7 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ onMoodSelect }) => {
     <Card className="w-[550px] h-[550px] bg-[#FFFDF7] shadow-xl rounded-2xl overflow-hidden">
       <CardHeader className="h-1/6">
         <CardTitle className="text-3xl font-bold">
-          {step === 1 && <span>Fee Flow Check-In</span>}
+          {step === 1 && <span>Feel Flow Check-In</span>}
           {step === 2 && <span>Mood Intensity Dial</span>}
           {step === 3 && <span>Mood Origin Explorer</span>}
         </CardTitle>
