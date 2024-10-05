@@ -9,6 +9,7 @@ import BreatheEaseSection from "@/components/BreatheEaseSection";
 import OverallPerformanceSection from "@/components/OverallPerformanceSection";
 import DailyProgressSection from "@/components/DailyProgressSection";
 
+
 export default function Dashboard() {
   return (
     <div className="px-8">
