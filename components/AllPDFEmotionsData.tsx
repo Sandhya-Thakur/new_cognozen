@@ -22,10 +22,8 @@ type EmotionData = {
 
 type TabValue = 'live' | 'today' | 'week' | 'month';
 
-// Emotion names as received from the API
 const EMOTIONS = ['Happy', 'Angry', 'Disgust', 'Fear', 'Neutral', 'Sad', 'Surprise'];
 
-// Mappings for user-friendly display names
 const EMOTION_LABELS: { [key: string]: string } = {
   Happy: "Confidence",
   Angry: "Frustration",
@@ -36,7 +34,6 @@ const EMOTION_LABELS: { [key: string]: string } = {
   Surprise: "Curiosity"
 };
 
-// Colors for each emotion
 const COLORS = {
   Happy: "#22c55e",
   Angry: "#dc2626",
@@ -138,13 +135,13 @@ const AllPDFEmotionsData: React.FC = () => {
     switch (range) {
       case 'live':
       case 'today':
-        return "HH:mm";
+        return "EEE HH:mm";
       case 'week':
         return "EEE";
       case 'month':
         return "MMM d";
       default:
-        return "yyyy-MM-dd HH:mm";
+        return "EEE yyyy-MM-dd HH:mm";
     }
   };
 
@@ -164,11 +161,26 @@ const AllPDFEmotionsData: React.FC = () => {
     }
     const formattedData = formatData(filteredData, range);
 
+    const today = new Date();
+    let titleDayName = '';
+    switch (range) {
+      case 'live':
+      case 'today':
+        titleDayName = format(today, "EEEE's");
+        break;
+      case 'week':
+        titleDayName = "This Week's";
+        break;
+      case 'month':
+        titleDayName = "This Month's";
+        break;
+    }
+
     return (
       <Card className="w-full shadow-sm bg-gradient-to-br from-rose-50 to-pink-50">
         <CardHeader className="bg-gradient-to-r from-rose-100 to-pink-100">
           <CardTitle className="text-sm font-semibold text-rose-800">
-            {range.charAt(0).toUpperCase() + range.slice(1)} PDF Emotion Levels
+            {titleDayName} PDF Emotion Levels
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">

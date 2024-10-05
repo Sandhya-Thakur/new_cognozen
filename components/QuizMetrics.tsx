@@ -11,7 +11,6 @@ interface QuizMetric {
     quizId: number;
     score: number;
   } | null;
-  change?: number; // Make this optional
 }
 
 const QuizMetrics: React.FC = () => {
@@ -25,13 +24,14 @@ const QuizMetrics: React.FC = () => {
       try {
         const response = await fetch("/api/quiz-metrics");
         if (!response.ok) {
-          throw new Error("Failed to fetch quiz metrics");
+          const errorData = await response.json();
+          throw new Error(errorData.details || "Failed to fetch quiz metrics");
         }
         const data = await response.json();
         setMetric(data);
       } catch (error) {
         console.error("Error fetching quiz metrics:", error);
-        setError("Failed to load quiz metrics");
+        setError(error instanceof Error ? error.message : "An unknown error occurred");
       } finally {
         setIsLoading(false);
       }
@@ -40,8 +40,8 @@ const QuizMetrics: React.FC = () => {
     fetchQuizMetrics();
   }, []);
 
-  if (isLoading) return <div>Loading quiz metrics...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (isLoading) return <div className="text-center p-4">Loading quiz metrics...</div>;
+  if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
   if (!metric) return null;
 
   return (
@@ -63,20 +63,22 @@ const QuizMetrics: React.FC = () => {
                 <TooltipContent side="bottom" className="w-64 p-4 z-50 bg-white text-gray-800">
                   <h4 className="font-semibold mb-2">Quiz Activity</h4>
                   <p className="text-sm mb-2">
-                    This card shows your quiz activity metrics.
+                    This card shows your quiz activity metrics for the last 30 days.
                   </p>
                   <p className="text-sm mb-2">
-                    Track your quiz progress and performance.
+                    Total Quizzes: {metric.totalQuizzes}
                   </p>
                   <p className="text-sm mb-2">
-                    The main number represents your total completed quizzes.
+                    Average Score: {metric.averageScore !== null ? `${metric.averageScore.toFixed(2)}%` : 'N/A'}
                   </p>
                   <p className="text-sm mb-2">
-                    The percentage shows the completion rate of your quizzes.
+                    Completion Rate: {metric.completionRate.toFixed(2)}%
                   </p>
-                  <p className="text-sm">
-                    The progress bar indicates your quiz completion rate.
-                  </p>
+                  {metric.topPerformingQuiz && (
+                    <p className="text-sm">
+                      Top Quiz Score: {metric.topPerformingQuiz.score.toFixed(2)}%
+                    </p>
+                  )}
                 </TooltipContent>
               </Tooltip>
             </div>

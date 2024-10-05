@@ -3,7 +3,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader } from "lucide-react";
-import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { format, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 
 type AttentionData = {
   id: number;
@@ -23,14 +23,14 @@ const TodaysQuizAttentionData: React.FC = () => {
         const allData: AttentionData[] = response.data;
         
         const today = new Date();
-        const weekStart = startOfWeek(today);
-        const weekEnd = endOfWeek(today);
+        const dayStart = startOfDay(today);
+        const dayEnd = endOfDay(today);
 
-        const thisWeekData = allData.filter(entry =>
-          isWithinInterval(new Date(entry.timestamp), { start: weekStart, end: weekEnd })
+        const todayData = allData.filter(entry =>
+          isWithinInterval(new Date(entry.timestamp), { start: dayStart, end: dayEnd })
         );
         
-        setData(thisWeekData);
+        setData(todayData);
       } catch (error) {
         console.error("Failed to fetch quiz attention data", error);
       }
@@ -50,7 +50,7 @@ const TodaysQuizAttentionData: React.FC = () => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="flex h-64 justify-center items-center text-purple-500">
-        <p>No quiz attention data available for this week</p>
+        <p>No quiz attention data available for today</p>
       </div>
     );
   }
@@ -58,14 +58,14 @@ const TodaysQuizAttentionData: React.FC = () => {
   const formattedData = data
     .map(entry => ({
       ...entry,
-      timestamp: format(new Date(entry.timestamp), "EEE HH:mm")
+      timestamp: format(new Date(entry.timestamp), "HH:mm")
     }))
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   return (
     <Card className="w-full rounded-2xl shadow-sm bg-gradient-to-br from-purple-50 to-indigo-50">
       <CardHeader className="bg-gradient-to-r from-purple-100 to-indigo-100">
-        <CardTitle className="text-sm font-semibold text-purple-800">Current Week Quiz Attention Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-purple-800">Current Day Quiz Attention Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">

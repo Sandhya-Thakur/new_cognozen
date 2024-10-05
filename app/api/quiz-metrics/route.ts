@@ -5,7 +5,8 @@ import { quizzes, quizAttempts, chats } from "@/lib/db/schema";
 import { sql, and, eq, gt, inArray } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
+// Removing Edge runtime for broader compatibility
+// export const runtime = "edge";
 
 interface QuizMetric {
   totalQuizzes: number;
@@ -19,7 +20,7 @@ interface QuizMetric {
 
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
+    const { userId } = auth();
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
 
     // Total quizzes attempted
     const totalQuizzes = await db
-      .select({ count: sql<number>`COUNT(DISTINCT ${quizAttempts.id})` })
+      .select({ count: sql<number>`CAST(COUNT(DISTINCT ${quizAttempts.id}) AS INTEGER)` })
       .from(quizAttempts)
       .where(
         and(
@@ -56,7 +57,7 @@ export async function GET(request: Request) {
 
     // Average score of completed quizzes
     const avgScore = await db
-      .select({ avg: sql<number>`AVG(${quizAttempts.score})` })
+      .select({ avg: sql<number>`CAST(AVG(${quizAttempts.score}) AS FLOAT)` })
       .from(quizAttempts)
       .where(
         and(
@@ -68,7 +69,7 @@ export async function GET(request: Request) {
 
     // Completion rate
     const completedQuizzes = await db
-      .select({ count: sql<number>`COUNT(*)` })
+      .select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
       .from(quizAttempts)
       .where(
         and(
@@ -96,20 +97,16 @@ export async function GET(request: Request) {
       .orderBy(sql`${quizAttempts.score} DESC`)
       .limit(1);
 
-    const totalQuizzesCount = Number(totalQuizzes[0]?.count) || 0;
-    const rawAverageScore = avgScore[0]?.avg;
-    const completedQuizzesCount = Number(completedQuizzes[0]?.count) || 0;
+    const totalQuizzesCount = totalQuizzes[0]?.count || 0;
+    const completedQuizzesCount = completedQuizzes[0]?.count || 0;
     const completionRate = totalQuizzesCount > 0 
       ? (completedQuizzesCount / totalQuizzesCount) * 100 
       : 0;
 
-    // Debug logging
-    console.log('Raw average score:', rawAverageScore);
-    console.log('Type of raw average score:', typeof rawAverageScore);
-
+    const rawAverageScore = avgScore[0]?.avg;
     let processedAverageScore: number | null = null;
-    if (rawAverageScore !== null && rawAverageScore !== undefined && !isNaN(Number(rawAverageScore))) {
-      processedAverageScore = Number(Number(rawAverageScore).toFixed(2));
+    if (rawAverageScore !== null && rawAverageScore !== undefined && !isNaN(rawAverageScore)) {
+      processedAverageScore = Number(rawAverageScore.toFixed(2));
     }
 
     const quizMetric: QuizMetric = {
@@ -124,7 +121,6 @@ export async function GET(request: Request) {
         : null,
     };
 
-    // Debug logging
     console.log('Quiz metric:', JSON.stringify(quizMetric, null, 2));
 
     return NextResponse.json(quizMetric);
@@ -133,7 +129,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         error: "Failed to fetch quiz metrics",
-        details: (error as Error).message,
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

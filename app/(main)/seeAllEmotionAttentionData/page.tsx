@@ -21,18 +21,8 @@ const AllPdfEmotionAttentionData = () => {
   return (
     <div>
       <Header />
-      <AllAttentionData/>
-      <AllEmotionsDataDashboard/>
-      <MoodSummary/>
-      <HabitTrackerDashboard/>
-      <GoalsOverviewDashboard/>
-      <WeeklyChallengeStatus/>
-      <PersonalizedInsightsDashboard/>
-      <JournalEntriesSummary/>
-      <GratitudeLog/>
-      <EmotionalWellbeingGoalsProgress/>
-      <AllSuggestedActivities/>
       <div className="grid grid-cols-12 gap-4 mt-4">
+
         <div className="col-span-12 md:col-span-6">
           <TodaysPdfAttentionData />
         </div>
@@ -56,6 +46,9 @@ const AllPdfEmotionAttentionData = () => {
           <DailyMoodComparison />
         </div>
         </div>
+        <AllAttentionData/>
+        <AllEmotionsDataDashboard/>
+
 
 
 

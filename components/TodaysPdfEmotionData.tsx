@@ -3,7 +3,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Scatter, Cell } from 'recharts';
 import { Loader } from "lucide-react";
-import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { format, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 
 type EmotionData = {
   id: number;
@@ -75,14 +75,14 @@ const TodaysPdfEmotionData: React.FC = () => {
         const allData: EmotionData[] = response.data;
         
         const today = new Date();
-        const weekStart = startOfWeek(today);
-        const weekEnd = endOfWeek(today);
+        const dayStart = startOfDay(today);
+        const dayEnd = endOfDay(today);
 
-        const thisWeekData = allData.filter(entry =>
-          isWithinInterval(new Date(entry.timestamp), { start: weekStart, end: weekEnd })
+        const todayData = allData.filter(entry =>
+          isWithinInterval(new Date(entry.timestamp), { start: dayStart, end: dayEnd })
         );
         
-        setData(thisWeekData);
+        setData(todayData);
       } catch (error) {
         console.error("Failed to fetch PDF emotion data", error);
       }
@@ -102,20 +102,20 @@ const TodaysPdfEmotionData: React.FC = () => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="flex h-64 justify-center items-center text-rose-500">
-        <p>No PDF emotion data available for this week</p>
+        <p>No PDF emotion data available for today</p>
       </div>
     );
   }
 
   const formattedData = data.map(entry => ({
     ...entry,
-    timestamp: format(new Date(entry.timestamp), "EEE HH:mm"),
+    timestamp: format(new Date(entry.timestamp), "HH:mm"),
   })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   return (
     <Card className="w-full rounded-2xl shadow-sm bg-gradient-to-br from-rose-50 to-pink-50">
       <CardHeader className="bg-gradient-to-r from-rose-100 to-pink-100">
-        <CardTitle className="text-sm font-semibold text-rose-800">Current Week PDF Reading Emotion Levels</CardTitle>
+        <CardTitle className="text-sm font-semibold text-rose-800">Current Day PDF Reading Emotion Levels</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="h-[300px] w-full">
