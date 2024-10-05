@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { InfoIcon } from "lucide-react";
@@ -13,36 +13,19 @@ interface QuizMetric {
   } | null;
 }
 
-const QuizMetrics: React.FC = () => {
-  const [metric, setMetric] = useState<QuizMetric | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const StaticQuizMetrics: React.FC = () => {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchQuizMetrics = async () => {
-      try {
-        const response = await fetch("/api/quiz-metrics");
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.details || "Failed to fetch quiz metrics");
-        }
-        const data = await response.json();
-        setMetric(data);
-      } catch (error) {
-        console.error("Error fetching quiz metrics:", error);
-        setError(error instanceof Error ? error.message : "An unknown error occurred");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchQuizMetrics();
-  }, []);
-
-  if (isLoading) return <div className="text-center p-4">Loading quiz metrics...</div>;
-  if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-  if (!metric) return null;
+  // Static data to simulate the quiz metrics
+  const metric: QuizMetric = {
+    totalQuizzes: 15,
+    averageScore: 85.5,
+    completionRate: 78.3,
+    topPerformingQuiz: {
+      quizId: 7,
+      score: 95.0,
+    },
+  };
 
   return (
     <TooltipProvider>
@@ -109,4 +92,4 @@ const QuizMetrics: React.FC = () => {
   );
 };
 
-export default QuizMetrics;
+export default StaticQuizMetrics;
