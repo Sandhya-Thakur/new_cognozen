@@ -23,14 +23,14 @@ const QandA: React.FC = () => {
       <div className="bg-white p-4 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-2">Share Your Valuable Feedback with Us</h2>
         <p className="text-sm text-gray-600">
-          We thrive on your feedback! If you have questions that aren't covered here or suggestions on how we can improve, please let us know. Your insights are invaluable in helping us enhance our FAQ section and ensure it meets your needs.
+          We thrive on your feedback! If you have questions that are not covered here or suggestions on how we can improve, please let us know. Your insights are invaluable in helping us enhance our FAQ section and ensure it meets your needs.
         </p>
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-2">Need More Help? Get in Touch!</h2>
         <p className="text-sm text-gray-600 mb-4">
-          Can't find the answer you're looking for? Reach out to us directly through the contact form on our website. We're here to help you every step of the way and ensure your experience with CognoZen is nothing short of excellent.
+          Can not find the answer you are looking for? Reach out to us directly through the contact form on our website. We are here to help you every step of the way and ensure your experience with CognoZen is nothing short of excellent.
         </p>
         <p className="text-sm font-medium">Website: cognozen.ai</p>
         <div className="flex space-x-3 mt-4">

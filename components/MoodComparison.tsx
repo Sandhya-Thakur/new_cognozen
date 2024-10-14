@@ -141,7 +141,7 @@ const DailyMoodComparison: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="rounded-xl shadow bg-white">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-600">Today's Mood</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">Today Mood</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[200px]">
@@ -169,7 +169,7 @@ const DailyMoodComparison: React.FC = () => {
             </Card>
             <Card className="rounded-xl shadow bg-white">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-600">Yesterday's Mood</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">Yesterday Mood</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[200px]">
