@@ -13,10 +13,9 @@ type AttentionData = {
   userId: string;
 };
 
-type TabValue = 'live' | 'today' | 'week' | 'month';
+type TabValue = 'today' | 'week' | 'month';
 
 const graphColorSchemes = {
-  live: { stroke: "#C4B5FD", fill: "#DDD6FE" },
   today: { stroke: "#A78BFA", fill: "#C4B5FD" },
   week: { stroke: "#8B5CF6", fill: "#A78BFA" },
   month: { stroke: "#7C3AED", fill: "#8B5CF6" }
@@ -25,7 +24,7 @@ const graphColorSchemes = {
 const AllQuizAttentionData: React.FC = () => {
   const [data, setData] = useState<AttentionData[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabValue>('live');
+  const [activeTab, setActiveTab] = useState<TabValue>('today');
 
   useEffect(() => {
     const fetchAttentionData = async () => {
@@ -63,8 +62,6 @@ const AllQuizAttentionData: React.FC = () => {
       try {
         const entryDate = parseISO(entry.timestamp);
         switch (range) {
-          case 'live':
-            return true; // We'll take the last 20 entries later
           case 'today':
             return isToday(entryDate);
           case 'week':
@@ -88,7 +85,8 @@ const AllQuizAttentionData: React.FC = () => {
           const date = parseISO(entry.timestamp);
           return {
             ...entry,
-            timestamp: format(date, getDateFormat(range))
+            timestamp: format(date, getDateFormat(range)),
+            fullTimestamp: format(date, "yyyy-MM-dd HH:mm:ss")
           };
         } catch (error) {
           console.error("Error formatting date:", entry.timestamp);
@@ -96,13 +94,11 @@ const AllQuizAttentionData: React.FC = () => {
         }
       })
       .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
-      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      .sort((a, b) => new Date(a.fullTimestamp).getTime() - new Date(b.fullTimestamp).getTime());
   };
 
   const getDateFormat = (range: TabValue): string => {
     switch (range) {
-      case 'live':
-        return "HH:mm";
       case 'today':
         return "HH:mm";
       case 'week':
@@ -115,10 +111,7 @@ const AllQuizAttentionData: React.FC = () => {
   };
 
   const renderAttentionChart = (range: TabValue) => {
-    let filteredData = filterDataByTimeRange(data, range);
-    if (range === 'live') {
-      filteredData = filteredData.slice(-20);
-    }
+    const filteredData = filterDataByTimeRange(data, range);
     const formattedData = formatData(filteredData, range);
     const colors = graphColorSchemes[range];
 
@@ -139,12 +132,20 @@ const AllQuizAttentionData: React.FC = () => {
                   stroke="#7c3aed"
                   tick={{ fontSize: 12 }}
                   interval={range === 'month' ? 2 : 0}
+                  angle={range === 'month' ? -45 : 0}
+                  textAnchor={range === 'month' ? 'end' : 'middle'}
+                  height={range === 'month' ? 60 : 30}
                 />
                 <YAxis stroke="#7c3aed" />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'white', border: 'none', boxShadow: '0 2px 4px rgba(124,58,237,0.1)' }}
                   labelStyle={{ fontWeight: 'bold', color: '#7c3aed' }}
-                  labelFormatter={(value) => value} // Use the formatted timestamp directly
+                  labelFormatter={(value, entry) => {
+                    if (entry && entry[0] && entry[0].payload && entry[0].payload.fullTimestamp) {
+                      return entry[0].payload.fullTimestamp;
+                    }
+                    return value;
+                  }}
                 />
                 <Area type="monotone" dataKey="level" stroke={colors.stroke} fill={colors.fill} fillOpacity={0.6} />
               </AreaChart>
@@ -159,7 +160,6 @@ const AllQuizAttentionData: React.FC = () => {
     <div className="container mx-auto px-4 py-4 bg-[#F8F9FA]">
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabValue)} className="mb-12">
         <TabsList className="bg-purple-100 text-purple-800">
-          <TabsTrigger value="live" className="data-[state=active]:bg-purple-200 data-[state=active]:text-purple-900">Live Data</TabsTrigger>
           <TabsTrigger value="today" className="data-[state=active]:bg-purple-200 data-[state=active]:text-purple-900">Today</TabsTrigger>
           <TabsTrigger value="week" className="data-[state=active]:bg-purple-200 data-[state=active]:text-purple-900">This Week</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-purple-200 data-[state=active]:text-purple-900">This Month</TabsTrigger>

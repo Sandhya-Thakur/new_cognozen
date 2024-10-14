@@ -63,7 +63,14 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ onMoodSelect }) => {
     { mood: "Depressed", image: "😞", color: "bg-blue-900" },
   ];
 
-  const commonReasons = ['Social', 'Sleep', 'Family', 'Eating Habits', 'Self Esteem', 'Weather', 'School', 'Partner', 'Exams', 'Sports'];
+  const commonReasons = [
+    'Social', 'Sleep', 'Family', 'Eating Habits', 'Self Esteem', 'Weather',
+    'School', 'Partner', 'Exams', 'Sports', 'Work', 'Health', 'Finances',
+    'Hobbies', 'Personal Growth', 'Relationships', 'Stress', 'Achievements',
+    'Travel', 'Exercise', 'Meditation', 'Creativity', 'Nature', 'Pets',
+    'Technology', 'News', 'Music', 'Reading', 'Cooking', 'Cleaning',
+    'Volunteering', 'Learning', 'Socializing', 'Relaxation', 'Entertainment'
+  ];
 
   const handleMoodSelection = (mood: string) => {
     setSelectedMood(mood);

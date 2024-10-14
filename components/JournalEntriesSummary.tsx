@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -8,6 +6,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trash2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 interface JournalEntry {
   id: number;
@@ -16,49 +17,77 @@ interface JournalEntry {
 }
 
 const JournalEntriesSummary: React.FC = () => {
-  const [recentEntries, setRecentEntries] = useState<JournalEntry[]>([]);
-  const [weeklyEntries, setWeeklyEntries] = useState<JournalEntry[]>([]);
-  const [monthlyEntries, setMonthlyEntries] = useState<JournalEntry[]>([]);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [deleteEntryId, setDeleteEntryId] = useState<number | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    // Fetch journal entries from your API
-    // This is a placeholder. Replace with actual API calls.
-    const fetchEntries = async () => {
-      // const response = await fetch('/api/journal-entries');
-      // const data = await response.json();
-      // setRecentEntries(data.recent);
-      // setWeeklyEntries(data.weekly);
-      // setMonthlyEntries(data.monthly);
-
-      // Placeholder data
-      setRecentEntries([
-        { id: 1, content: "Today was a productive day. I completed all my tasks.", createdAt: "2024-08-29T10:00:00Z" },
-        { id: 2, content: "Feeling a bit stressed about the upcoming project deadline.", createdAt: "2024-08-28T09:30:00Z" },
-      ]);
-      setWeeklyEntries([
-        { id: 3, content: "This week has been challenging but rewarding.", createdAt: "2024-08-25T11:00:00Z" },
-        { id: 4, content: "I've been consistent with my meditation practice this week.", createdAt: "2024-08-22T08:45:00Z" },
-      ]);
-      setMonthlyEntries([
-        { id: 5, content: "Reflecting on this month's progress. I've grown in many ways.", createdAt: "2024-08-15T14:20:00Z" },
-        { id: 6, content: "Started a new hobby this month. It's been fun and relaxing.", createdAt: "2024-08-05T16:30:00Z" },
-      ]);
-    };
-
     fetchEntries();
   }, []);
 
+  const fetchEntries = async () => {
+    try {
+      const response = await fetch('/api/get-journal-data');
+      const data = await response.json();
+      setEntries(data.entries);
+    } catch (error) {
+      console.error("Error fetching journal entries:", error);
+    }
+  };
+
+  const deleteEntry = async (id: number) => {
+    try {
+      const response = await fetch(`/api/get-journal-data?id=${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setEntries(entries.filter(entry => entry.id !== id));
+        setShowAlert(false);
+      } else {
+        console.error("Failed to delete entry");
+      }
+    } catch (error) {
+      console.error("Error deleting journal entry:", error);
+    }
+  };
+
+  const getTodayEntries = () => {
+    const today = new Date().setHours(0, 0, 0, 0);
+    return entries.filter(entry => new Date(entry.createdAt).setHours(0, 0, 0, 0) === today);
+  };
+
+  const getWeeklyEntries = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    return entries.filter(entry => new Date(entry.createdAt) >= oneWeekAgo);
+  };
+
+  const getMonthlyEntries = () => {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    return entries.filter(entry => new Date(entry.createdAt) >= oneMonthAgo);
+  };
+
   const renderEntries = (entries: JournalEntry[]) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4">
       {entries.map((entry) => (
-        <Card key={entry.id} className="border-[#C0C0C0]">
-          <CardHeader className="bg-[#0F52BA] text-white">
-            <CardTitle className="text-lg">
-              {new Date(entry.createdAt).toLocaleDateString()}
+        <Card key={entry.id} className="border-gray-200 rounded-xl shadow-md overflow-hidden">
+          <CardHeader className="bg-[#6366F1] text-white p-4 flex justify-between items-center">
+            <CardTitle className="text-lg font-semibold">
+              {new Date(entry.createdAt).toLocaleString()}
             </CardTitle>
+            <button 
+              onClick={() => {
+                setDeleteEntryId(entry.id);
+                setShowAlert(true);
+              }} 
+              className="text-white hover:text-red-300"
+            >
+              <Trash2 size={20} />
+            </button>
           </CardHeader>
           <CardContent className="bg-white p-4">
-            <p>{entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content}</p>
+            <p className="text-gray-800">{entry.content}</p>
           </CardContent>
         </Card>
       ))}
@@ -66,26 +95,39 @@ const JournalEntriesSummary: React.FC = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-[#F8F9FA]">
-      <h1 className="text-xl font-bold mb-8 text-[#0F52BA]">Journal Entries Summary</h1>
+    <div className="container mx-auto px-4 py-12 bg-gray-100">
+      <h1 className="text-3xl font-bold mb-8 text-[#6366F1]">Journal Entries Summary</h1>
 
-      <Tabs defaultValue="recent" className="mb-12">
-        <TabsList className="bg-[#0F52BA] text-white">
-          <TabsTrigger value="recent" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Recent Entries</TabsTrigger>
-          <TabsTrigger value="weekly" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Weekly Summary</TabsTrigger>
-          <TabsTrigger value="monthly" className="data-[state=active]:bg-[#87CEEB] data-[state=active]:text-[#2C3E50]">Monthly Overview</TabsTrigger>
+      {showAlert && (
+        <Alert className="mb-4 bg-red-100 border-red-400 text-red-700">
+          <AlertTitle className="font-bold">Are you sure you want to delete this entry?</AlertTitle>
+          <AlertDescription>
+            This action cannot be undone. This will permanently delete your journal entry.
+          </AlertDescription>
+          <div className="mt-4 flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setShowAlert(false)}>Cancel</Button>
+            <Button onClick={() => deleteEntryId && deleteEntry(deleteEntryId)}>Delete</Button>
+          </div>
+        </Alert>
+      )}
+
+      <Tabs defaultValue="today" className="mb-12">
+        <TabsList className="bg-[#6366F1] text-white rounded-lg">
+          <TabsTrigger value="today" className="data-[state=active]:bg-[#818CF8] data-[state=active]:text-white">Today Entries</TabsTrigger>
+          <TabsTrigger value="weekly" className="data-[state=active]:bg-[#818CF8] data-[state=active]:text-white">This Week Entries</TabsTrigger>
+          <TabsTrigger value="monthly" className="data-[state=active]:bg-[#818CF8] data-[state=active]:text-white">This Month Entries</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="recent">
-          {renderEntries(recentEntries)}
+        <TabsContent value="today">
+          {renderEntries(getTodayEntries())}
         </TabsContent>
 
         <TabsContent value="weekly">
-          {renderEntries(weeklyEntries)}
+          {renderEntries(getWeeklyEntries())}
         </TabsContent>
 
         <TabsContent value="monthly">
-          {renderEntries(monthlyEntries)}
+          {renderEntries(getMonthlyEntries())}
         </TabsContent>
       </Tabs>
     </div>

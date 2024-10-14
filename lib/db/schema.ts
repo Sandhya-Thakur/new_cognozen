@@ -59,7 +59,6 @@ export const flashcards = pgTable("flashcards", {
 });
 
 
-
 // Existing tables (chats, messages, etc.) remain unchanged
 
 export const quizzes = pgTable("quizzes", {
@@ -236,6 +235,12 @@ export type SuggestedActivity = typeof suggestedActivities.$inferSelect;
 
 
 
+
+
+
+
+
+
 // storing habit data
 
 export const habits = pgTable("habits", {
@@ -332,6 +337,11 @@ export const moodHabitCorrelations = pgTable("mood_habit_correlations", {
 export type MoodHabitCorrelation = typeof moodHabitCorrelations.$inferSelect;
 
 
+
+
+
+
+
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id", { length: 256 }).notNull(),
@@ -343,4 +353,21 @@ export const notifications = pgTable("notifications", {
 });
 
 export type Notification = typeof notifications.$inferSelect;
+
+
+
+// FAQs storage
+
+
+export const FAQs = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  role: userSystemEnum("role").notNull(),
+});
+
+export type FAQs = typeof FAQs.$inferSelect;
+
+
 

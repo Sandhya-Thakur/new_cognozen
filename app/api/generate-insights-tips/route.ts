@@ -1,10 +1,9 @@
-// app/api/generate-insights/route.ts
-
 import { NextResponse } from "next/server";
 import { Configuration, OpenAIApi } from "openai-edge";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
-import { insightsAndTips } from "@/lib/db/schema";
+import { insightsAndTips, moodData } from "@/lib/db/schema";
+import { desc, eq } from "drizzle-orm";
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -19,23 +18,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { mood } = await req.json();
+    // Fetch the latest mood data
+    const latestMoodData = await db
+      .select()
+      .from(moodData)
+      .where(eq(moodData.userId, userId))
+      .orderBy(desc(moodData.timestamp))
+      .limit(1);
 
-    if (!mood) {
-      return NextResponse.json({ error: "Mood is required" }, { status: 400 });
+    if (latestMoodData.length === 0) {
+      return NextResponse.json({ error: "No mood data found" }, { status: 404 });
     }
+
+    const { mood, reasons } = latestMoodData[0];
 
     const prompt = {
       role: "system" as const,
-      content: `You are an empathetic AI assistant providing insights and tips based on a person's mood. 
-      Your responses should be supportive, encouraging, and tailored to the specific mood.
+      content: `You are an empathetic AI assistant providing insights and tips based on a person's mood and the reasons behind it.
+      Your responses should be supportive, encouraging, and tailored to the specific mood and reasons.
       Provide practical advice and strategies to help improve or maintain the person's emotional well-being.
       Format your response as a JSON object with the following structure:
       {
         "mood": "The mood being addressed",
         "understanding": {
           "title": "Understanding the Mood: [Mood]",
-          "description": "A brief explanation of the mood"
+          "description": "A brief explanation of the mood and its context"
         },
         "impacts": ["An array of potential impacts"],
         "strategies": [
@@ -50,7 +57,13 @@ export async function POST(req: Request) {
 
     const userMessage = {
       role: "user" as const,
-      content: `Generate insights and tips for someone feeling ${mood}. Include a brief explanation of the mood, its potential impacts, and at least three practical strategies to manage or improve this emotional state.`,
+      content: `Generate insights and tips for someone feeling ${mood}. ${
+        reasons && reasons.length > 0
+          ? `The reasons for this mood are: ${reasons.join(", ")}.`
+          : "No specific reasons were provided for this mood."
+      } Include a brief explanation of the mood considering ${
+        reasons && reasons.length > 0 ? "these reasons" : "the lack of specific reasons"
+      }, its potential impacts, and at least three practical strategies to manage or improve this emotional state.`,
     };
 
     const response = await openai.createChatCompletion({

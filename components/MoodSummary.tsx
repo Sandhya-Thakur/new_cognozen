@@ -14,20 +14,29 @@ interface MoodData {
   timestamp: string;
 }
 
-const MOOD_COLORS = {
-  Happy: '#FFD54F',
-  Sad: '#90CAF9',
-  Angry: '#EF9A9A',
-  Neutral: '#E0E0E0',
-  Excited: '#FFCC80',
-  Anxious: '#CE93D8',
-  Calm: '#A5D6A7'
-};
+interface Mood {
+  mood: string;
+  image: string;
+  color: string;
+}
+
+const moods: Mood[] = [
+  { mood: "Happy", image: "😊", color: "#FFD54F" },
+  { mood: "Content", image: "🙂", color: "#81C784" },
+  { mood: "Calm", image: "😌", color: "#64B5F6" },
+  { mood: "Neutral", image: "😐", color: "#E0E0E0" },
+  { mood: "Bored", image: "😒", color: "#BDBDBD" },
+  { mood: "Frustrated", image: "😠", color: "#EF9A9A" },
+  { mood: "Sad", image: "😢", color: "#90CAF9" },
+  { mood: "Depressed", image: "😞", color: "#5C6BC0" },
+];
+
+const MOOD_COLORS = Object.fromEntries(moods.map(mood => [mood.mood, mood.color]));
 
 const MoodSummary: React.FC = () => {
   const [moodData, setMoodData] = useState<MoodData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'current' | 'today' | 'tenDays' | 'month'>('current');
+  const [activeTab, setActiveTab] = useState<'today' | 'tenDays' | 'month'>('month');
 
   useEffect(() => {
     const fetchMoodData = async () => {
@@ -78,7 +87,6 @@ const MoodSummary: React.FC = () => {
     }));
   };
 
-  const getCurrentData = () => processData(moodData, subDays(new Date(), 1), new Date(), 'hour');
   const getTodayData = () => processData(moodData, startOfDay(new Date()), endOfDay(new Date()), 'hour');
   const getTenDaysData = () => processData(moodData, subDays(new Date(), 10), new Date(), 'day');
   const getMonthData = () => processData(moodData, startOfMonth(new Date()), endOfMonth(new Date()), 'week');
@@ -96,12 +104,12 @@ const MoodSummary: React.FC = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            {Object.keys(MOOD_COLORS).map((mood) => (
+            {moods.map((mood) => (
               <Bar 
-                key={mood} 
-                dataKey={mood} 
+                key={mood.mood} 
+                dataKey={mood.mood} 
                 stackId="a" 
-                fill={MOOD_COLORS[mood as keyof typeof MOOD_COLORS]} 
+                fill={mood.color} 
               />
             ))}
           </BarChart>
@@ -122,17 +130,12 @@ const MoodSummary: React.FC = () => {
     <div className="container mx-auto px-4 py-4 bg-[#F1F8E9]">
       <h1 className="text-xl font-bold mb-8 text-[#1B5E20]">Mood Summary</h1>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'current' | 'today' | 'tenDays' | 'month')} className="mb-12">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'today' | 'tenDays' | 'month')} className="mb-12">
         <TabsList className="bg-[#C8E6C9] text-[#1B5E20]">
-          <TabsTrigger value="current" className="data-[state=active]:bg-[#4CAF50] data-[state=active]:text-white">Current Mood</TabsTrigger>
           <TabsTrigger value="today" className="data-[state=active]:bg-[#4CAF50] data-[state=active]:text-white">Today</TabsTrigger>
           <TabsTrigger value="tenDays" className="data-[state=active]:bg-[#4CAF50] data-[state=active]:text-white">Last 10 Days</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-[#4CAF50] data-[state=active]:text-white">This Month</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="current">
-          {renderMoodChart(getCurrentData(), "Current Mood Data")}
-        </TabsContent>
 
         <TabsContent value="today">
           {renderMoodChart(getTodayData(), "Today's Mood Data")}

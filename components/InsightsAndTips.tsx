@@ -18,30 +18,41 @@ interface InsightData {
   conclusion: string;
 }
 
+interface MoodData {
+  mood: string;
+  reasons: string[] | null;
+  intensity: number;
+  timestamp: string;
+}
+
 const InsightsAndTips: React.FC = () => {
   const [insights, setInsights] = useState<InsightData | null>(null);
   const [lastInsights, setLastInsights] = useState<InsightData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [latestMood, setLatestMood] = useState<string | null>(null);
+  const [latestMoodData, setLatestMoodData] = useState<MoodData | null>(null);
   const [showLastInsights, setShowLastInsights] = useState(true);
 
   useEffect(() => {
-    fetchLatestMood();
+    fetchLatestMoodData();
     fetchLastInsights();
   }, []);
 
-  const fetchLatestMood = async () => {
+  const fetchLatestMoodData = async () => {
     try {
       const response = await fetch('/api/get-latest-mood');
       if (!response.ok) {
-        throw new Error('Failed to fetch latest mood');
+        throw new Error('Failed to fetch latest mood data');
       }
       const data = await response.json();
-      setLatestMood(data.mood);
+      if (data.mood) {
+        setLatestMoodData(data);
+      } else {
+        setLatestMoodData(null);
+      }
     } catch (error) {
-      console.error('Error fetching latest mood:', error);
-      setError('Failed to fetch latest mood. Please try again.');
+      console.error('Error fetching latest mood data:', error);
+      setError('Failed to fetch latest mood data. Please try again.');
     }
   };
 
@@ -60,7 +71,7 @@ const InsightsAndTips: React.FC = () => {
   };
 
   const generateInsights = async () => {
-    if (!latestMood) {
+    if (!latestMoodData) {
       setError("No mood data found. Please log a mood first.");
       return;
     }
@@ -75,7 +86,7 @@ const InsightsAndTips: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ mood: latestMood }),
+        body: JSON.stringify(latestMoodData),
       });
 
       if (!response.ok) {
@@ -130,13 +141,20 @@ const InsightsAndTips: React.FC = () => {
   return (
     <div className="mt-8 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-indigo-800">Insights & Tips</h2>
-      <div className="flex items-center mb-4">
-        <div className={`w-3 h-3 rounded-full mr-2 ${getMoodColor(latestMood)}`}></div>
-        <p>Latest Mood: <span className="font-semibold">{latestMood || 'None'}</span></p>
-      </div>
+      {latestMoodData && (
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <div className={`w-3 h-3 rounded-full mr-2 ${getMoodColor(latestMoodData.mood)}`}></div>
+            <p>Latest Mood: <span className="font-semibold">{latestMoodData.mood}</span></p>
+          </div>
+          <p>Intensity: <span className="font-semibold">{latestMoodData.intensity}</span></p>
+          <p>Reasons: {latestMoodData.reasons ? latestMoodData.reasons.join(", ") : "No specific reasons provided"}</p>
+          <p>Timestamp: {new Date(latestMoodData.timestamp).toLocaleString()}</p>
+        </div>
+      )}
       <button
         onClick={generateInsights}
-        disabled={isLoading || !latestMood}
+        disabled={isLoading || !latestMoodData}
         className="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-indigo-700 transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Generating...' : 'Generate Insights'}
@@ -158,9 +176,7 @@ const InsightsAndTips: React.FC = () => {
   );
 };
 
-function getMoodColor(mood: string | null): string {
-  if (!mood) return 'bg-gray-500';
-  
+function getMoodColor(mood: string): string {
   switch (mood.toLowerCase()) {
     case 'happy': return 'bg-green-500';
     case 'sad': return 'bg-blue-500';

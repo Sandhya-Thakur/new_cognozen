@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { journalEntries } from "@/lib/db/schema";
+import { gratitudeEntries } from "@/lib/db/schema";
 import { auth } from "@clerk/nextjs";
 import { desc, eq, and } from "drizzle-orm";
 
@@ -15,14 +15,14 @@ export async function GET(req: Request) {
 
     const entries = await db
       .select()
-      .from(journalEntries)
-      .where(eq(journalEntries.userId, userId))
-      .orderBy(desc(journalEntries.createdAt))
-      .limit(50); // Limit to the most recent 50 entries, adjust as needed
+      .from(gratitudeEntries)
+      .where(eq(gratitudeEntries.userId, userId))
+      .orderBy(desc(gratitudeEntries.createdAt))
+      .limit(50);
 
     return NextResponse.json({ entries });
   } catch (error) {
-    console.error("Error fetching journal entries:", error);
+    console.error("Error fetching gratitude entries:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -35,29 +35,28 @@ export async function DELETE(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const entryId = searchParams.get('id');
+    const id = searchParams.get('id');
 
-    if (!entryId) {
-      return NextResponse.json({ error: "Entry ID is required" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "Missing entry ID" }, { status: 400 });
     }
 
     const result = await db
-      .delete(journalEntries)
+      .delete(gratitudeEntries)
       .where(
         and(
-          eq(journalEntries.id, parseInt(entryId)),
-          eq(journalEntries.userId, userId)
+          eq(gratitudeEntries.id, parseInt(id)),
+          eq(gratitudeEntries.userId, userId)
         )
-      )
-      .returning();
+      );
 
-    if (result.length === 0) {
+    if (result.rowCount === 0) {
       return NextResponse.json({ error: "Entry not found or not authorized to delete" }, { status: 404 });
     }
 
     return NextResponse.json({ message: "Entry deleted successfully" });
   } catch (error) {
-    console.error("Error deleting journal entry:", error);
+    console.error("Error deleting gratitude entry:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

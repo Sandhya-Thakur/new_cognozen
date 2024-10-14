@@ -13,10 +13,9 @@ type AttentionData = {
   userId: string;
 };
 
-type TabValue = 'live' | 'today' | 'week' | 'month';
+type TabValue = 'today' | 'week' | 'month';
 
 const graphColorSchemes = {
-  live: { stroke: "#FCD34D", fill: "#FDE68A" },
   today: { stroke: "#F59E0B", fill: "#FCD34D" },
   week: { stroke: "#D97706", fill: "#F59E0B" },
   month: { stroke: "#B45309", fill: "#D97706" }
@@ -25,7 +24,7 @@ const graphColorSchemes = {
 const AllPDFAttentionData: React.FC = () => {
   const [data, setData] = useState<AttentionData[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabValue>('live');
+  const [activeTab, setActiveTab] = useState<TabValue>('today');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +40,7 @@ const AllPDFAttentionData: React.FC = () => {
   }, []);
 
   const handleTabChange = (value: string) => {
-    if (value === 'live' || value === 'today' || value === 'week' || value === 'month') {
+    if (value === 'today' || value === 'week' || value === 'month') {
       setActiveTab(value as TabValue);
     }
   };
@@ -68,8 +67,6 @@ const AllPDFAttentionData: React.FC = () => {
       try {
         const entryDate = parseISO(entry.timestamp);
         switch (range) {
-          case 'live':
-            return true; // We'll take the last 20 entries later
           case 'today':
             return isToday(entryDate);
           case 'week':
@@ -88,8 +85,6 @@ const AllPDFAttentionData: React.FC = () => {
 
   const getDateFormat = (range: TabValue): string => {
     switch (range) {
-      case 'live':
-        return "HH:mm";
       case 'today':
         return "HH:mm";
       case 'week':
@@ -121,17 +116,12 @@ const AllPDFAttentionData: React.FC = () => {
   };
 
   const renderAttentionChart = (range: TabValue) => {
-    let filteredData = filterDataByTimeRange(data, range);
-    if (range === 'live') {
-      filteredData = filteredData.slice(-20);
-    }
+    const filteredData = filterDataByTimeRange(data, range);
     const formattedData = formatData(filteredData, range);
     const colors = graphColorSchemes[range];
 
     const getAxisInterval = (range: TabValue) => {
       switch (range) {
-        case 'live':
-          return 4;
         case 'today':
           return Math.floor(formattedData.length / 6);
         case 'week':
@@ -172,7 +162,7 @@ const AllPDFAttentionData: React.FC = () => {
                     if (entry && entry[0] && entry[0].payload && entry[0].payload.fullTimestamp) {
                       return entry[0].payload.fullTimestamp;
                     }
-                    return value; // Fallback to the original value if fullTimestamp is not available
+                    return value;
                   }}
                 />
                 <Area 
@@ -194,7 +184,6 @@ const AllPDFAttentionData: React.FC = () => {
     <div className="container mx-auto px-4 py-4 bg-[#F8F9FA]">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-12">
         <TabsList className="bg-amber-100 text-amber-800">
-          <TabsTrigger value="live" className="data-[state=active]:bg-amber-200 data-[state=active]:text-amber-900">Live Data</TabsTrigger>
           <TabsTrigger value="today" className="data-[state=active]:bg-amber-200 data-[state=active]:text-amber-900">Today</TabsTrigger>
           <TabsTrigger value="week" className="data-[state=active]:bg-amber-200 data-[state=active]:text-amber-900">This Week</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-amber-200 data-[state=active]:text-amber-900">This Month</TabsTrigger>

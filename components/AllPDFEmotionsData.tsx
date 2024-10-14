@@ -20,7 +20,7 @@ type EmotionData = {
   surprise: number;
 };
 
-type TabValue = 'live' | 'today' | 'week' | 'month';
+type TabValue = 'today' | 'week' | 'month';
 
 const EMOTIONS = ['Happy', 'Angry', 'Disgust', 'Fear', 'Neutral', 'Sad', 'Surprise'];
 
@@ -70,7 +70,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const AllPDFEmotionsData: React.FC = () => {
   const [data, setData] = useState<EmotionData[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabValue>('live');
+  const [activeTab, setActiveTab] = useState<TabValue>('today');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,7 +86,7 @@ const AllPDFEmotionsData: React.FC = () => {
   }, []);
 
   const handleTabChange = (value: string) => {
-    if (value === 'live' || value === 'today' || value === 'week' || value === 'month') {
+    if (value === 'today' || value === 'week' || value === 'month') {
       setActiveTab(value as TabValue);
     }
   };
@@ -113,8 +113,6 @@ const AllPDFEmotionsData: React.FC = () => {
       try {
         const entryDate = parseISO(entry.timestamp);
         switch (range) {
-          case 'live':
-            return true; // We'll take the last 20 entries later
           case 'today':
             return isToday(entryDate);
           case 'week':
@@ -133,15 +131,14 @@ const AllPDFEmotionsData: React.FC = () => {
 
   const getDateFormat = (range: TabValue): string => {
     switch (range) {
-      case 'live':
       case 'today':
-        return "EEE HH:mm";
+        return "HH:mm";
       case 'week':
         return "EEE";
       case 'month':
         return "MMM d";
       default:
-        return "EEE yyyy-MM-dd HH:mm";
+        return "yyyy-MM-dd HH:mm";
     }
   };
 
@@ -150,29 +147,26 @@ const AllPDFEmotionsData: React.FC = () => {
       .map(entry => ({
         ...entry,
         timestamp: format(parseISO(entry.timestamp), getDateFormat(range)),
+        fullTimestamp: format(parseISO(entry.timestamp), "yyyy-MM-dd HH:mm:ss"),
       }))
-      .sort((a, b) => parseISO(a.timestamp).getTime() - parseISO(b.timestamp).getTime());
+      .sort((a, b) => parseISO(a.fullTimestamp).getTime() - parseISO(b.fullTimestamp).getTime());
   };
 
   const renderEmotionChart = (range: TabValue) => {
-    let filteredData = filterDataByTimeRange(data, range);
-    if (range === 'live') {
-      filteredData = filteredData.slice(-20);
-    }
+    const filteredData = filterDataByTimeRange(data, range);
     const formattedData = formatData(filteredData, range);
 
     const today = new Date();
     let titleDayName = '';
     switch (range) {
-      case 'live':
       case 'today':
-        titleDayName = format(today, "EEEE's");
+        titleDayName = format(today, "EEEE");
         break;
       case 'week':
-        titleDayName = "This Week's";
+        titleDayName = "This Week";
         break;
       case 'month':
-        titleDayName = "This Month's";
+        titleDayName = "This Month";
         break;
     }
 
@@ -188,7 +182,14 @@ const AllPDFEmotionsData: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={formattedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#fecdd3" />
-                <XAxis dataKey="timestamp" stroke="#e11d48" />
+                <XAxis 
+                  dataKey="timestamp" 
+                  stroke="#e11d48"
+                  interval={range === 'month' ? 2 : 0}
+                  angle={range === 'month' ? -45 : 0}
+                  textAnchor={range === 'month' ? 'end' : 'middle'}
+                  height={range === 'month' ? 60 : 30}
+                />
                 <YAxis stroke="#e11d48" />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend formatter={(value) => EMOTION_LABELS[value as keyof typeof EMOTION_LABELS]} />
@@ -220,7 +221,6 @@ const AllPDFEmotionsData: React.FC = () => {
     <div className="container mx-auto px-4 py-4 bg-[#F8F9FA]">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-12">
         <TabsList className="bg-rose-100 text-rose-800">
-          <TabsTrigger value="live" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">Live Data</TabsTrigger>
           <TabsTrigger value="today" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">Today</TabsTrigger>
           <TabsTrigger value="week" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">This Week</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-rose-200 data-[state=active]:text-rose-900">This Month</TabsTrigger>

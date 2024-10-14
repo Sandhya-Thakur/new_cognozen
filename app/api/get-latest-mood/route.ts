@@ -1,4 +1,4 @@
-// api/get-latest-mood
+// api/get-latest-mood/route.ts
 
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
@@ -14,17 +14,27 @@ export async function GET() {
     }
 
     const latestMood = await db
-      .select()
+      .select({
+        mood: moodData.mood,
+        reasons: moodData.reasons,
+        intensity: moodData.intensity,
+        timestamp: moodData.timestamp,
+      })
       .from(moodData)
       .where(eq(moodData.userId, userId))
       .orderBy(desc(moodData.timestamp))
       .limit(1);
 
     if (latestMood.length === 0) {
-      return NextResponse.json({ mood: null });
+      return NextResponse.json({ mood: null, reasons: null, intensity: null, timestamp: null });
     }
 
-    return NextResponse.json({ mood: latestMood[0].mood });
+    return NextResponse.json({
+      mood: latestMood[0].mood,
+      reasons: latestMood[0].reasons,
+      intensity: latestMood[0].intensity,
+      timestamp: latestMood[0].timestamp,
+    });
   } catch (error) {
     console.error("Error fetching latest mood:", error);
     return NextResponse.json(

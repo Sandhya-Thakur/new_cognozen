@@ -2,18 +2,25 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { Loader } from "lucide-react";
 import { format, isToday, startOfWeek, startOfMonth, isAfter, parseISO } from 'date-fns';
 
+type ApiEmotionData = {
+  id: number;
+  happy: number;
+  angry: number;
+  disgust: number;
+  fear: number;
+  neutral: number;
+  sad: number;
+  surprise: number;
+  dominantEmotion: string;
+  timestamp: string;
+  userId: string;
+};
+
 type EmotionData = {
-  surprise: any;
-  sad: any;
-  neutral: any;
-  disgust: any;
-  angry: any;
-  happy: any;
-  fear: any;
   id: number;
   confidence: number;
   frustration: number;
@@ -27,12 +34,10 @@ type EmotionData = {
   userId: string;
 };
 
-type TabValue = 'live' | 'today' | 'week' | 'month';
+type TabValue = 'today' | 'week' | 'month';
 
-// Updated emotion names
 const EMOTIONS = ['Confidence', 'Frustration', 'Boredom', 'Anxiety', 'Satisfaction', 'Disappointment', 'Curiosity'];
 
-// Updated mappings for API to display names
 const EMOTION_LABELS: { [key: string]: string } = {
   Happy: "Confidence",
   Angry: "Frustration",
@@ -43,7 +48,6 @@ const EMOTION_LABELS: { [key: string]: string } = {
   Surprise: "Curiosity"
 };
 
-// Updated colors for each emotion
 const COLORS = {
   Confidence: "#22c55e",
   Frustration: "#dc2626",
@@ -54,20 +58,13 @@ const COLORS = {
   Curiosity: "#db2777"
 };
 
-const graphColorSchemes = {
-  live: { stroke: "#F472B6", fill: "#FBCFE8" },
-  today: { stroke: "#EC4899", fill: "#F472B6" },
-  week: { stroke: "#DB2777", fill: "#EC4899" },
-  month: { stroke: "#BE185D", fill: "#DB2777" }
-};
-
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-rose-50 p-2 shadow-md rounded-md text-sm border border-rose-200">
-        <p className="font-semibold text-rose-800">{`Time: ${label}`}</p>
-        <p className="text-rose-600">
+      <div className="bg-pink-50 p-2 shadow-md rounded-md text-sm border border-pink-200">
+        <p className="font-semibold text-pink-800">{`Time: ${label}`}</p>
+        <p className="text-pink-600">
           {`Dominant: ${data.dominantEmotion}`}
         </p>
         {EMOTIONS.map(emotion => (
@@ -87,15 +84,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const AllQuizEmotionsData: React.FC = () => {
   const [data, setData] = useState<EmotionData[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabValue>('live');
+  const [activeTab, setActiveTab] = useState<TabValue>('today');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<EmotionData[]>("/api/get-quiz-emotions-data");
-        // Transform the data to use new emotion names
-        const transformedData = response.data.map(item => ({
-          ...item,
+        const response = await axios.get<ApiEmotionData[]>("/api/get-quiz-emotions-data");
+        const transformedData: EmotionData[] = response.data.map(item => ({
+          id: item.id,
           confidence: item.happy,
           frustration: item.angry,
           boredom: item.disgust,
@@ -103,7 +99,9 @@ const AllQuizEmotionsData: React.FC = () => {
           satisfaction: item.neutral,
           disappointment: item.sad,
           curiosity: item.surprise,
-          dominantEmotion: EMOTION_LABELS[item.dominantEmotion] || item.dominantEmotion
+          dominantEmotion: EMOTION_LABELS[item.dominantEmotion as keyof typeof EMOTION_LABELS] || item.dominantEmotion,
+          timestamp: item.timestamp,
+          userId: item.userId
         }));
         setData(transformedData);
       } catch (error) {
@@ -115,7 +113,7 @@ const AllQuizEmotionsData: React.FC = () => {
   }, []);
 
   const handleTabChange = (value: string) => {
-    if (value === 'live' || value === 'today' || value === 'week' || value === 'month') {
+    if (value === 'today' || value === 'week' || value === 'month') {
       setActiveTab(value as TabValue);
     }
   };
@@ -142,8 +140,6 @@ const AllQuizEmotionsData: React.FC = () => {
       try {
         const entryDate = parseISO(entry.timestamp);
         switch (range) {
-          case 'live':
-            return true; // We'll take the last 20 entries later
           case 'today':
             return isToday(entryDate);
           case 'week':
@@ -162,8 +158,6 @@ const AllQuizEmotionsData: React.FC = () => {
 
   const getDateFormat = (range: TabValue): string => {
     switch (range) {
-      case 'live':
-        return "HH:mm";
       case 'today':
         return "HH:mm";
       case 'week':
@@ -195,54 +189,62 @@ const AllQuizEmotionsData: React.FC = () => {
   };
 
   const renderEmotionChart = (range: TabValue) => {
-    let filteredData = filterDataByTimeRange(data, range);
-    if (range === 'live') {
-      filteredData = filteredData.slice(-20);
-    }
+    const filteredData = filterDataByTimeRange(data, range);
     const formattedData = formatData(filteredData, range);
-    const colors = graphColorSchemes[range];
 
-    const getAxisInterval = (range: TabValue) => {
-      switch (range) {
-        case 'live':
-          return 4;
-        case 'today':
-          return Math.floor(formattedData.length / 6);
-        case 'week':
-          return 'preserveStartEnd';
-        case 'month':
-          return Math.floor(formattedData.length / 8);
-        default:
-          return 0;
-      }
-    };
+    const today = new Date();
+    let titleDayName = '';
+    switch (range) {
+      case 'today':
+        titleDayName = format(today, "EEEE");
+        break;
+      case 'week':
+        titleDayName = "This Week";
+        break;
+      case 'month':
+        titleDayName = "This Month";
+        break;
+    }
 
     return (
       <Card className="w-full shadow-sm bg-gradient-to-br from-pink-50 to-rose-50">
         <CardHeader className="bg-gradient-to-r from-pink-100 to-rose-100">
           <CardTitle className="text-sm font-semibold text-pink-800">
-            {range.charAt(0).toUpperCase() + range.slice(1)} Quiz Emotion Intensities
+            {titleDayName} Quiz Emotion Intensities
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={formattedData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#fbcfe8" />
+              <BarChart data={formattedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#fce7f3" />
                 <XAxis 
                   dataKey="timestamp" 
                   stroke="#db2777"
                   tick={{ fontSize: 12 }}
-                  interval={getAxisInterval(range)}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
+                  interval={range === 'month' ? 2 : 0}
+                  angle={range === 'month' ? -45 : 0}
+                  textAnchor={range === 'month' ? 'end' : 'middle'}
+                  height={range === 'month' ? 60 : 30}
                 />
                 <YAxis stroke="#db2777" />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend />
+                <Legend formatter={(value) => EMOTION_LABELS[value as keyof typeof EMOTION_LABELS] || value} />
                 {EMOTIONS.map(emotion => (
-                  <Bar key={emotion} dataKey={emotion.toLowerCase()} fill={COLORS[emotion as keyof typeof COLORS]} />
+                  <Bar
+                    key={emotion}
+                    dataKey={emotion.toLowerCase()}
+                    name={emotion}
+                    stroke={COLORS[emotion as keyof typeof COLORS]}
+                    fill={COLORS[emotion as keyof typeof COLORS]}
+                  >
+                    {formattedData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.dominantEmotion === emotion ? COLORS[emotion as keyof typeof COLORS] : `${COLORS[emotion as keyof typeof COLORS]}80`}
+                      />
+                    ))}
+                  </Bar>
                 ))}
               </BarChart>
             </ResponsiveContainer>
@@ -256,7 +258,6 @@ const AllQuizEmotionsData: React.FC = () => {
     <div className="container mx-auto px-4 py-4 bg-[#F8F9FA]">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-12">
         <TabsList className="bg-pink-100 text-pink-800">
-          <TabsTrigger value="live" className="data-[state=active]:bg-pink-200 data-[state=active]:text-pink-900">Live Data</TabsTrigger>
           <TabsTrigger value="today" className="data-[state=active]:bg-pink-200 data-[state=active]:text-pink-900">Today</TabsTrigger>
           <TabsTrigger value="week" className="data-[state=active]:bg-pink-200 data-[state=active]:text-pink-900">This Week</TabsTrigger>
           <TabsTrigger value="month" className="data-[state=active]:bg-pink-200 data-[state=active]:text-pink-900">This Month</TabsTrigger>

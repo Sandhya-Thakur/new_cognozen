@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { startOfDay, subDays, format } from 'date-fns';
+import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
 
 interface Mood {
   mood: string;
@@ -16,10 +17,9 @@ interface MoodData {
 }
 
 interface MoodSummary {
-  mood: string;
+  name: string;
+  value: number;
   image: string;
-  today: number;
-  yesterday: number;
 }
 
 const moods: Mood[] = [
@@ -63,112 +63,164 @@ const DailyMoodComparison: React.FC = () => {
     fetchMoodData();
   }, []);
 
-  const getComparisonData = (): MoodSummary[] => {
+  const getMoodSummary = (data: MoodData[]): MoodSummary[] => {
+    const moodCounts = data.reduce((acc, entry) => {
+      acc[entry.mood] = (acc[entry.mood] || 0) + 1;
+      return acc;
+    }, {} as { [key: string]: number });
+
+    return moods.map(({ mood, image }) => ({
+      name: mood,
+      value: moodCounts[mood] || 0,
+      image: image,
+    })).filter(summary => summary.value > 0);
+  };
+
+  const getComparisonData = () => {
     const today = startOfDay(new Date());
     const yesterday = startOfDay(subDays(today, 1));
 
     const todayData = moodData.filter(entry => new Date(entry.timestamp) >= today);
     const yesterdayData = moodData.filter(entry => new Date(entry.timestamp) >= yesterday && new Date(entry.timestamp) < today);
 
-    const calculateMoodPercentages = (data: MoodData[]) => {
-      const totalEntries = data.length;
-      return moods.reduce((acc, { mood }) => {
-        const count = data.filter(entry => entry.mood === mood).length;
-        acc[mood] = (count / totalEntries) * 100 || 0;
-        return acc;
-      }, {} as { [key: string]: number });
+    return {
+      today: getMoodSummary(todayData),
+      yesterday: getMoodSummary(yesterdayData),
     };
-
-    const todayPercentages = calculateMoodPercentages(todayData);
-    const yesterdayPercentages = calculateMoodPercentages(yesterdayData);
-
-    return moods.map(({ mood, image }) => ({
-      mood,
-      image,
-      today: todayPercentages[mood],
-      yesterday: yesterdayPercentages[mood],
-    }));
   };
 
   const calculateDominantMood = (data: MoodSummary[]): { mood: string; image: string; percentage: number } => {
-    const dominantToday = data.reduce((max, item) => item.today > max.percentage ? { mood: item.mood, image: item.image, percentage: item.today } : max, { mood: '', image: '', percentage: 0 });
-    return dominantToday;
+    const total = data.reduce((sum, item) => sum + item.value, 0);
+    const dominant = data.reduce((max, item) => item.value > max.value ? item : max, { name: '', value: 0, image: '' });
+    return {
+      mood: dominant.name,
+      image: dominant.image,
+      percentage: (dominant.value / total) * 100,
+    };
   };
 
-  const calculateMoodShift = (data: MoodSummary[]): { mood: string; image: string; shift: number } => {
-    const maxShift = data.reduce((max, item) => {
-      const shift = item.today - item.yesterday;
-      return Math.abs(shift) > Math.abs(max.shift) ? { mood: item.mood, image: item.image, shift } : max;
-    }, { mood: '', image: '', shift: 0 });
-    return maxShift;
+  const calculateMoodShift = (today: MoodSummary[], yesterday: MoodSummary[]): { mood: string; image: string; shift: number } => {
+    const todayTotal = today.reduce((sum, item) => sum + item.value, 0);
+    const yesterdayTotal = yesterday.reduce((sum, item) => sum + item.value, 0);
+
+    const todayPercentages = today.reduce((acc, item) => {
+      acc[item.name] = (item.value / todayTotal) * 100;
+      return acc;
+    }, {} as { [key: string]: number });
+
+    const yesterdayPercentages = yesterday.reduce((acc, item) => {
+      acc[item.name] = (item.value / yesterdayTotal) * 100;
+      return acc;
+    }, {} as { [key: string]: number });
+
+    const shifts = moods.map(({ mood, image }) => ({
+      mood,
+      image,
+      shift: (todayPercentages[mood] || 0) - (yesterdayPercentages[mood] || 0),
+    }));
+
+    return shifts.reduce((max, item) => Math.abs(item.shift) > Math.abs(max.shift) ? item : max, { mood: '', image: '', shift: 0 });
   };
 
   if (isLoading) return <div className="text-center py-4 text-gray-600">Loading mood comparison...</div>;
   if (error) return <div className="text-center py-4 text-red-500">{error}</div>;
 
-  const comparisonData = getComparisonData();
-  const dominantMood = calculateDominantMood(comparisonData);
-  const moodShift = calculateMoodShift(comparisonData);
+  const { today, yesterday } = getComparisonData();
+  const dominantMood = calculateDominantMood(today);
+  const moodShift = calculateMoodShift(today, yesterday);
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-lg bg-gradient-to-br from-blue-50 to-purple-50">
-      <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
-        <CardTitle className="text-lg font-semibold text-gray-800">
-          Comprehensive Mood Comparison: Today vs Yesterday
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-4">
-        <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700">Dominant Mood Today: 
-            <span className="ml-2 text-lg">{dominantMood.image} {dominantMood.mood} ({dominantMood.percentage.toFixed(1)}%)</span>
-          </p>
-          <p className="text-sm font-medium text-gray-700">Biggest Mood Shift: 
-            <span className="ml-2 text-lg">
-              {moodShift.image} {moodShift.mood} 
-              ({moodShift.shift > 0 ? '+' : ''}{moodShift.shift.toFixed(1)}%)
-            </span>
-          </p>
-        </div>
-        <div className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={comparisonData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              layout="vertical"
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" domain={[0, 100]} unit="%" />
-              <YAxis dataKey="mood" type="category" />
-              <Tooltip
-                content={({ payload, label }) => {
-                  if (payload && payload.length) {
-                    const mood = moods.find(m => m.mood === label);
-                    return (
-                      <div className="bg-white p-3 border border-gray-200 rounded-md shadow-md">
-                        <p className="font-medium text-gray-800">{label} {mood?.image}</p>
-                        {payload.map((entry, index) => (
-                          <p key={index} style={{ color: entry.color }}>
-                            {`${entry.name}: ${typeof entry.value === 'number' ? entry.value.toFixed(1) : 'N/A'}%`}
-                          </p>
+    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
+      <Card className="rounded-xl shadow-lg bg-gradient-to-br from-blue-50 to-purple-50">
+        <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-t-xl">
+          <CardTitle className="text-lg font-semibold text-gray-700">
+            Mood Comparison: Today vs Yesterday
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="rounded-xl shadow bg-white">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-600">Today's Mood</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={today}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        label={({ name, image }) => `${name} ${image}`}
+                      >
+                        {today.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={moodColors[entry.name]} />
                         ))}
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Legend />
-              <Bar dataKey="yesterday" name="Yesterday" stackId="a" fill="#82ca9d" />
-              <Bar dataKey="today" name="Today" stackId="a" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="mt-4 text-sm text-gray-600 text-center">
-          <p>Today: {format(new Date(), 'MMMM d, yyyy')}</p>
-          <p>Yesterday: {format(subDays(new Date(), 1), 'MMMM d, yyyy')}</p>
-        </div>
-      </CardContent>
-    </Card>
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-xl shadow bg-white">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-600">Yesterday's Mood</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={yesterday}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        label={({ name, image }) => `${name} ${image}`}
+                      >
+                        {yesterday.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={moodColors[entry.name]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="rounded-xl shadow bg-white">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-gray-600">Dominant Mood Today:</p>
+                <p className="text-2xl font-bold mt-2 text-gray-700">
+                  {dominantMood.image} {dominantMood.mood} ({dominantMood.percentage.toFixed(1)}%)
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-xl shadow bg-white">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-gray-600">Biggest Mood Shift:</p>
+                <p className="text-2xl font-bold mt-2 flex items-center text-gray-700">
+                  {moodShift.image} {moodShift.mood} 
+                  <span className={`ml-2 ${moodShift.shift > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {moodShift.shift > 0 ? <ArrowUpIcon size={24} /> : <ArrowDownIcon size={24} />}
+                    {Math.abs(moodShift.shift).toFixed(1)}%
+                  </span>
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
