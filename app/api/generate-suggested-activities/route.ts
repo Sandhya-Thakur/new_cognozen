@@ -10,6 +10,19 @@ const config = new Configuration({
 
 const openai = new OpenAIApi(config);
 
+interface Activity {
+  title: string;
+  description: string;
+}
+
+interface SuggestedActivity {
+  id: number;
+  userId: string;
+  mood: string;
+  activities: Activity[];
+  createdAt: Date;
+}
+
 export async function POST(req: Request) {
   try {
     console.log("API route started");
@@ -53,7 +66,7 @@ export async function POST(req: Request) {
     const activitiesString = data.choices[0].message?.content || "[]";
     console.log("Activities string:", activitiesString);
 
-    let activities;
+    let activities: Activity[];
     try {
       activities = JSON.parse(activitiesString);
       console.log("Parsed activities:", activities);
@@ -71,10 +84,18 @@ export async function POST(req: Request) {
     }).returning();
     console.log("Database insert result:", result);
 
+    const savedRecord: SuggestedActivity = {
+      id: result[0].id,
+      userId: result[0].userId,
+      mood: result[0].mood,
+      activities: activities,
+      createdAt: result[0].createdAt,
+    };
+
     return NextResponse.json({
       message: "Activities generated and saved successfully",
       activities: activities,
-      savedRecord: result[0]
+      savedRecord: savedRecord
     });
   } catch (error) {
     console.error("Detailed error in API route:", error);
