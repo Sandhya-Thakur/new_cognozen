@@ -8,14 +8,16 @@ import { eq, and, gte, lte } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
+interface Activity {
+  title: string;
+  description: string;
+}
+
 interface SuggestedActivity {
   id: number;
   date: string;
   mood: string;
-  activities: Array<{
-    title: string;
-    description: string;
-  }>;
+  activities: Activity[];
 }
 
 export async function GET(request: Request) {
@@ -68,20 +70,28 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: `No activities found for ${period}` }, { status: 404 });
     }
 
-    const processedData: SuggestedActivity[] = rawData.map(item => {
-      console.log("Processing item:", item.id);
-      try {
-        return {
-          id: item.id,
-          date: item.createdAt.toISOString(),
-          mood: item.mood,
-          activities: JSON.parse(item.activities)
-        };
-      } catch (parseError) {
-        console.error("Error parsing activities for item:", item.id, parseError);
-        return null;
-      }
-    }).filter(item => item !== null);
+    const processedData: SuggestedActivity[] = rawData
+      .map(item => {
+        console.log("Processing item:", item.id);
+        try {
+          const parsedActivities = JSON.parse(item.activities);
+          if (Array.isArray(parsedActivities)) {
+            return {
+              id: item.id,
+              date: item.createdAt.toISOString(),
+              mood: item.mood,
+              activities: parsedActivities
+            };
+          } else {
+            console.error("Invalid activities format for item:", item.id);
+            return null;
+          }
+        } catch (parseError) {
+          console.error("Error parsing activities for item:", item.id, parseError);
+          return null;
+        }
+      })
+      .filter((item): item is SuggestedActivity => item !== null);
 
     console.log("Processed data:", processedData.length, "items");
 

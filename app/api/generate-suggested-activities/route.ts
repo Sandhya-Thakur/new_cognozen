@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { Configuration, OpenAIApi } from "openai-edge";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
-import { suggestedActivities } from "@/lib/db/schema";
+import { insightsAndTips, moodData } from "@/lib/db/schema";
+import { desc, eq } from "drizzle-orm";
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,102 +11,92 @@ const config = new Configuration({
 
 const openai = new OpenAIApi(config);
 
-interface Activity {
-  title: string;
-  description: string;
-}
-
-interface SuggestedActivity {
-  id: number;
-  userId: string;
-  mood: string;
-  activities: Activity[];
-  createdAt: Date;
-}
-
 export async function POST(req: Request) {
   try {
-    console.log("API route started");
-
     const { userId } = await auth();
     if (!userId) {
-      console.error("Unauthorized access attempt");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { mood } = await req.json();
-    console.log("Received mood:", mood);
+    // Fetch the latest mood data
+    const latestMoodData = await db
+      .select()
+      .from(moodData)
+      .where(eq(moodData.userId, userId))
+      .orderBy(desc(moodData.timestamp))
+      .limit(1);
 
-    if (!mood) {
-      console.error("Mood is missing in the request");
-      return NextResponse.json({ error: "Mood is required" }, { status: 400 });
+    if (latestMoodData.length === 0) {
+      return NextResponse.json({ error: "No mood data found" }, { status: 404 });
     }
+
+    const { mood, reasons } = latestMoodData[0];
 
     const prompt = {
       role: "system" as const,
-      content: `You are an AI assistant providing suggested activities based on a person's mood.
-      Your suggestions should be tailored to help improve or maintain the person's emotional well-being.
-      Provide 5 activities that are suitable for the given mood.
-      Format your response as a JSON array of objects, each with a 'title' and 'description' field.`,
+      content: `You are an empathetic AI assistant providing insights and tips based on a person's mood and the reasons behind it.
+      Your responses should be supportive, encouraging, and tailored to the specific mood and reasons.
+      Provide practical advice and strategies to help improve or maintain the person's emotional well-being.
+      Format your response as a JSON object with the following structure:
+      {
+        "mood": "The mood being addressed",
+        "understanding": {
+          "title": "Understanding the Mood: [Mood]",
+          "description": "A brief explanation of the mood and its context"
+        },
+        "impacts": ["An array of potential impacts"],
+        "strategies": [
+          {
+            "title": "Strategy title",
+            "description": "Detailed description of the strategy"
+          }
+        ],
+        "conclusion": "A brief concluding statement"
+      }`,
     };
 
     const userMessage = {
       role: "user" as const,
-      content: `Generate 5 suggested activities for someone feeling ${mood}. Each activity should be relevant and helpful for this emotional state.`,
+      content: `Generate insights and tips for someone feeling ${mood}. ${
+        reasons && reasons.length > 0
+          ? `The reasons for this mood are: ${reasons.join(", ")}.`
+          : "No specific reasons were provided for this mood."
+      } Include a brief explanation of the mood considering ${
+        reasons && reasons.length > 0 ? "these reasons" : "the lack of specific reasons"
+      }, its potential impacts, and at least three practical strategies to manage or improve this emotional state.`,
     };
 
-    console.log("Sending request to OpenAI");
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [prompt, userMessage],
     });
 
     const data = await response.json();
-    console.log("Received response from OpenAI:", JSON.stringify(data, null, 2));
+    const insightsString = data.choices[0].message?.content || "{}";
 
-    const activitiesString = data.choices[0].message?.content || "[]";
-    console.log("Activities string:", activitiesString);
+    // Parse the JSON string to an object
+    const insightsObject = JSON.parse(insightsString);
 
-    let activities: Activity[];
-    try {
-      activities = JSON.parse(activitiesString);
-      console.log("Parsed activities:", activities);
-    } catch (parseError) {
-      console.error("Error parsing activities JSON:", parseError);
-      return NextResponse.json({ error: "Failed to parse activities" }, { status: 500 });
-    }
+    // Convert the insights object to a string for storage
+    const contentString = JSON.stringify(insightsObject);
 
-    console.log("Inserting activities into database");
-    const result = await db.insert(suggestedActivities).values({
+    // Insert the insights into the database
+    const result = await db.insert(insightsAndTips).values({
       userId,
       mood,
-      activities: activitiesString,
+      content: contentString,
       createdAt: new Date(),
     }).returning();
-    console.log("Database insert result:", result);
-
-    const savedRecord: SuggestedActivity = {
-      id: result[0].id,
-      userId: result[0].userId,
-      mood: result[0].mood,
-      activities: activities,
-      createdAt: result[0].createdAt,
-    };
 
     return NextResponse.json({
-      message: "Activities generated and saved successfully",
-      activities: activities,
-      savedRecord: savedRecord
+      message: "Insights generated and saved successfully",
+      insights: insightsObject,
+      savedRecord: result[0]
     });
   } catch (error) {
-    console.error("Detailed error in API route:", error);
-    if (error instanceof Error) {
-      console.error("Error name:", error.name);
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
-    }
+    console.error("Error generating insights:", error);
     return NextResponse.json(
-      { error: "An error occurred while generating activities" },
+      { error: "An error occurred while generating insights" },
       { status: 500 }
     );
   }

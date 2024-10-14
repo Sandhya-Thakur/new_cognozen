@@ -167,7 +167,7 @@ export const moodData = pgTable("moodData", {
   userId: varchar("user_id", { length: 256 }).notNull(),
   mood: varchar("mood", { length: 50 }).notNull(),
   intensity: integer("intensity").notNull(),
-  reasons: text("reasons").array(),
+  reasons: text("reasons").array().notNull(),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
 
