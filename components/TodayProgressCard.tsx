@@ -23,7 +23,7 @@ const TodaysFocusCard: React.FC = () => {
     <Card className="w-full max-w-sm rounded-xl">
       <CardHeader className="p-4 pb-0">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold">Today's Focus</CardTitle>
+          <CardTitle className="text-xl font-bold">Today Focus</CardTitle>
           <span className="text-sm font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">↑ 8.25%</span>
         </div>
       </CardHeader>
