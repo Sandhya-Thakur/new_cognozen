@@ -10,6 +10,13 @@ const CognoHub = () => {
   return (
     <div>
       <Header />
+      <CognoHubPdf/>
+      <FlashCardGroups/>
+      <QuizGroups/>
+      <QuizSummary/>
+
+
+
     </div>
   );
 };
