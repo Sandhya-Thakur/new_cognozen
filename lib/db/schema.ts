@@ -12,6 +12,7 @@ import {
   date,
   time,
   unique,
+  jsonb,
 
 } from "drizzle-orm/pg-core";
 
@@ -242,36 +243,66 @@ export type SuggestedActivity = typeof suggestedActivities.$inferSelect;
 
 
 // storing habit data
-
 export const habits = pgTable("habits", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id", { length: 256 }).notNull(),
   name: varchar("name", { length: 100 }).notNull(),
   description: text("description"),
-  frequency: varchar("frequency", { length: 20 }).notNull(), // e.g., 'daily', 'weekly', 'monthly'
-  timeOfDay: varchar("time_of_day", { length: 20 }), // e.g., 'morning', 'afternoon', 'evening'
+  frequency: varchar("frequency", { length: 20 }).notNull(), // 'daily', 'weekly', 'monthly'
+  timeOfDay: varchar("time_of_day", { length: 20 }), 
   isActive: boolean("is_active").default(true),
+  status: varchar("status", { length: 20 }).default('upcoming'), // Add status field for 'upcoming', 'completed', 'missed', 'on_track'
+  dailyAchieved: boolean("daily_achieved").default(false), // Add daily achievement tracking
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export type Habit = typeof habits.$inferSelect;
+// Modifications needed for the habitDetails table
+export const habitDetails = pgTable("habit_details", {
+  id: serial("id").primaryKey(),
+  habitId: integer("habit_id").notNull().references(() => habits.id),
+  habitType: varchar("habit_type", { length: 20 }).notNull(), // 'routine' or 'challenge'
+  schedule: jsonb("schedule").notNull(), // Modify schedule structure to include:
+  /* Example schedule JSON structure:
+    {
+      startDate: timestamp,
+      selectedDays: string[], // ['Mo', 'We', 'Fr', 'Sa']
+      time: string, // '8:30 AM'
+      repeat: 'daily' | 'weekly' | 'monthly'
+    }
+  */
+  endDate: timestamp("end_date"),
+  challengeLength: integer("challenge_length"),
+  timePerSession: integer("time_per_session"),
+  reminder: jsonb("reminder"), // Modify reminder structure to include:
+  /* Example reminder JSON structure:
+    {
+      time: number,
+      unit: 'minutes_before' | 'hours_before' | 'days_before',
+      enabled: boolean
+    }
+  */
+  showOnScheduledTime: boolean("show_on_scheduled_time").default(true),
+  tags: text("tags").array(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
+// Modify habitCompletions to include journal entries
 export const habitCompletions = pgTable(
   "habit_completions",
   {
     id: serial("id").primaryKey(),
     habitId: integer("habit_id").references(() => habits.id),
     completedAt: date("completed_at").notNull(),
-    value: integer("value").notNull().default(1), // New field for completion value
+    value: integer("value").notNull().default(1),
+    journalEntry: text("journal_entry"), // Add journal entry field
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => ({
     uniqueHabitCompletion: unique().on(table.habitId, table.completedAt),
   })
 );
-
-export type HabitCompletion = typeof habitCompletions.$inferSelect;
 
 // storing goal data
 export const goals = pgTable("goals", {
@@ -368,6 +399,17 @@ export const FAQs = pgTable("messages", {
 });
 
 export type FAQs = typeof FAQs.$inferSelect;
+
+
+
+export const TodoList = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type TodoList= typeof TodoList.$inferSelect;
 
 
 

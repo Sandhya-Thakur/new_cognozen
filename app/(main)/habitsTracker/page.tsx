@@ -4,86 +4,32 @@ import HabitCreationWizard from "@/components/HabitCreationWizard";
 import AllsHabits from "@/components/AllHabits";
 import ManualHabitCompletion from "@/components/ManualHabitCompletion";
 import HabitInsightsComponent from "@/components/HabitInsightsComponent";
-
-interface Habit {
-  id: number;
-  name: string;
-}
+import HabitTrackerWelcomeLine from "@/components/HabitTrackerWelcomeLine";
+import HabitTrackerMetricSection from "@/components/HabitTrackerMetricSection";
+import HabitPerformanceChart from "@/components/HabitPerformanceChart";
+import TodayProgressCard from "@/components/TodayProgressCard";
+import EngagementHeatmapCard from "@/components/EngagementHeatmapCard";
+import AllHabitscards from "@/components/AllHabitscards";
 
 export default function HabitsTrackerPage() {
-  const [showCreationWizard, setShowCreationWizard] = useState(false);
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [selectedHabitId, setSelectedHabitId] = useState<number | null>(null);
-
-  const fetchHabits = async () => {
-    try {
-      const response = await fetch("/api/habits/all");
-      if (response.ok) {
-        const data = await response.json();
-        setHabits(data.habits);
-        if (data.habits.length > 0) {
-          setSelectedHabitId(data.habits[0].id);
-        }
-      } else {
-        console.error("Failed to fetch habits");
-      }
-    } catch (error) {
-      console.error("Error fetching habits:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchHabits();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
-      <header className="bg-[#0F52BA] text-white py-8 rounded-b-3xl shadow-lg">
-        <div className="container mx-auto px-6">
-          <h1 className="text-4xl font-bold">Habits Tracker</h1>
-          <p className="mt-2 text-xl text-blue-100">
-            Build better habits, achieve your goals
-          </p>
+    <div className="px-8">
+      <div>
+        <HabitTrackerWelcomeLine />
+      </div>
+      <div>
+        <HabitTrackerMetricSection />
+      </div>
+      <div className="grid grid-cols-12 gap-2 mt-4">
+        <div className="col-span-12 md:col-span-10 space-y-4">
+          <HabitPerformanceChart />
+          <AllHabitscards />
         </div>
-      </header>
-
-      <main className="container mx-auto mt-12 px-6">
-        <div className="flex justify-between items-center mb-8">
-          <button
-            onClick={() => setShowCreationWizard(true)}
-            className="bg-[#0F52BA] hover:bg-[#0D47A1] text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-opacity-50 shadow-md"
-          >
-            Create New Habit
-          </button>
+        <div className="col-span-12 md:col-span-2 space-y-4">
+          <TodayProgressCard />
+          <EngagementHeatmapCard />
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
-              <AllsHabits />
-            </div>
-            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
-              <ManualHabitCompletion />
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-lg transition duration-300">
-              <HabitInsightsComponent />
-            </div>
-          </div>
-        </div>
-
-      </main>
-
-      {showCreationWizard && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <HabitCreationWizard onClose={() => setShowCreationWizard(false)} />
-        </div>
-      )}
-
-      <footer className="flex justify-center space-x-4 p-8 mt-12">
-      </footer>
+      </div>
     </div>
   );
 }

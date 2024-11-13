@@ -96,7 +96,7 @@ const FeelFlowBreathingExercise: React.FC = () => {
               objectFit="contain"
             />
           </div>
-          <h2 className="text-2xl font-bold text-indigo-900 mb-2">
+          <h2 className="text-xl font-bold text-indigo-900 mb-2">
             BreatheEase
           </h2>
           <p className="text-base text-indigo-800 mb-2">1-minute mind ease</p>
@@ -106,7 +106,7 @@ const FeelFlowBreathingExercise: React.FC = () => {
               : "Reconnect with your breath"}
           </p>
         </div>
-        <div className="flex justify-center space-x-6 mt-10">
+        <div className="flex justify-center space-x-6 mt-6">
           <button
             onClick={handleToggle}
             className="bg-orange-400 hover:bg-orange-500 text-white rounded-full p-5 transition-colors duration-200"

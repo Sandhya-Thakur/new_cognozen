@@ -9,13 +9,7 @@ import QuizSummary from "@/components/QuizSummary"
 const CognoHub = () => {
   return (
     <div>
-         
-      <CognoHubWelcomeLine />
       <Header />
-      <CognoHubPdf />
-      <FlashCardGroups />
-      <QuizGroups/>
-      <QuizSummary/>
     </div>
   );
 };
