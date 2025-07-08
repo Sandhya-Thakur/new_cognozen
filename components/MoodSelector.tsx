@@ -155,6 +155,7 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ onMoodSelect }) => {
             <p className="text-gray-600 mb-6">
               Take a moment to reflect. How are you fee<span className="bg-yellow-200">ling</span> right now?
               This simple awareness can be powerful.
+
             </p>
             <div className="grid grid-cols-4 gap-4 mb-6">
               {moods.map((item) => (
@@ -229,6 +230,10 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ onMoodSelect }) => {
               {isUploading ? "Uploading..." : "Submit"}
             </Button>
           )}
+           
+        </div>
+        <div className="pt-4">
+        <span className="bg-yellow-400">Please Refresh page to get Latest Mood Data</span>
         </div>
       </CardContent>
     </Card>

@@ -10,6 +10,9 @@ const CognoHub = () => {
   return (
     <div>
       <Header />
+      <div className="pt-4 pl-2">
+        <span className="bg-yellow-400">Please Refresh page to get Recent Upload</span>
+        </div>
       <CognoHubPdf/>
       <FlashCardGroups/>
       <QuizGroups/>
