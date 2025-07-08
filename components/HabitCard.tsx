@@ -2,6 +2,7 @@ import React from 'react';
 import { MoreVertical, TrendingUp, Clock } from "lucide-react";
 
 export type Habit = {
+  isActive: unknown;
   id: number;
   name: string;
   status: 'Check-in' | 'Daily Achieved' | 'On Track' | 'Completed' | 'Upcoming';

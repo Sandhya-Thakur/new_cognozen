@@ -1,3 +1,4 @@
+//api/habits/habits/streak
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { habits, habitCompletions } from "@/lib/db/schema";

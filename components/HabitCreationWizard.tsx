@@ -19,6 +19,7 @@ interface HabitCreationWizardProps {
 const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
   onClose,
 }) => {
+  // Basic form state
   const [habitType, setHabitType] = useState<"routine" | "challenge">(
     "routine"
   );
@@ -31,19 +32,30 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
   const [timePerSession, setTimePerSession] = useState("");
   const [reminder, setReminder] = useState("");
   const [showOnScheduledTime, setShowOnScheduledTime] = useState(true);
+  const [reminderUnit, setReminderUnit] = useState("Minutes before");
+  const [newTag, setNewTag] = useState("");
+
+  // UI state for dropdowns and modals
   const [showCalendar, setShowCalendar] = useState(false);
   const [showRepeatOptions, setShowRepeatOptions] = useState(false);
+  const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
+  const [showReminderOptions, setShowReminderOptions] = useState(false);
+  const [showTagInput, setShowTagInput] = useState(false);
+
+  // Time picker state
   const [selectedTime, setSelectedTime] = useState({
     hour: "8",
     minute: "00",
     period: "AM",
   });
-  const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
-  const [showReminderOptions, setShowReminderOptions] = useState(false);
-  const [reminderUnit, setReminderUnit] = useState("Minutes before");
-  const [showTagInput, setShowTagInput] = useState(false);
-  const [newTag, setNewTag] = useState("");
 
+  // Calendar state - NEW: Added separate state for both calendars
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [endDateMonth, setEndDateMonth] = useState(new Date().getMonth());
+  const [endDateYear, setEndDateYear] = useState(new Date().getFullYear());
+
+  // Static data
   const weekDays = [
     { short: "Mo", long: "Monday" },
     { short: "Tu", long: "Tuesday" },
@@ -54,13 +66,114 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
     { short: "Su", long: "Sunday" },
   ];
 
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const [tags, setTags] = useState<Tag[]>([
     { id: "1", name: "Habits" },
     { id: "2", name: "Motivation" },
     { id: "3", name: "Meditation" },
     { id: "4", name: "Selfawareness" },
   ]);
+  // Calendar helper functions - NEW: Proper calendar calculations
+  const getDaysInMonth = (month: number, year: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
 
+  const getFirstDayOfMonth = (month: number, year: number) => {
+    const firstDay = new Date(year, month, 1).getDay();
+    return firstDay === 0 ? 7 : firstDay; // Convert Sunday (0) to 7 for Monday start
+  };
+
+  // Navigation functions for start date calendar
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(currentYear - 1);
+    } else {
+      setCurrentMonth(currentMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
+
+  // Navigation functions for end date calendar
+  const handleEndDatePrevMonth = () => {
+    if (endDateMonth === 0) {
+      setEndDateMonth(11);
+      setEndDateYear(endDateYear - 1);
+    } else {
+      setEndDateMonth(endDateMonth - 1);
+    }
+  };
+
+  const handleEndDateNextMonth = () => {
+    if (endDateMonth === 11) {
+      setEndDateMonth(0);
+      setEndDateYear(endDateYear + 1);
+    } else {
+      setEndDateMonth(endDateMonth + 1);
+    }
+  };
+
+  // Reusable calendar rendering function - NEW: Dynamic calendar generation
+  const renderCalendarDays = (
+    month: number,
+    year: number,
+    onDateSelect: (day: number) => void
+  ) => {
+    const daysInMonth = getDaysInMonth(month, year);
+    const firstDay = getFirstDayOfMonth(month, year);
+    const daysArray = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 1; i < firstDay; i++) {
+      daysArray.push(<div key={`empty-${i}`} className="h-8 w-8"></div>);
+    }
+
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const isToday =
+        day === new Date().getDate() &&
+        month === new Date().getMonth() &&
+        year === new Date().getFullYear();
+
+      daysArray.push(
+        <button
+          key={day}
+          type="button"
+          onClick={() => onDateSelect(day)}
+          className={`h-8 w-8 flex items-center justify-center rounded-full hover:bg-blue-50 transition-colors
+            ${isToday ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-blue-50"}`}
+        >
+          {day}
+        </button>
+      );
+    }
+
+    return daysArray;
+  };
+
+  // Event handlers
   const handleAddTag = () => {
     if (newTag.trim()) {
       setTags((prev) => [
@@ -82,21 +195,28 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
     );
   };
 
+  // Date selection handlers - NEW: Proper date formatting
   const handleDateSelect = (day: number) => {
-    const date = `November ${day}, 2024`;
+    const date = `${monthNames[currentMonth]} ${day}, ${currentYear}`;
     const time = `${selectedTime.hour}:${selectedTime.minute} ${selectedTime.period}`;
     setSchedule(`${date} @ ${time}`);
     setShowCalendar(false);
   };
 
-  // Add this function to update schedule when time changes
+  const handleEndDateSelect = (day: number) => {
+    const date = `${monthNames[endDateMonth]} ${day}, ${endDateYear}`;
+    setEndRepeat(date);
+    setShowEndDateCalendar(false);
+  };
+
+  // Time change handler - FIXED: Properly updates schedule
   const handleTimeChange = (
     field: "hour" | "minute" | "period",
     value: string
   ) => {
     setSelectedTime((prev) => {
       const newTime = { ...prev, [field]: value };
-      // Update schedule with new time
+      // Update schedule with new time if date is already selected
       if (schedule) {
         const [date] = schedule.split("@");
         setSchedule(
@@ -107,6 +227,7 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
     });
   };
 
+  // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -130,7 +251,7 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
           timePerSession: parseInt(timePerSession),
           reminder,
           showOnScheduledTime,
-          tags: tags.map((tag) => tag.name), // Modified to send only tag names
+          tags: tags.map((tag) => tag.name),
         }),
       });
 
@@ -142,10 +263,10 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 w-full max-w-md">
+    <div className="bg-white rounded-3xl p-6 w-full max-w-md mx-auto">
       <h2 className="text-xl font-semibold mb-6">Add Habit</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4">
         {/* Habit Type Selection */}
         <div className="flex gap-4 mb-6">
           <label className="flex items-center gap-2">
@@ -196,7 +317,6 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
         </div>
 
         {/* Habit Schedule */}
-        {/* Habit Schedule */}
         <div className="relative">
           <label className="text-sm text-gray-600">Habit Schedule*</label>
           <div
@@ -222,9 +342,17 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
             <div className="absolute z-10 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 w-full">
               <div className="p-4">
                 <div className="flex justify-between items-center mb-4">
-                  <ChevronLeft className="w-5 h-5 text-gray-400 cursor-pointer" />
-                  <span className="font-medium">November 2024</span>
-                  <ChevronRight className="w-5 h-5 text-gray-400 cursor-pointer" />
+                  <ChevronLeft
+                    className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600"
+                    onClick={handlePrevMonth}
+                  />
+                  <span className="font-medium">
+                    {monthNames[currentMonth]} {currentYear}
+                  </span>
+                  <ChevronRight
+                    className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600"
+                    onClick={handleNextMonth}
+                  />
                 </div>
 
                 <div className="grid grid-cols-7 gap-1 mb-2">
@@ -239,23 +367,11 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
                 </div>
 
                 <div className="grid grid-cols-7 gap-1">
-                  {[...Array(35)].map((_, i) => {
-                    const day = i + 1;
-                    const isCurrentDay = day === 26;
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => handleDateSelect(day)}
-                        className={`h-8 w-8 flex items-center justify-center rounded-full hover:bg-blue-50 
-                  ${isCurrentDay ? "bg-blue-600 text-white" : "text-gray-700"}
-                  ${day > 30 ? "text-gray-300" : ""}`}
-                        disabled={day > 30}
-                      >
-                        {day <= 30 ? day : day - 30}
-                      </button>
-                    );
-                  })}
+                  {renderCalendarDays(
+                    currentMonth,
+                    currentYear,
+                    handleDateSelect
+                  )}
                 </div>
 
                 <div className="mt-4 flex items-center gap-2">
@@ -313,7 +429,6 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
                 </div>
               </div>
 
-              {/* Done Button Section */}
               <div className="p-4 border-t border-gray-100 flex justify-end">
                 <div className="flex gap-2">
                   <button
@@ -327,7 +442,8 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
                     type="button"
                     onClick={() => {
                       const date =
-                        schedule.split("@")[0]?.trim() || `November 26, 2024`;
+                        schedule.split("@")[0]?.trim() ||
+                        `${monthNames[currentMonth]} ${new Date().getDate()}, ${currentYear}`;
                       const time = `${selectedTime.hour}:${selectedTime.minute} ${selectedTime.period}`;
                       setSchedule(`${date} @ ${time}`);
                       setShowCalendar(false);
@@ -421,7 +537,6 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
             </div>
           )}
 
-          {/* Week Day Selector */}
           {repeatSchedule === "weekly" && (
             <div className="mt-2 p-2 bg-gray-50 rounded-xl flex justify-between">
               {weekDays.map((day) => (
@@ -467,9 +582,17 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
           {showEndDateCalendar && (
             <div className="absolute z-10 mt-2 p-4 bg-white rounded-xl shadow-lg border border-gray-200 w-full">
               <div className="flex justify-between items-center mb-4">
-                <ChevronLeft className="w-5 h-5 text-gray-400 cursor-pointer" />
-                <span className="font-medium">December 2024</span>
-                <ChevronRight className="w-5 h-5 text-gray-400 cursor-pointer" />
+                <ChevronLeft
+                  className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600"
+                  onClick={handleEndDatePrevMonth}
+                />
+                <span className="font-medium">
+                  {monthNames[endDateMonth]} {endDateYear}
+                </span>
+                <ChevronRight
+                  className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600"
+                  onClick={handleEndDateNextMonth}
+                />
               </div>
 
               <div className="grid grid-cols-7 gap-1 mb-2">
@@ -484,30 +607,32 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
               </div>
 
               <div className="grid grid-cols-7 gap-1">
-                {[...Array(35)].map((_, i) => {
-                  const day = i + 1;
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      className={`h-8 w-8 flex items-center justify-center rounded-full hover:bg-blue-50 
-                ${day === 16 ? "bg-blue-600 text-white" : "text-gray-700"}`}
-                      onClick={() => {
-                        setEndRepeat(`December ${day}, 2024`);
-                        setShowEndDateCalendar(false);
-                      }}
-                    >
-                      {day <= 31 ? day : day - 31}
-                      {day === 12 && (
-                        <span className="absolute w-1 h-1 bg-yellow-400 rounded-full -bottom-1"></span>
-                      )}
-                    </button>
-                  );
-                })}
+                {renderCalendarDays(
+                  endDateMonth,
+                  endDateYear,
+                  handleEndDateSelect
+                )}
               </div>
             </div>
           )}
         </div>
+
+        {/* Challenge Length */}
+        {habitType === "challenge" && (
+          <div className="flex items-center gap-2">
+            <span>Challenge Length</span>
+            <input
+              type="number"
+              value={challengeLength}
+              onChange={(e) => setChallengeLength(e.target.value)}
+              className="w-16 p-2 bg-gray-50 rounded-lg text-center"
+              placeholder="30"
+            />
+            <span className="px-3 py-1 bg-yellow-400 text-black rounded-lg text-sm">
+              Days
+            </span>
+          </div>
+        )}
 
         {/* Time per Session */}
         <div className="flex items-center gap-2">
@@ -525,7 +650,6 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
         </div>
 
         {/* Reminder */}
-
         <div className="relative">
           <div className="flex items-center gap-2">
             <span>Reminder</span>
@@ -541,7 +665,7 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
                 className="flex items-center gap-2 px-3 py-1 bg-blue-900 text-white rounded-lg text-sm cursor-pointer"
                 onClick={() => setShowReminderOptions(!showReminderOptions)}
               >
-                <span>Select</span>
+                <span>{reminderUnit}</span>
                 <ChevronDown className="w-4 h-4" />
               </div>
 
@@ -617,12 +741,50 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
         {/* Add Tags */}
         <div>
           <span className="block mb-2">Add Tags</span>
-          <button
-            type="button"
-            className="px-4 py-2 border-2 border-dashed border-yellow-200 rounded-full text-gray-400 hover:border-yellow-300 transition-colors"
-          >
-            + Add tag
-          </button>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-1"
+              >
+                {tag.name}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag.id)}
+                  className="ml-1 text-blue-600 hover:text-blue-800"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+          {showTagInput ? (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder="Enter tag name"
+                className="flex-1 p-2 bg-gray-50 rounded-lg text-sm"
+                onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
+              />
+              <button
+                type="button"
+                onClick={handleAddTag}
+                className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm"
+              >
+                Add
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowTagInput(true)}
+              className="px-4 py-2 border-2 border-dashed border-yellow-200 rounded-full text-gray-400 hover:border-yellow-300 transition-colors"
+            >
+              + Add tag
+            </button>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -635,13 +797,14 @@ const HabitCreationWizard: React.FC<HabitCreationWizardProps> = ({
             Cancel
           </button>
           <button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
           >
             Save
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

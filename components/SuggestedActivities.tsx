@@ -57,12 +57,19 @@ const SuggestedActivities: React.FC = () => {
         throw new Error(data.error || "Failed to fetch activities");
       }
 
-      setActivities(data.activities);
+      // Safe handling of activities data
+      if (data && data.activities) {
+        setActivities(Array.isArray(data.activities) ? data.activities : []);
+      } else {
+        setActivities([]);
+      }
+      
       setShowLastActivities(false); // Hide last activities when new ones are generated
       console.log("Saved record:", data.savedRecord);
     } catch (error) {
       console.error("Error:", error);
       setError(error instanceof Error ? error.message : "Failed to generate activities. Please try again.");
+      setActivities([]); // Set to empty array on error
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +103,8 @@ const SuggestedActivities: React.FC = () => {
 
       {error && <p className="text-red-500 mt-4">{error}</p>}
 
-      {activities.length > 0 && (
+      {/* Safe check for activities - this was the main issue */}
+      {activities && activities.length > 0 && (
         <div className="mt-6 bg-white p-4 rounded-b-lg">
           <h3 className="text-xl font-semibold mb-4 text-indigo-800">
             Personalized MoodBoosters
@@ -114,7 +122,7 @@ const SuggestedActivities: React.FC = () => {
         </div>
       )}
 
-      {showLastActivities && activities.length === 0 && (
+      {showLastActivities && (!activities || activities.length === 0) && (
         <LastGeneratedActivities onNewActivitiesGenerated={() => setShowLastActivities(false)} />
       )}
     </div>

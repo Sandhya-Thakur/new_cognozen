@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Configuration, OpenAIApi } from "openai-edge";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/lib/db";
-import { insightsAndTips, moodData } from "@/lib/db/schema";
+import { moodData, suggestedActivities } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 
 const config = new Configuration({
@@ -18,7 +18,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch the latest mood data
+    const body = await req.json();
+    const { mood } = body;
+
+    if (!mood) {
+      return NextResponse.json({ error: "Mood is required" }, { status: 400 });
+    }
+
+    // Fetch the latest mood data to get reasons if available
     const latestMoodData = await db
       .select()
       .from(moodData)
@@ -26,44 +33,48 @@ export async function POST(req: Request) {
       .orderBy(desc(moodData.timestamp))
       .limit(1);
 
-    if (latestMoodData.length === 0) {
-      return NextResponse.json({ error: "No mood data found" }, { status: 404 });
+    let reasons: string[] = [];
+    if (latestMoodData.length > 0) {
+      reasons = latestMoodData[0].reasons || [];
     }
-
-    const { mood, reasons } = latestMoodData[0];
 
     const prompt = {
       role: "system" as const,
-      content: `You are an empathetic AI assistant providing insights and tips based on a person's mood and the reasons behind it.
-      Your responses should be supportive, encouraging, and tailored to the specific mood and reasons.
-      Provide practical advice and strategies to help improve or maintain the person's emotional well-being.
+      content: `You are an empathetic AI assistant that suggests personalized activities based on a person's mood.
+      Your responses should be supportive, practical, and tailored to help improve or maintain their emotional well-being.
+      
       Format your response as a JSON object with the following structure:
       {
-        "mood": "The mood being addressed",
-        "understanding": {
-          "title": "Understanding the Mood: [Mood]",
-          "description": "A brief explanation of the mood and its context"
-        },
-        "impacts": ["An array of potential impacts"],
-        "strategies": [
+        "activities": [
           {
-            "title": "Strategy title",
-            "description": "Detailed description of the strategy"
+            "title": "Activity title (keep it short and engaging)",
+            "description": "A detailed description of the activity and how it can help with the current mood"
           }
-        ],
-        "conclusion": "A brief concluding statement"
-      }`,
+        ]
+      }
+      
+      Provide exactly 5 activities that are:
+      - Practical and achievable
+      - Specific to the mood provided
+      - Varied in type (physical, mental, social, creative, etc.)
+      - Actionable with clear steps`,
     };
 
     const userMessage = {
       role: "user" as const,
-      content: `Generate insights and tips for someone feeling ${mood}. ${
+      content: `Generate 5 personalized mood-boosting activities for someone feeling ${mood}. ${
         reasons && reasons.length > 0
           ? `The reasons for this mood are: ${reasons.join(", ")}.`
           : "No specific reasons were provided for this mood."
-      } Include a brief explanation of the mood considering ${
-        reasons && reasons.length > 0 ? "these reasons" : "the lack of specific reasons"
-      }, its potential impacts, and at least three practical strategies to manage or improve this emotional state.`,
+      } 
+      
+      Consider these factors:
+      - The current mood: ${mood}
+      - The person wants activities that will help them feel better or maintain their current positive state
+      - Activities should be diverse and cater to different preferences
+      - Each activity should have a clear title and detailed description
+      
+      Make sure each activity is specific, actionable, and designed to positively impact their emotional state.`,
     };
 
     const response = await openai.createChatCompletion({
@@ -72,31 +83,29 @@ export async function POST(req: Request) {
     });
 
     const data = await response.json();
-    const insightsString = data.choices[0].message?.content || "{}";
+    const activitiesString = data.choices[0].message?.content || "{}";
 
     // Parse the JSON string to an object
-    const insightsObject = JSON.parse(insightsString);
+    const activitiesObject = JSON.parse(activitiesString);
 
-    // Convert the insights object to a string for storage
-    const contentString = JSON.stringify(insightsObject);
-
-    // Insert the insights into the database
-    const result = await db.insert(insightsAndTips).values({
+    // Save to database
+    const result = await db.insert(suggestedActivities).values({
       userId,
       mood,
-      content: contentString,
+      activities: JSON.stringify(activitiesObject.activities),
       createdAt: new Date(),
     }).returning();
 
     return NextResponse.json({
-      message: "Insights generated and saved successfully",
-      insights: insightsObject,
+      message: "Activities generated successfully",
+      activities: activitiesObject.activities,
+      mood: mood,
       savedRecord: result[0]
     });
   } catch (error) {
-    console.error("Error generating insights:", error);
+    console.error("Error generating activities:", error);
     return NextResponse.json(
-      { error: "An error occurred while generating insights" },
+      { error: "An error occurred while generating activities" },
       { status: 500 }
     );
   }

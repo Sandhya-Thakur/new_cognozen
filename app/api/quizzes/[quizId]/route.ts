@@ -1,62 +1,64 @@
-// File: /api/quizzes/[quizId]/route.ts
+// =============================================================================
+// Missing API: Get Quiz with Questions
+// File: app/api/quizzes/[quizId]/route.ts
+// =============================================================================
 
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
-import { quizzes, quizQuestions } from "@/lib/db/schema";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+import { db } from "@/lib/db";
+import { quizzes, quizQuestions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-export const dynamic = "force-dynamic"; // static by default, unless reading the request
-export const runtime = "edge"; // specify the runtime to be edge
-
-export async function GET(
-  request: Request,
-  { params }: { params: { quizId: string } }
-) {
-  const { userId } = await auth();
-  if (!userId) {
-    return redirect("/sign-in");
-  }
-
-  const quizId = parseInt(params.quizId);
-
+export async function GET(req: Request, { params }: { params: { quizId: string } }) {
   try {
-    const quiz = await db
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const quizId = parseInt(params.quizId);
+
+    // Get quiz details
+    const [quiz] = await db
       .select()
       .from(quizzes)
-      .where(eq(quizzes.id, quizId))
-      .limit(1);
+      .where(eq(quizzes.id, quizId));
 
-    if (quiz.length === 0) {
+    if (!quiz) {
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
     }
 
+    // Get questions (don't send correct answers to frontend for security)
     const questions = await db
-      .select()
+      .select({
+        id: quizQuestions.id,
+        questionText: quizQuestions.questionText,
+        options: quizQuestions.options,
+        order: quizQuestions.order,
+        difficulty: quizQuestions.difficulty,
+        // Don't include correctAnswer for security
+      })
       .from(quizQuestions)
       .where(eq(quizQuestions.quizId, quizId))
       .orderBy(quizQuestions.order);
 
     return NextResponse.json({
-      id: quiz[0].id,
-      title: quiz[0].title,
-      description: quiz[0].description,
-      totalQuestions: quiz[0].totalQuestions,
-      createdAt: quiz[0].createdAt,
+      id: quiz.id,
+      title: quiz.title,
+      description: quiz.description,
+      totalQuestions: quiz.totalQuestions,
+      difficulty: quiz.difficulty,
+      category: quiz.category,
       questions: questions.map(q => ({
         id: q.id,
         questionText: q.questionText,
         options: q.options,
         order: q.order,
-        // Note: We're not sending the correct answer to the client for security reasons
+        difficulty: q.difficulty
       }))
     });
   } catch (error) {
-    console.error("Failed to fetch quiz data", error);
-    return NextResponse.json(
-      { error: "Failed to fetch quiz data" },
-      { status: 500 }
-    );
+    console.error("Error fetching quiz:", error);
+    return NextResponse.json({ error: "Failed to fetch quiz" }, { status: 500 });
   }
 }

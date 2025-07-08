@@ -61,16 +61,20 @@ export const flashcards = pgTable("flashcards", {
 
 
 // Existing tables (chats, messages, etc.) remain unchanged
-
 export const quizzes = pgTable("quizzes", {
   id: serial("id").primaryKey(),
   chatId: integer("chat_id")
-  .references(() => chats.id)
-  .notNull(),
+    .references(() => chats.id)
+    .notNull(),
   title: text("title").notNull(),
   description: text("description"),
   totalQuestions: integer("total_questions").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  // Add these fields for better tracking
+  difficulty: varchar("difficulty", { length: 20 }).default("medium"), // easy, medium, hard
+  category: varchar("category", { length: 50 }), // topic category for analysis
+  averageScore: doublePrecision("average_score"), // average score across all attempts
+  totalAttempts: integer("total_attempts").default(0), // how many times attempted
 });
 
 export const quizQuestions = pgTable("quiz_questions", {
@@ -81,16 +85,40 @@ export const quizQuestions = pgTable("quiz_questions", {
   correctAnswer: text("correct_answer").notNull(),
   explanation: text("explanation"),
   order: integer("order").notNull(),
+  // Add these fields for analysis
+  difficulty: varchar("difficulty", { length: 20 }).default("medium"), // question difficulty
+  questionType: varchar("question_type", { length: 30 }).default("multiple_choice"), // multiple_choice, true_false, etc.
+  timeToAnswer: integer("time_to_answer"), // expected time in seconds
+  correctAnswerCount: integer("correct_answer_count").default(0), // how many got it right
+  totalAnswerCount: integer("total_answer_count").default(0), // total attempts on this question
+  successRate: doublePrecision("success_rate"), // percentage of correct answers
 });
 
 export const quizAttempts = pgTable("quiz_attempts", {
   id: serial("id").primaryKey(),
   quizId: integer("quiz_id").references(() => quizzes.id).notNull(),
+  userId: varchar("user_id", { length: 256 }).notNull(), // Add userId for tracking
   score: integer("score"),
   currentQuestionOrder: integer("current_question_order").notNull().default(1),
   completed: boolean("completed").notNull().default(false),
   startedAt: timestamp("started_at").notNull().defaultNow(),
   completedAt: timestamp("completed_at"),
+  // Add these fields for detailed analysis
+  totalTimeSpent: integer("total_time_spent"), // total time in seconds
+  correctAnswers: integer("correct_answers").default(0), // count of correct answers
+  wrongAnswers: integer("wrong_answers").default(0), // count of wrong answers
+  skippedQuestions: integer("skipped_questions").default(0), // count of skipped questions
+  averageTimePerQuestion: doublePrecision("average_time_per_question"), // average time per question
+  performanceData: jsonb("performance_data"), // detailed performance metrics
+  /* Example performance_data structure:
+  {
+    "strongAreas": ["basic_concepts", "definitions"],
+    "weakAreas": ["advanced_topics", "calculations"],
+    "improvementSuggestions": ["Review chapter 3", "Practice more problems"],
+    "confidenceLevel": "medium",
+    "streakCount": 3
+  }
+  */
 });
 
 export const quizResponses = pgTable("quiz_responses", {
@@ -100,7 +128,96 @@ export const quizResponses = pgTable("quiz_responses", {
   userAnswer: text("user_answer").notNull(),
   isCorrect: boolean("is_correct").notNull(),
   answeredAt: timestamp("answered_at").notNull().defaultNow(),
+  // Add these fields for detailed analysis
+  questionText: text("question_text").notNull(), // store question for analysis
+  correctAnswer: text("correct_answer").notNull(), // store correct answer for comparison
+  allOptions: json("all_options"), // store all available options
+  timeSpent: integer("time_spent"), // time spent on this question in seconds
+  confidence: integer("confidence"), // user's confidence level (1-5)
+  answerAnalysis: jsonb("answer_analysis"), // detailed analysis of the answer
+  /* Example answer_analysis structure:
+  {
+    "matchType": "exact" | "partial" | "incorrect",
+    "similarity": 0.95,
+    "keywordsMatched": ["wand", "magic"],
+    "keywordsMissed": ["fairy"],
+    "reasoning": "Answer contained main concept but missed key detail",
+    "partialCredit": 0.8,
+    "improvementHint": "Include more specific details"
+  }
+  */
+  partialCredit: doublePrecision("partial_credit"), // partial credit score (0.0 to 1.0)
+  reviewStatus: varchar("review_status", { length: 20 }).default("pending"), // pending, reviewed, flagged
 });
+
+// Add a new table for detailed quiz analysis and performance tracking
+export const quizAnalysis = pgTable("quiz_analysis", {
+  id: serial("id").primaryKey(),
+  quizAttemptId: integer("quiz_attempt_id").references(() => quizAttempts.id).notNull(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  quizId: integer("quiz_id").references(() => quizzes.id).notNull(),
+  analysisType: varchar("analysis_type", { length: 30 }).notNull(), // performance, improvement, comparison
+  analysisData: jsonb("analysis_data").notNull(), // detailed analysis results
+  /* Example analysis_data structure:
+  {
+    "overallPerformance": {
+      "score": 75,
+      "ranking": "above_average",
+      "improvementFromLast": 15
+    },
+    "topicBreakdown": {
+      "basic_concepts": 90,
+      "advanced_topics": 60,
+      "problem_solving": 70
+    },
+    "recommendedActions": [
+      "Review advanced concepts in chapter 5",
+      "Practice more calculation problems",
+      "Retake quiz in 3 days"
+    ],
+    "strengthAreas": ["definitions", "basic_understanding"],
+    "weaknessAreas": ["complex_calculations", "advanced_applications"],
+    "learningPath": "beginner_to_intermediate"
+  }
+  */
+  recommendations: text("recommendations").array(), // array of improvement suggestions
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  isProcessed: boolean("is_processed").default(false), // whether analysis is complete
+});
+
+// Add a table for tracking user progress over time
+export const userQuizProgress = pgTable("user_quiz_progress", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  quizId: integer("quiz_id").references(() => quizzes.id).notNull(),
+  bestScore: integer("best_score").default(0), // best score achieved
+  averageScore: doublePrecision("average_score"), // average across all attempts
+  totalAttempts: integer("total_attempts").default(0), // total attempts by user
+  lastAttemptDate: timestamp("last_attempt_date"),
+  improvementRate: doublePrecision("improvement_rate"), // rate of improvement over time
+  masteryLevel: varchar("mastery_level", { length: 20 }).default("beginner"), // beginner, intermediate, advanced, expert
+  progressData: jsonb("progress_data"), // detailed progress tracking
+  /* Example progress_data structure:
+  {
+    "scoreHistory": [60, 70, 75, 80, 85],
+    "timeHistory": [300, 280, 260, 240, 220],
+    "difficultyPreference": "medium",
+    "learningPattern": "visual",
+    "retentionRate": 0.85,
+    "nextReviewDate": "2024-07-15"
+  }
+  */
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Type definitions for TypeScript
+export type Quiz = typeof quizzes.$inferSelect;
+export type QuizQuestion = typeof quizQuestions.$inferSelect;
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export type QuizResponse = typeof quizResponses.$inferSelect;
+export type QuizAnalysis = typeof quizAnalysis.$inferSelect;
+export type UserQuizProgress = typeof userQuizProgress.$inferSelect;
 
 
 // storing attention data for reading pdf

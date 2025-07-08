@@ -4,50 +4,44 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { habits, habitDetails } from "@/lib/db/schema";
 import { auth } from "@clerk/nextjs";
-import { z } from "zod"; // For validation
+import { z } from "zod";
 
 // Define types for the schedule and reminder JSONB structures
 interface ScheduleData {
   startDate: string;
   selectedDays?: string[];
-  time: string;
-  repeat: 'daily' | 'weekly' | 'monthly';
+  repeat: 'daily' | 'everyday' | 'weekly' | 'monthly';
 }
 
 interface ReminderData {
   time: number;
-  unit: 'minutes_before' | 'hours_before' | 'days_before';
+  unit: 'minutes_before' | 'hours_before' | 'days_before' | 'at_time_scheduled';
   enabled: boolean;
 }
 
-// Request body validation schema
+// FIXED: Request body validation schema to match frontend exactly
 const createHabitSchema = z.object({
   // Basic Info
   name: z.string().min(1).max(100),
-  description: z.string().optional(),
   
-  // Habit Type and Schedule
+  // Habit Type
   habitType: z.enum(['routine', 'challenge']),
-  frequency: z.enum(['daily', 'weekly', 'monthly']),
+  
+  // Schedule - FIXED: Match frontend structure
   schedule: z.object({
-    startDate: z.string(),
-    selectedDays: z.array(z.string()).optional(),
-    time: z.string(),
-    repeat: z.enum(['daily', 'weekly', 'monthly'])
+    startDate: z.string(), // "November 26, 2024 @ 8:00 AM"
+    repeat: z.enum(['daily', 'everyday', 'weekly', 'monthly']),
+    selectedDays: z.array(z.string()).optional() // Only for weekly
   }),
   
-  // Optional fields
-  endDate: z.string().optional(),
-  challengeLength: z.number().optional(),
-  timePerSession: z.number().min(1).optional(),
-  timeOfDay: z.string().optional(),
+  // Optional fields - FIXED: Match frontend exactly
+  endDate: z.string().optional(), // "December 31, 2024"
+  challengeLength: z.union([z.string(), z.number(), z.null()]).optional(), // Can be string, number, or null
+  timePerSession: z.union([z.string(), z.number()]).optional(), // Can be string or number
   
-  // Reminder settings
-  reminder: z.object({
-    time: z.number(),
-    unit: z.enum(['minutes_before', 'hours_before', 'days_before']),
-    enabled: z.boolean()
-  }).optional(),
+  // Reminder - FIXED: Frontend sends as separate fields
+  reminder: z.string().optional(), // "10" (just the number)
+  reminderUnit: z.string().optional().default("Minutes before"), // "Minutes before", "Hours before", etc.
   
   // Display settings
   showOnScheduledTime: z.boolean().default(true),
@@ -66,61 +60,117 @@ export async function POST(req: Request) {
 
     // Parse and validate request body
     const body = await req.json();
+    console.log("Received body:", JSON.stringify(body, null, 2)); // Debug log
+    
     const validatedData = createHabitSchema.parse(body);
+    console.log("Validated data:", JSON.stringify(validatedData, null, 2)); // Debug log
 
-    // Extract schedule data
+    // FIXED: Extract and parse time from startDate
+    const extractTimeFromSchedule = (startDate: string) => {
+      if (startDate.includes('@')) {
+        const [datePart, timePart] = startDate.split('@');
+        return {
+          date: datePart.trim(),
+          time: timePart.trim()
+        };
+      }
+      return {
+        date: startDate,
+        time: "8:00 AM" // Default time
+      };
+    };
+
+    const { date, time } = extractTimeFromSchedule(validatedData.schedule.startDate);
+
+    // FIXED: Create schedule data matching database structure
     const scheduleData: ScheduleData = {
       startDate: validatedData.schedule.startDate,
       selectedDays: validatedData.schedule.selectedDays,
-      time: validatedData.schedule.time,
       repeat: validatedData.schedule.repeat
     };
 
-    // Extract reminder data if provided
-    const reminderData: ReminderData | undefined = validatedData.reminder ? {
-      time: validatedData.reminder.time,
-      unit: validatedData.reminder.unit,
-      enabled: validatedData.reminder.enabled
-    } : undefined;
+    // FIXED: Convert reminder to proper format
+    const createReminderData = (): ReminderData | undefined => {
+      if (!validatedData.reminder) return undefined;
+      
+      const reminderTime = parseInt(validatedData.reminder);
+      if (isNaN(reminderTime)) return undefined;
 
-    // Create transaction for atomic operation
-    const habitData = await db.transaction(async (tx) => {
-      // Create main habit record
-      const [newHabit] = await tx
-        .insert(habits)
-        .values({
-          userId,
-          name: validatedData.name,
-          description: validatedData.description,
-          frequency: validatedData.frequency,
-          timeOfDay: validatedData.timeOfDay,
-          status: 'upcoming', // Default status
-          dailyAchieved: false,
-          isActive: true
-        })
-        .returning();
-
-      // Create habit details record
-      const [newHabitDetails] = await tx
-        .insert(habitDetails)
-        .values({
-          habitId: newHabit.id,
-          habitType: validatedData.habitType,
-          schedule: scheduleData,
-          endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
-          challengeLength: validatedData.challengeLength,
-          timePerSession: validatedData.timePerSession,
-          reminder: reminderData,
-          showOnScheduledTime: validatedData.showOnScheduledTime,
-          tags: validatedData.tags
-        })
-        .returning();
+      // Convert frontend reminder unit to database format
+      let unit: 'minutes_before' | 'hours_before' | 'days_before' | 'at_time_scheduled';
+      switch (validatedData.reminderUnit?.toLowerCase()) {
+        case 'hours before':
+          unit = 'hours_before';
+          break;
+        case 'days before':
+          unit = 'days_before';
+          break;
+        case 'at time scheduled':
+          unit = 'at_time_scheduled';
+          break;
+        default:
+          unit = 'minutes_before';
+      }
 
       return {
-        ...newHabit,
-        details: newHabitDetails
+        time: reminderTime,
+        unit: unit,
+        enabled: true
       };
-    });
+    };
+
+    const reminderData = createReminderData();
+
+    // FIXED: Convert string/number to integers safely
+    const parseIntSafe = (value: string | number | null | undefined): number | undefined => {
+      if (value === null || value === undefined) return undefined;
+      if (typeof value === 'number') return value;
+      if (typeof value === 'string') {
+        const parsed = parseInt(value);
+        return isNaN(parsed) ? undefined : parsed;
+      }
+      return undefined;
+    };
+
+    // FIXED: Extract frequency from schedule.repeat
+    const frequency = validatedData.schedule.repeat === 'everyday' ? 'daily' : validatedData.schedule.repeat;
+
+    // FIXED: Remove transaction since neon-http doesn't support it
+    // Create main habit record first
+    const [newHabit] = await db
+      .insert(habits)
+      .values({
+        userId,
+        name: validatedData.name,
+        description: undefined, // Frontend doesn't send description
+        frequency: frequency, // Use converted frequency
+        timeOfDay: time, // Extracted time from schedule
+        status: 'upcoming',
+        dailyAchieved: false,
+        isActive: true
+      })
+      .returning();
+
+    // Create habit details record
+    const [newHabitDetails] = await db
+      .insert(habitDetails)
+      .values({
+        habitId: newHabit.id,
+        habitType: validatedData.habitType,
+        schedule: scheduleData,
+        endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
+        challengeLength: parseIntSafe(validatedData.challengeLength),
+        timePerSession: parseIntSafe(validatedData.timePerSession),
+        reminder: reminderData,
+        showOnScheduledTime: validatedData.showOnScheduledTime,
+        tags: validatedData.tags
+      })
+      .returning();
+
+    const habitData = {
+      ...newHabit,
+      details: newHabitDetails
+    };
 
     return NextResponse.json({
       message: "Habit created successfully",
@@ -132,9 +182,11 @@ export async function POST(req: Request) {
     
     // Zod validation error handling
     if (error instanceof z.ZodError) {
+      console.error("Validation errors:", error.errors);
       return NextResponse.json({
         error: "Validation error",
-        details: error.errors
+        details: error.errors,
+        receivedData: await req.json().catch(() => "Could not parse request body")
       }, { status: 400 });
     }
 
