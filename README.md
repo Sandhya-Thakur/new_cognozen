@@ -21,7 +21,7 @@ engagement, performance, resilience, and retention.
 - **📈 Analytics** - Comprehensive insights and performance analytics
 
 ### Key Capabilities
-- Real-Time Actionable Insights: Empower instructors with real-time insights on learnersʼ 
+- Real-Time Actionable Insights: Empower instructors with real-time insights on learnersʼ ' 
   cognitive performance, progress, engagement, and emotional patterns. 
 - Scalable Bio-inspired Personalization: Personalizes learning through bio-inspired, 
   multi-modal content delivery, adapting to individual cognitive and emotional profiles
