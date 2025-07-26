@@ -1,9 +1,9 @@
 # CognoZen 🧠✨
 CognoZen AI is revolutionizing the future of learning with its cutting-edge CognoZen Empowerment 
-Suite CES, an advanced Adaptive Learning Intelligence Platform ALIP that redefines how 
+Suite, an advanced Adaptive Learning Intelligence Platform that redefines how 
 personalized learning is designed, delivered, and experienced. By leveraging our proprietary 
 technology, CES creates a powerful synergy powered by sophisticated AI/ML algorithms to deliver 
-real-time, actionable insights into learners' behaviors and patterns enabling adaptive and 
+real-time, actionable insights into learners' behaviors and patterns, enabling adaptive and 
 personalized learning experiences at scale. We are not merely developing a platform; we are 
 pioneering a new era of personalized, adaptive learning that sets an unparalleled standard for 
 engagement, performance, resilience, and retention.
